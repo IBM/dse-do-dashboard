@@ -32,7 +32,7 @@ class PrepareDataPage(MainPage):
                                  options=[ {'label': i, 'value': i}
                                            for i in input_tables],
                                  value=input_tables[0],
-                                 style = {'width': '75vw','height':'1vw'},
+                                 style = {'width': '75vw','height':'2vw'},
                                  ),
                 ),
             ], style = {'width': '80vw'}),

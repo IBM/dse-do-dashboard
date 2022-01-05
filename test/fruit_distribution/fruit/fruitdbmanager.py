@@ -12,7 +12,7 @@ from dse_do_utils.scenariodbmanager import ScenarioTable, ParameterTable, KpiTab
 
 import pandas as pd
 
-from fruit_distribution.scenariodbmanager_update import ScenarioDbManagerUpdate
+from dse_do_dashboard.utils.scenariodbmanager_update import ScenarioDbManagerUpdate
 
 
 class ProductMarginTable(ScenarioDbTable):

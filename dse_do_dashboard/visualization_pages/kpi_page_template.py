@@ -11,7 +11,7 @@ from dse_do_dashboard.do_dash_app import DoDashApp
 from dse_do_dashboard.visualization_pages.visualization_page import VisualizationPage
 from dse_do_utils.plotlymanager import PlotlyManager
 
-from fruit_distribution.fruit.fruitplotlymanager import FruitPlotlyManager
+# from fruit_distribution.fruit.fruitplotlymanager import FruitPlotlyManager
 
 
 class KpiPageTemplate(VisualizationPage):

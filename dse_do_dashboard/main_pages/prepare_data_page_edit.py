@@ -15,7 +15,7 @@ import pprint
 
 from dse_do_dashboard.utils.dash_common_utils import get_data_table_card_children, get_pivot_table_card_children, \
     diff_dashtable_mi, ScenarioTableSchema
-from fruit_distribution.scenariodbmanager_update import DbCellUpdate
+from dse_do_dashboard.utils.scenariodbmanager_update import DbCellUpdate
 
 
 class PrepareDataPageEdit(MainPage):
