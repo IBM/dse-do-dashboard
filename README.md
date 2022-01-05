@@ -1,10 +1,8 @@
 # DSE_DO_Dashboard
-Preparation before we can migrate to a fully open-source project on the public IBM GitHub.
-
 Plotly/Dash-based dashboard for Decision Optimization projects in IBM Cloud Pak for Data.
 
-[Source (GitHub)](https://github.com/IBM/dse-decision-optimization-dashboard)<br>
-[Documentation (GitHubPages)](https://ibm.github.io/dse-decision-optimization-dashboard/)
+[Source (GitHub)](https://github.com/IBM/dse-do-dashboard)<br>
+[Documentation (GitHubPages)](https://ibm.github.io/dse-do-dashboard/)
 
 This repository contains the package `dse_do_dashboard`. This can be installed using pip.
 
