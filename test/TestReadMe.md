@@ -1,0 +1,1 @@
+In PyCharm, add the `test` folder as a source folder (see https://www.jetbrains.com/help/pycharm/configuring-project-structure.html)
