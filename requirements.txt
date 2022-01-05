@@ -1,11 +1,14 @@
 # For DSE_DO_Dashboard:
 dash~=2.0.0
-# gunicorn==19.9.0  # May not be necessary
+## gunicorn==19.9.0  # May not be necessary
 flask_caching
 dash_bootstrap_components
 dash_pivottable
+dash_daq
 sqlalchemy==1.3.23
 dse-do-utils==0.5.3.1
+
+
 pandas==1.2.4
 docplex
 # openpyxl  # May not be necessary, only for Excel parts of the dse-do-utils?
@@ -16,7 +19,6 @@ ibm-db-sa
 
 #For plots:
 folium==0.12.1
-
 plotly~=5.5.0
 numpy~=1.21.5
 
@@ -27,5 +29,3 @@ m2r2
 # wheel for building package:
 wheel
 twine
-
-dash_daq

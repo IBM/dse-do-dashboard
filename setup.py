@@ -24,7 +24,7 @@ setuptools.setup(
         'dash_bootstrap_components',
         'dash_pivottable',
         'dash_daq',
-        'sqlalchemy',
+        'sqlalchemy>=1.3.23',
         'pandas',
         'plotly'
     ],
