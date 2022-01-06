@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 from dse_do_dashboard.do_dash_app import DoDashApp
 from dse_do_dashboard.main_pages.explore_solution_page import ExploreSolutionPage
 from dse_do_dashboard.main_pages.home_page import HomePage
+from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dse_do_dashboard.main_pages.prepare_data_page import PrepareDataPage
 from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
@@ -69,7 +70,8 @@ class FruitDashApp(DoDashApp):
         Can be overridden to replace by subclasses (not typical).
         """
         main_pages = [
-            HomePage(self),
+            # HomePage(self),
+            HomePageEdit(self),
             # PrepareDataPage(self),
             PrepareDataPageEdit(self),
             RunModelPage(self),
