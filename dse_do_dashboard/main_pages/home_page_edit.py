@@ -28,26 +28,26 @@ class HomePageEdit(MainPage):
     def get_layout(self):
         scenarios_df = self.dash_app.read_scenarios_table_from_db_cached().reset_index()  # SCDB2.get_scenarios_df().reset_index()
 
-        rename_scenario_modal = html.Div(
-            [
-                dbc.Button("Rename Scenario", id="open"),
-                # dbc.Modal(
-                #     [
-                #         dbc.ModalHeader("Rename Scenario"),
-                #         dbc.ModalBody("BODY OF MODAL"),
-                #         dbc.ModalFooter([
-                #             dbc.Button("Rename", id="rename", className="ml-auto"),
-                #             # dbc.Button("Cancel", id="cancel", className="ml-auto")
-                #             dbc.Button("Close", id="close", className="ml-auto"),
-                #         ]),
-                #     ],
-                #     id="modal",
-                # ),
-            ]
-        )
+        # rename_scenario_modal = html.Div(
+        #     [
+        #         dbc.Button("Rename Scenario", id="open"),
+        #         # dbc.Modal(
+        #         #     [
+        #         #         dbc.ModalHeader("Rename Scenario"),
+        #         #         dbc.ModalBody("BODY OF MODAL"),
+        #         #         dbc.ModalFooter([
+        #         #             dbc.Button("Rename", id="rename", className="ml-auto"),
+        #         #             # dbc.Button("Cancel", id="cancel", className="ml-auto")
+        #         #             dbc.Button("Close", id="close", className="ml-auto"),
+        #         #         ]),
+        #         #     ],
+        #         #     id="modal",
+        #         # ),
+        #     ]
+        # )
 
         layout = html.Div([
-            rename_scenario_modal,
+            # rename_scenario_modal,
 
             dbc.Card([
                 dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
@@ -109,7 +109,9 @@ class HomePageEdit(MainPage):
         layout = []
         for scenario_name in scenarios_df.scenario_name:
             layout.append(
-                dbc.Card(dbc.Row([dbc.Col(scenario_name), dbc.Col(self.get_scenario_edit_dropdown(scenario_name))])),
+                dbc.Card(dbc.Row([
+                    dbc.Col(self.get_scenario_edit_dropdown(scenario_name), width=1),
+                    dbc.Col(scenario_name),])),
             )
             # break
         return layout
@@ -130,12 +132,14 @@ class HomePageEdit(MainPage):
                             id = {'type':'rename_scenario_mi', 'index': scenario_name},
                             n_clicks=0
                         ),
+                        self.get_scenario_duplicate_modal_dialog(scenario_name),
                         dbc.DropdownMenuItem(divider=True),
                         dbc.DropdownMenuItem(
                             "Delete",
                             id = {'type':'delete_scenario_mi', 'index': scenario_name},
                             n_clicks=0
                         ),
+                        self.get_scenario_delete_modal_dialog(scenario_name),
                     ],
                     label="...",
                     size="sm",
@@ -166,13 +170,124 @@ class HomePageEdit(MainPage):
                 )
         return modal
 
+    def get_scenario_duplicate_modal_dialog(self, scenario_name: str):
+        new_scenario_name = self.dash_app.dbm._find_free_duplicate_scenario_name(scenario_name)
+        modal = dbc.Modal(
+            [
+                dbc.ModalHeader("Duplicate Scenario"),
+                dbc.ModalBody(f"Name for the duplicate of the scenario '{scenario_name}':"),
+                dbc.Input(
+                    id = {'type':'duplicate_scenario_modal_input', 'index': scenario_name},
+                    value=new_scenario_name, type="text"),
+                dbc.ModalFooter([
+                    dbc.Button("Cancel",
+                               id = {'type':'duplicate_scenario_modal_cancel', 'index': scenario_name},
+                               className="ml-auto"),
+                    dbc.Button("Duplicate",
+                               id = {'type':'duplicate_scenario_modal_rename', 'index': scenario_name},
+                               className="ml-auto"),
+                ]),
+            ],
+            id = {'type':'duplicate_scenario_modal', 'index': scenario_name},
+        )
+        return modal
+
+    def get_scenario_delete_modal_dialog(self, scenario_name: str):
+        modal = dbc.Modal(
+            [
+                dbc.ModalHeader("Delete Scenario"),
+                dbc.ModalBody(f"Delete the scenario '{scenario_name}':"),
+                dbc.ModalFooter([
+                    dbc.Button("Cancel",
+                               id = {'type':'delete_scenario_modal_cancel', 'index': scenario_name},
+                               className="ml-auto"),
+                    dbc.Button("Delete",
+                               id = {'type':'delete_scenario_modal_rename', 'index': scenario_name},
+                               className="ml-auto"),
+                ]),
+            ],
+            id = {'type':'delete_scenario_modal', 'index': scenario_name},
+        )
+        return modal
+
     def set_dash_callbacks(self):
         app = self.dash_app.app
 
         #############################################################################
         # Scenario operations callbacks
         #############################################################################
+        @app.callback(
+            Output({'type': 'delete_scenario_modal', 'index': MATCH}, "is_open"),
+            [
+                Input({'type': 'delete_scenario_mi', 'index': MATCH}, 'n_clicks'),
+                Input({'type': 'delete_scenario_modal_cancel', 'index': MATCH}, "n_clicks"),
+                Input({'type': 'delete_scenario_modal_rename', 'index': MATCH}, "n_clicks"),
+            ],
+            [State({'type': 'delete_scenario_modal', 'index': MATCH}, "is_open"),
+             # State({'type': 'delete_scenario_modal_input', 'index': MATCH}, "value")
+             ],
+        )
+        def toggle_delete_modal(n1, n2, n3, is_open):
+            """
 
+            """
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                raise PreventUpdate
+
+            if n1 or n2 or n3:
+                # print(f"Rename modal: {new_scenario_name}")
+                # print(f"ctx.triggered[0] = {ctx.triggered[0]}")
+                triggered_component_id_str = ctx.triggered[0]['prop_id'].split('.')[0]  # This returns a STRING representation of the pattern-matching id
+                # print(f"Rename context id = {triggered_component_id}")
+                triggered_component_id_dict = ast.literal_eval(triggered_component_id_str)  # Convert the string to a Dict to get the type.
+                ctx_type = triggered_component_id_dict['type']
+                current_scenario_name = triggered_component_id_dict['index']
+                # print(f"Rename context type = {ctx_type}")
+
+                if ctx_type == 'delete_scenario_modal_rename':
+                    print(f"Deleting scenario from {current_scenario_name}")
+                    self.dash_app.dbm.delete_scenario_from_db(current_scenario_name)
+
+                return not is_open
+            return is_open
+
+        @app.callback(
+            Output({'type': 'duplicate_scenario_modal', 'index': MATCH}, "is_open"),
+            [
+                Input({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'n_clicks'),
+                Input({'type': 'duplicate_scenario_modal_cancel', 'index': MATCH}, "n_clicks"),
+                Input({'type': 'duplicate_scenario_modal_rename', 'index': MATCH}, "n_clicks"),
+            ],
+            [State({'type': 'duplicate_scenario_modal', 'index': MATCH}, "is_open"),
+             State({'type': 'duplicate_scenario_modal_input', 'index': MATCH}, "value")
+             ],
+        )
+        def toggle_duplicate_modal(n1, n2, n3, is_open, new_scenario_name):
+            """
+            TODO: replace by a duplicate + delete
+            """
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                raise PreventUpdate
+
+            if n1 or n2 or n3:
+                # print(f"Rename modal: {new_scenario_name}")
+                # print(f"ctx.triggered[0] = {ctx.triggered[0]}")
+                triggered_component_id_str = ctx.triggered[0]['prop_id'].split('.')[0]  # This returns a STRING representation of the pattern-matching id
+                # print(f"Rename context id = {triggered_component_id}")
+                triggered_component_id_dict = ast.literal_eval(triggered_component_id_str)  # Convert the string to a Dict to get the type.
+                ctx_type = triggered_component_id_dict['type']
+                current_scenario_name = triggered_component_id_dict['index']
+                # print(f"Rename context type = {ctx_type}")
+
+                if ctx_type == 'duplicate_scenario_modal_rename':
+                    if new_scenario_name != current_scenario_name:
+                        print(f"Duplicating scenario from {current_scenario_name} to {new_scenario_name}")
+                        self.dash_app.dbm.duplicate_scenario_in_db(current_scenario_name, new_scenario_name)
+
+                return not is_open
+            return is_open
 
         @app.callback(
             Output({'type': 'rename_scenario_modal', 'index': MATCH}, "is_open"),

@@ -45,6 +45,7 @@ class DoDashApp(DashApp):
     """
     def __init__(self, db_credentials: Dict,
                  schema: Optional[str] = None,
+                 db_echo: Optional[bool] = False,
                  logo_file_name: Optional[str] = 'IBM.png',
                  cache_config: Optional[Dict]= {},
                  visualization_pages: Optional[List[VisualizationPage]]= [],
@@ -77,6 +78,7 @@ class DoDashApp(DashApp):
         """
         self.db_credentials = db_credentials
         self.schema = schema
+        self.db_echo = db_echo
         self.database_manager_class = database_manager_class
         # assert issubclass(self.database_manager_class, ScenarioDbManager)
         self.dbm = self.create_database_manager_instance()
@@ -126,7 +128,7 @@ class DoDashApp(DashApp):
         Optionally, override this method."""
         if self.database_manager_class is not None and self.db_credentials is not None:
             print(f"Connecting to DB2 at {self.db_credentials['host']}")
-            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=False)
+            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo)
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
         return dbm
