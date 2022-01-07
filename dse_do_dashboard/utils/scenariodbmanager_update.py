@@ -3,6 +3,7 @@
 
 from typing import Dict, List, NamedTuple, Any, Optional
 
+import sqlalchemy
 from dse_do_utils.scenariodbmanager import ScenarioDbManager, ScenarioDbTable
 
 
@@ -129,13 +130,16 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
 
     ##############################################
     def rename_scenario_in_db(self, source_scenario_name: str, target_scenario_name: str):
-        """Rename a scenario. Uses a transaction (when enabled)."""
+        """Rename a scenario. Uses a transaction (when enabled).
+        TODO: get rename in SQL to work. Currently causing Integrity errors due to not being able to defer constraint checking."""
         if self.enable_transactions:
             print("Duplicate scenario within a transaction")
             with self.engine.begin() as connection:
                 self._rename_scenario_in_db(source_scenario_name, target_scenario_name, connection=connection)
+                # self._rename_scenario_in_db_sql(source_scenario_name, target_scenario_name, connection=connection)
         else:
             self._rename_scenario_in_db(source_scenario_name, target_scenario_name)
+            # self._rename_scenario_in_db_sql(source_scenario_name, target_scenario_name)
 
     def _rename_scenario_in_db(self, source_scenario_name: str, target_scenario_name: str = None, connection=None):
         """
@@ -152,6 +156,78 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
 
         # Note that when using a transaction, the order of delete vs insert is irrelevant
         inputs, outputs = self.read_scenario_from_db(source_scenario_name)
+        # print(f"KPI columns {outputs['kpis'].columns}")
+        outputs['kpis'].columns = outputs['kpis'].columns.str.upper()  # HACK!!! TODO: fix in read_scenario
         self._replace_scenario_in_db_transaction(scenario_name=new_scenario_name, inputs=inputs, outputs=outputs,
                                                  bulk=True, connection=connection)
         self._delete_scenario_from_db(scenario_name=source_scenario_name, connection=connection)
+
+    def _rename_scenario_in_db_sql(self, source_scenario_name: str, target_scenario_name: str = None, connection=None):
+        """Do a rename using an SQL UPDATE
+
+        UPDATE table SET scenario_name = 'target_scenario_name' WHERE scenario_name = 'source_scenario_name'
+
+        Bottleneck: causes Integrity errors while updating. Need to defer constraint checking!
+        """
+        for scenario_table_name, db_table in self.db_tables.items():
+            sql = f"UPDATE {db_table.db_table_name} SET scenario_name = '{target_scenario_name}' WHERE scenario_name = '{source_scenario_name}'"
+            if connection is None:
+                self.engine.execute(sql)
+            else:
+                connection.execute(sql)
+        pass
+
+
+    def _delete_scenario_from_db(self, scenario_name: str, connection=None):
+        """Deletes all rows associated with a given scenario.
+        Note that it only deletes rows from tables defined in the self.db_tables, i.e. will NOT delete rows in 'auto-inserted' tables!
+        Must do a 'cascading' delete to ensure not violating FK constraints. In reverse order of how they are inserted.
+        Also deletes entry in scenario table
+        """
+        if connection is None:
+            insp = sqlalchemy.inspect(self.engine)
+        else:
+            insp = sqlalchemy.inspect(connection)
+        tables_in_db = insp.get_table_names(schema=self.schema)
+        for scenario_table_name, db_table in reversed(self.db_tables.items()):
+            # if insp.has_table(db_table.db_table_name, schema=self.schema):  # .has_table() only supported in SQLAlchemy 1.4+
+            if db_table.db_table_name in tables_in_db:
+                sql = f"DELETE FROM {db_table.db_table_name} WHERE scenario_name = '{scenario_name}'"
+                if connection is None:
+                    self.engine.execute(sql)
+                else:
+                    connection.execute(sql)
+
+        # Delete scenario entry in scenario table:
+        sql = f"DELETE FROM SCENARIO WHERE scenario_name = '{scenario_name}'"
+        if connection is None:
+            self.engine.execute(sql)
+        else:
+            connection.execute(sql)
+
+        # if connection is None:
+        #     insp = sqlalchemy.inspect(self.engine)
+        #     print(f"inspector no transaction = {type(insp)}")
+        #     tables_in_db = insp.get_table_names(schema=self.schema)
+        #     print(tables_in_db)
+        #     for scenario_table_name, db_table in reversed(self.db_tables.items()):
+        #         if insp.has_table(db_table.db_table_name, schema=self.schema):
+        #         if insp.has_table(db_table.db_table_name, schema=self.schema):
+        #             sql = f"DELETE FROM {db_table.db_table_name} WHERE scenario_name = '{scenario_name}'"
+        #             self.engine.execute(sql)
+        #
+        #     # Delete scenario entry in scenario table:
+        #     sql = f"DELETE FROM SCENARIO WHERE scenario_name = '{scenario_name}'"
+        #     self.engine.execute(sql)
+        # else:
+        #     insp = sqlalchemy.inspect(connection)
+        #     print(f"inspector with transaction= {type(insp)}")
+        #     print(insp.get_table_names(schema=self.schema))
+        #     for scenario_table_name, db_table in reversed(self.db_tables.items()):
+        #         if insp.has_table(db_table.db_table_name, schema=self.schema):
+        #             sql = f"DELETE FROM {db_table.db_table_name} WHERE scenario_name = '{scenario_name}'"
+        #             connection.execute(sql)
+        #
+        #     # Delete scenario entry in scenario table:
+        #     sql = f"DELETE FROM SCENARIO WHERE scenario_name = '{scenario_name}'"
+        #     connection.execute(sql)

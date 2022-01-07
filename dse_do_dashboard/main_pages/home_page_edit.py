@@ -1,6 +1,9 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+import ast
+
 from dash.exceptions import PreventUpdate
+import dash
 
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dash import dcc, html, Output, Input, State, ALL, MATCH
@@ -146,13 +149,16 @@ class HomePageEdit(MainPage):
         modal = dbc.Modal(
                     [
                         dbc.ModalHeader("Rename Scenario"),
-                        dbc.ModalBody(f"New scenario name = '{scenario_name}'"),
+                        dbc.ModalBody(f"New scenario name for '{scenario_name}'"),
+                        dbc.Input(
+                            id = {'type':'rename_scenario_modal_input', 'index': scenario_name},
+                            value=scenario_name, type="text"),
                         dbc.ModalFooter([
+                            dbc.Button("Cancel",
+                                       id = {'type':'rename_scenario_modal_cancel', 'index': scenario_name},
+                                       className="ml-auto"),
                             dbc.Button("Rename",
                                        id = {'type':'rename_scenario_modal_rename', 'index': scenario_name},
-                                       className="ml-auto"),
-                            dbc.Button("Close",
-                                       id = {'type':'rename_scenario_modal_close', 'index': scenario_name},
                                        className="ml-auto"),
                         ]),
                     ],
@@ -169,16 +175,40 @@ class HomePageEdit(MainPage):
 
 
         @app.callback(
-            Output({'type':'rename_scenario_modal', 'index': MATCH}, "is_open"),
+            Output({'type': 'rename_scenario_modal', 'index': MATCH}, "is_open"),
             [
              Input({'type': 'rename_scenario_mi', 'index': MATCH}, 'n_clicks'),
-             Input({'type':'rename_scenario_modal_close', 'index': MATCH}, "n_clicks"),
-             Input({'type':'rename_scenario_modal_rename', 'index': MATCH}, "n_clicks"),
+             Input({'type': 'rename_scenario_modal_cancel', 'index': MATCH}, "n_clicks"),
+             Input({'type': 'rename_scenario_modal_rename', 'index': MATCH}, "n_clicks"),
              ],
-            [State({'type': 'rename_scenario_modal', 'index': MATCH}, "is_open")],
+            [State({'type': 'rename_scenario_modal', 'index': MATCH}, "is_open"),
+             State({'type': 'rename_scenario_modal_input', 'index': MATCH}, "value")
+             ],
                 )
-        def toggle_rename_modal(n1, n2, n3, is_open):
+        def toggle_rename_modal(n1, n2, n3, is_open, new_scenario_name):
+            """
+            TODO: trigger reload of scenario table and update of UI
+            If `rename_scenario_modal_rename` then do the rename
+            """
+            ctx = dash.callback_context
+            if not ctx.triggered:
+                raise PreventUpdate
+
             if n1 or n2 or n3:
+                # print(f"Rename modal: {new_scenario_name}")
+                # print(f"ctx.triggered[0] = {ctx.triggered[0]}")
+                triggered_component_id_str = ctx.triggered[0]['prop_id'].split('.')[0]  # This returns a STRING representation of the pattern-matching id
+                # print(f"Rename context id = {triggered_component_id}")
+                triggered_component_id_dict = ast.literal_eval(triggered_component_id_str)  # Convert the string to a Dict to get the type.
+                ctx_type = triggered_component_id_dict['type']
+                current_scenario_name = triggered_component_id_dict['index']
+                # print(f"Rename context type = {ctx_type}")
+
+                if ctx_type == 'rename_scenario_modal_rename':
+                    if new_scenario_name != current_scenario_name:
+                        print(f"Renaming scenario from {current_scenario_name} to {new_scenario_name}")
+                        self.dash_app.dbm.rename_scenario_in_db(current_scenario_name, new_scenario_name)
+
                 return not is_open
             return is_open
 

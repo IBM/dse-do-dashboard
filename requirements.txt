@@ -5,7 +5,7 @@ flask_caching
 dash_bootstrap_components
 dash_pivottable
 dash_daq
-sqlalchemy==1.3.23
+sqlalchemy==1.3.23  # 1.3.23 is version in CPD 4.0.2. Also ibm-db-sa doesn't yet fully support 1.4
 dse-do-utils==0.5.3.1
 
 

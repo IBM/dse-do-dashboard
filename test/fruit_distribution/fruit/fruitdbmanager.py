@@ -114,4 +114,7 @@ class FruitScenarioDbManager(ScenarioDbManagerUpdate):
                 ('TruckOutput', CustomerTruckOutputTable()),
                 ('kpis', KpiTable()),
             ])
-        super().__init__(input_db_tables=input_db_tables, output_db_tables=output_db_tables, credentials=credentials, schema=schema, echo=echo, multi_scenario=multi_scenario)
+        super().__init__(input_db_tables=input_db_tables, output_db_tables=output_db_tables, credentials=credentials,
+                         schema=schema, echo=echo, multi_scenario=multi_scenario,
+                         # enable_transactions=False  # HACK!!!
+                         )
