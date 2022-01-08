@@ -157,15 +157,18 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
             else:
                 table_column_names = db_table.get_df_column_names()
 
-            table_column_names = ['"value"' if n == 'value' else n for n in table_column_names]  # HACK for Parameter table!!!
+            print(f"#####TABLE METADATA: {type(db_table.table_metadata)}")
+            # print(t1.insert().from_select(['a', 'b'], t2.select().where(t2.c.y == 5)))
+
+            # table_column_names = ['"value"' if n == 'value' else n for n in table_column_names]  # HACK for Parameter table!!!
 
             print(f"Columns for {scenario_table_name}: {table_column_names}")
             target_column_names = table_column_names.copy()
             # target_column_names = [f"{db_table.db_table_name}.{n}" for n in target_column_names]
             target_columns_txt = ','.join(target_column_names)
             # target_columns_txt = ','.join([f'"{n}"' for n in target_column_names])
-            # source_column_names = table_column_names.copy()
-            # source_column_names[0] = f"'{target_scenario_name}'"
+            source_column_names = table_column_names.copy()
+            source_column_names[0] = f"'{target_scenario_name}'"
             # source_columns_txt = ','.join(source_column_names)
 
             other_source_column_names =  table_column_names.copy()[1:]  # Drop the scenario_name column
@@ -173,6 +176,11 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
             other_source_columns_txt = ','.join(other_source_column_names)
             # source_columns = ','.join(f'"{n}"' for n in source_column_names[1:])
             # source_columns_txt = f"'{target_scenario_name}', {source_columns}"
+
+            # t = db_table.table_metadata
+            # print("+++++++++++SQLAlchemy insert-select")
+            # print(t.insert().from_select(target_column_names, t.select().where(t.c.scenario_name == source_scenario_name)))
+
             sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE scenario_name = '{source_scenario_name}'"
             # sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE {db_table.db_table_name}.scenario_name = '{source_scenario_name}'"
             if batch_sql:
