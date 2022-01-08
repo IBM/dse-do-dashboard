@@ -11,7 +11,7 @@ dse-do-utils==0.5.3.1
 
 pandas==1.2.4
 docplex
-# openpyxl  # May not be necessary, only for Excel parts of the dse-do-utils?
+openpyxl  # May not be necessary, only for Excel parts of the dse-do-utils?
 
 # When using DB2/DB2WH
 ibm-db

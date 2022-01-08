@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Version bump-up to 0.1.1.0 due to many new features
 - DashApp, DoDashApp `debug` property renamed to `dash_debug`
 ### Added
-- Home page scenario duplicate, rename, delete
+- HomePage: Scenario duplicate, rename, delete
 - DoDashApp.db_echo flag for DB connection debugging
+- HomePage: Download scenario as Excel file
+- HomePage: Download all scenarios as zip archive
 
 ## [0.1.0.0b5] - 2022-01-05
 ### Changed

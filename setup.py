@@ -26,7 +26,8 @@ setuptools.setup(
         'dash_daq',
         'sqlalchemy>=1.3.23',
         'pandas',
-        'plotly'
+        'plotly',
+        'openpyxl',
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

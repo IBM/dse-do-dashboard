@@ -1,9 +1,15 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 import ast
+import os
+import tempfile
+import zipfile
 
+import flask
+import pandas as pd
 from dash.exceptions import PreventUpdate
 import dash
+from dse_do_utils import ScenarioManager
 
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dash import dcc, html, Output, Input, State, ALL, MATCH
@@ -48,6 +54,14 @@ class HomePageEdit(MainPage):
 
         layout = html.Div([
             # rename_scenario_modal,
+            # dbc.Button(
+            #     "Download all scenarios",
+            #     id="download_scenarios_button",
+            #     className="mb-3",
+            #     color="primary",
+            #     n_clicks=0,
+            # ),
+            # dcc.Download(id='download_scenarios_download'),
 
             dbc.Card([
                 dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
@@ -113,6 +127,17 @@ class HomePageEdit(MainPage):
                     dbc.Col(self.get_scenario_edit_dropdown(scenario_name, scenarios_df), width=1),
                     dbc.Col(scenario_name),])),
             )
+        layout.extend([
+            dbc.Button(
+                "Download all scenarios",
+                id="download_scenarios_button",
+                className="mb-3",
+                color="primary",
+                n_clicks=0,
+            ),
+            dcc.Download(id='download_scenarios_download'),
+        ]
+        )
             # break
         return layout
 
@@ -133,6 +158,15 @@ class HomePageEdit(MainPage):
                             n_clicks=0
                         ),
                         self.get_scenario_duplicate_modal_dialog(scenario_name, scenarios_df),
+                        dbc.DropdownMenuItem(
+                            "Download",
+                            id = {'type':'download_scenario_mi', 'index': scenario_name},
+                            n_clicks=0
+                        ),
+                        dcc.Download(id={'type':'download_scenario_download', 'index': scenario_name}),
+                        # html.A(id={'type':'download_scenario_link', 'index': scenario_name},
+                        #        children='Download File'
+                        #        ),
                         dbc.DropdownMenuItem(divider=True),
                         dbc.DropdownMenuItem(
                             "Delete",
@@ -216,6 +250,82 @@ class HomePageEdit(MainPage):
         #############################################################################
         # Scenario operations callbacks
         #############################################################################
+        @app.callback([
+            Output('download_scenarios_button', 'n_clicks'),
+            Output('download_scenarios_download', 'data'),
+            ],
+            Input('download_scenarios_button', 'n_clicks'),
+            prevent_initial_call=True
+        )
+        def download_scenarios_callback(n_clicks):
+            """Download all scenarios in a zip file.
+            TODO: download selected set of scenarios
+            """
+            print("Download all scenarios")
+            scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()
+            data = None
+            with tempfile.TemporaryDirectory() as tmpdir:
+                zip_filepath = os.path.join(tmpdir, 'scenarios.zip')
+                with zipfile.ZipFile(zip_filepath, 'w') as zipMe:
+                    for scenario_name in scenarios_df.index:
+                        print(f"Download scenario {scenario_name}")
+                        inputs, outputs = self.dash_app.dbm.read_scenario_from_db(scenario_name)
+                        filename = f'{scenario_name}_export.xlsx'
+                        filepath = os.path.join(tmpdir, filename)
+                        with pd.ExcelWriter(filepath) as writer:
+                            ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
+                            writer.save()
+                            zipMe.write(filepath, arcname=filename, compress_type=zipfile.ZIP_DEFLATED)
+                data = dcc.send_file(zip_filepath)
+
+            return 0, data
+
+        @app.callback([
+            Output({'type': 'download_scenario_mi', 'index': MATCH}, 'n_clicks'),
+            Output({'type': 'download_scenario_download', 'index': MATCH}, 'data'),
+            ],
+            Input({'type': 'download_scenario_mi', 'index': MATCH}, 'n_clicks'),
+            State({'type': 'download_scenario_mi', 'index': MATCH}, 'id'),
+            prevent_initial_call=True
+            )
+        def download_scenario_callback(n_clicks, id):
+            """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option.
+            See https://community.plotly.com/t/excel-writer-to-dcc-download/54132/5 for use of tempfile.TemporaryDirectory()
+            """
+            scenario_name = id['index']
+            print(f"Download scenario {scenario_name}")
+            # df = pd.DataFrame({'dropdown_value': [1, 2, 3]})
+            # relative_filename = os.path.join(
+            #     'downloads',
+            #     '{}-download.xlsx'.format(scenario_name)
+            # )
+            # absolute_filename = os.path.join(os.getcwd(), relative_filename)
+            # writer = pd.ExcelWriter(absolute_filename)
+            # df.to_excel(writer, 'Sheet1')
+            # writer.save()
+            # href = './{}'.format(relative_filename)
+
+            inputs, outputs = self.dash_app.dbm.read_scenario_from_db(scenario_name)
+            #TODO: inputs include a scenario table. Remove.
+
+            data = None
+            with tempfile.TemporaryDirectory() as tmpdir:
+                filename = f'{scenario_name}_export.xlsx'
+                filepath = os.path.join(tmpdir, filename)
+                with pd.ExcelWriter(filepath) as writer:
+                    ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
+                    writer.save()
+                    data = dcc.send_file(filepath)
+
+            return 0, data
+
+        # @app.server.route('/downloads/<path:path>')
+        # def serve_static(path):
+        #     root_dir = os.getcwd()
+        #     return flask.send_from_directory(
+        #         os.path.join(root_dir, 'downloads'), path
+        #     )
+
         @app.callback(
             Output({'type': 'delete_scenario_modal', 'index': MATCH}, "is_open"),
             [
@@ -327,44 +437,44 @@ class HomePageEdit(MainPage):
                 return not is_open
             return is_open
 
-        @app.callback(
-            Output({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'n_clicks'),
-            Input({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'n_clicks'),
-            State({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'id'),
-            prevent_initial_call=True
-        )
-        def duplicate_scenario_callback(n_clicks, id):
-            """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option."""
-            scenario_name = id['index']
-            print(f"Duplicate scenario {scenario_name}")
-            raise PreventUpdate
-            return 0
-
-        @app.callback(
-            Output({'type': 'rename_scenario_mi', 'index': MATCH}, 'n_clicks'),
-            Input({'type': 'rename_scenario_mi', 'index': MATCH}, 'n_clicks'),
-            State({'type': 'rename_scenario_mi', 'index': MATCH}, 'id'),
-            prevent_initial_call=True
-        )
-        def rename_scenario_callback(n_clicks, id):
-            """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option."""
-            scenario_name = id['index']
-            print(f"Rename scenario {scenario_name}")
-            raise PreventUpdate
-            return 0
-
-        @app.callback(
-            Output({'type': 'delete_scenario_mi', 'index': MATCH}, 'n_clicks'),
-            Input({'type': 'delete_scenario_mi', 'index': MATCH}, 'n_clicks'),
-            State({'type': 'delete_scenario_mi', 'index': MATCH}, 'id'),
-            prevent_initial_call=True
-        )
-        def delete_scenario_callback(n_clicks, id):
-            """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option."""
-            scenario_name = id['index']
-            print(f"Delete scenario {scenario_name}")
-            raise PreventUpdate
-            return 0
+        # @app.callback(
+        #     Output({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'n_clicks'),
+        #     Input({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'n_clicks'),
+        #     State({'type': 'duplicate_scenario_mi', 'index': MATCH}, 'id'),
+        #     prevent_initial_call=True
+        # )
+        # def duplicate_scenario_callback(n_clicks, id):
+        #     """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option."""
+        #     scenario_name = id['index']
+        #     print(f"Duplicate scenario {scenario_name}")
+        #     raise PreventUpdate
+        #     return 0
+        #
+        # @app.callback(
+        #     Output({'type': 'rename_scenario_mi', 'index': MATCH}, 'n_clicks'),
+        #     Input({'type': 'rename_scenario_mi', 'index': MATCH}, 'n_clicks'),
+        #     State({'type': 'rename_scenario_mi', 'index': MATCH}, 'id'),
+        #     prevent_initial_call=True
+        # )
+        # def rename_scenario_callback(n_clicks, id):
+        #     """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option."""
+        #     scenario_name = id['index']
+        #     print(f"Rename scenario {scenario_name}")
+        #     raise PreventUpdate
+        #     return 0
+        #
+        # @app.callback(
+        #     Output({'type': 'delete_scenario_mi', 'index': MATCH}, 'n_clicks'),
+        #     Input({'type': 'delete_scenario_mi', 'index': MATCH}, 'n_clicks'),
+        #     State({'type': 'delete_scenario_mi', 'index': MATCH}, 'id'),
+        #     prevent_initial_call=True
+        # )
+        # def delete_scenario_callback(n_clicks, id):
+        #     """We need the `n_clicks` as input. Only the `id` will not be triggered when a user selects the menu option."""
+        #     scenario_name = id['index']
+        #     print(f"Delete scenario {scenario_name}")
+        #     raise PreventUpdate
+        #     return 0
 
         #############################################################################
         @app.callback(
