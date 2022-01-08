@@ -104,19 +104,19 @@ class HomePageEdit(MainPage):
         ])
         return layout
 
-    def get_scenario_operations_table(self, scenarios_df):
+    def get_scenario_operations_table(self, scenarios_df, ):
         """Create a layout which allows a user to select an operation on a scenario: duplicate, rename, delete"""
         layout = []
         for scenario_name in scenarios_df.scenario_name:
             layout.append(
                 dbc.Card(dbc.Row([
-                    dbc.Col(self.get_scenario_edit_dropdown(scenario_name), width=1),
+                    dbc.Col(self.get_scenario_edit_dropdown(scenario_name, scenarios_df), width=1),
                     dbc.Col(scenario_name),])),
             )
             # break
         return layout
 
-    def get_scenario_edit_dropdown(self, scenario_name):
+    def get_scenario_edit_dropdown(self, scenario_name, scenarios_df):
         dropdown = html.Div(
             [
                 dbc.DropdownMenu(
@@ -132,7 +132,7 @@ class HomePageEdit(MainPage):
                             id = {'type':'rename_scenario_mi', 'index': scenario_name},
                             n_clicks=0
                         ),
-                        self.get_scenario_duplicate_modal_dialog(scenario_name),
+                        self.get_scenario_duplicate_modal_dialog(scenario_name, scenarios_df),
                         dbc.DropdownMenuItem(divider=True),
                         dbc.DropdownMenuItem(
                             "Delete",
@@ -170,8 +170,8 @@ class HomePageEdit(MainPage):
                 )
         return modal
 
-    def get_scenario_duplicate_modal_dialog(self, scenario_name: str):
-        new_scenario_name = self.dash_app.dbm._find_free_duplicate_scenario_name(scenario_name)
+    def get_scenario_duplicate_modal_dialog(self, scenario_name: str, scenarios_df=None):
+        new_scenario_name = self.dash_app.dbm._find_free_duplicate_scenario_name(scenario_name, scenarios_df)
         modal = dbc.Modal(
             [
                 dbc.ModalHeader("Duplicate Scenario"),

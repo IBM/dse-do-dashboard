@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]## [0.1.1.0b0]
 ### Changed
 - Version bump-up to 0.1.1.0 due to many new features
+- DashApp, DoDashApp `debug` property renamed to `dash_debug`
 ### Added
 - Home page scenario duplicate, rename, delete
 - DoDashApp.db_echo flag for DB connection debugging

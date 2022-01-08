@@ -117,6 +117,16 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         :return:
 
         See https://stackoverflow.com/questions/9879830/select-modify-and-insert-into-the-same-table
+
+        Problem: the table Parameter/parameters has a column 'value' (lower-case).
+        Almost all of the column names in the DFs are lower-case, as are the column names in the ScenarioDbTable.
+        Typically, the DB schema converts that the upper-case column names in the DB.
+        But probably because 'VALUE' is a reserved word, it does NOT do this for 'value'. But that means in order to refer to this column in SQL,
+        one needs to put "value" between double quotes.
+        Problem is that you CANNOT do that for other columns, since these are in upper-case in the DB.
+        Note that the kpis table uses upper case 'VALUE' and that seems to work fine
+
+        TODO: test with mixed-case column names!
         """
         if target_scenario_name is None:
             new_scenario_name = self._find_free_duplicate_scenario_name(source_scenario_name)
@@ -141,15 +151,30 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         for scenario_table_name, db_table in self.db_tables.items():
             if scenario_table_name == 'Scenario':
                 continue
-            if scenario_table_name == 'Parameter':
-                continue
-            table_column_names = db_table.get_df_column_names()
+            # if scenario_table_name == 'Parameter':  # HACK!!!!!!!! The 'VALUE' column gives SQL exception in below sql
+            #     table_column_names = ['scenario_name','param','"value"']
+                # continue
+            else:
+                table_column_names = db_table.get_df_column_names()
+
+            table_column_names = ['"value"' if n == 'value' else n for n in table_column_names]  # HACK for Parameter table!!!
+
+            print(f"Columns for {scenario_table_name}: {table_column_names}")
             target_column_names = table_column_names.copy()
+            # target_column_names = [f"{db_table.db_table_name}.{n}" for n in target_column_names]
             target_columns_txt = ','.join(target_column_names)
-            source_column_names = table_column_names.copy()
-            source_column_names[0] = f"'{target_scenario_name}'"
-            source_columns = ','.join(source_column_names)
-            sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT {source_columns} FROM {db_table.db_table_name} WHERE scenario_name = '{source_scenario_name}'"
+            # target_columns_txt = ','.join([f'"{n}"' for n in target_column_names])
+            # source_column_names = table_column_names.copy()
+            # source_column_names[0] = f"'{target_scenario_name}'"
+            # source_columns_txt = ','.join(source_column_names)
+
+            other_source_column_names =  table_column_names.copy()[1:]  # Drop the scenario_name column
+            # other_source_column_names = [f"{db_table.db_table_name}.{n}" for n in other_source_column_names]
+            other_source_columns_txt = ','.join(other_source_column_names)
+            # source_columns = ','.join(f'"{n}"' for n in source_column_names[1:])
+            # source_columns_txt = f"'{target_scenario_name}', {source_columns}"
+            sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE scenario_name = '{source_scenario_name}'"
+            # sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE {db_table.db_table_name}.scenario_name = '{source_scenario_name}'"
             if batch_sql:
                 sql_statements.append(sql_insert)
             else:
@@ -160,21 +185,23 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
             connection.execute(batch_sql)
 
 
-    def _find_free_duplicate_scenario_name(self, scenario_name: str) -> Optional[str]:
+    def _find_free_duplicate_scenario_name(self, scenario_name: str, scenarios_df=None) -> Optional[str]:
         """Finds next free scenario name based on pattern '{scenario_name}_copy_n'.
         Will try at maximum 20 attempts.
         """
         max_num_attempts = 20
         for i in range(1, max_num_attempts + 1):
             new_name = f"{scenario_name}({i})"
-            free = self._check_free_scenario_name(new_name)
+            free = self._check_free_scenario_name(new_name, scenarios_df)
             if free:
                 return new_name
         raise ValueError(f"Cannot find free name for duplicate scenario. Tried {max_num_attempts}. Last attempt = {new_name}. Rename scenarios.")
         return None
 
-    def _check_free_scenario_name(self, scenario_name) -> bool:
-        free = (False if scenario_name in self.get_scenarios_df().index else True)
+    def _check_free_scenario_name(self, scenario_name, scenarios_df=None) -> bool:
+        if scenarios_df is None:
+            scenarios_df = self.get_scenarios_df()
+        free = (False if scenario_name in scenarios_df.index else True)
         return free
 
     ##############################################

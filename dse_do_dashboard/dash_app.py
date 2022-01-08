@@ -25,11 +25,11 @@ class DashApp(ABC):
     def __init__(self, logo_file_name: str = 'IBM.png',
                  cache_config: Dict = {},
                  port: int = 8050,
-                 debug: bool = False,
+                 dash_debug: bool = False,
                  host_env: Optional[HostEnvironment] = None):
         self.port = port
         self.host_env = host_env
-        self.debug = debug
+        self.dash_debug = dash_debug
         self.app = self.create_dash_app()
 
         # Margins to layout the header, sidebar and content area:
@@ -83,7 +83,7 @@ class DashApp(ABC):
                 DA.run_server()
 
         """
-        self.app.run_server(debug=self.debug, port=self.port)
+        self.app.run_server(debug=self.dash_debug, port=self.port)
 
     def config_cache(self):
         self.cache = Cache()

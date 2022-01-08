@@ -53,7 +53,7 @@ class DoDashApp(DashApp):
                  data_manager_class=None,
                  plotly_manager_class=None,
                  port: Optional[int] = 8050,
-                 debug: Optional[bool] = False,
+                 dash_debug: Optional[bool] = False,
                  host_env: Optional[HostEnvironment] = None
                  ):
         """Create a Dashboard app.
@@ -71,7 +71,7 @@ class DoDashApp(DashApp):
         :param plotly_manager_class: class of the PlotlyManager.
         Either specify the `data_manager_class` and the `plotly_manager_class` or override the method `get_plotly_manager`
         :param port: Port for DashApp. Default = 8050.
-        :param debug: If true, runs dash app server in debug mode.
+        :param dash_debug: If true, runs dash app server in debug mode.
         :param host_env: If HostEnvironment.CPD402, will use the ws_applications import make_link to
         generate a requests_pathname_prefix for the Dash app. For use with custom environment in CPD v4.0.02.
         The alternative (None of HostEnvironment.Local) runs the Dash app regularly.
@@ -120,7 +120,7 @@ class DoDashApp(DashApp):
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
 
-        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, debug=debug, host_env=host_env)
+        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, dash_debug=dash_debug, host_env=host_env)
 
     def create_database_manager_instance(self) -> ScenarioDbManager:
         """Create an instance of a ScenarioDbManager.

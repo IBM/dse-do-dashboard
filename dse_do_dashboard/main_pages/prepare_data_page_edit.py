@@ -13,39 +13,33 @@ from dash import dcc, html
 import dash_bootstrap_components as dbc
 import pprint
 
+from dse_do_dashboard.main_pages.prepare_data_page import PrepareDataPage
 from dse_do_dashboard.utils.dash_common_utils import get_data_table_card_children, get_pivot_table_card_children, \
     diff_dashtable_mi, ScenarioTableSchema
 from dse_do_dashboard.utils.scenariodbmanager_update import DbCellUpdate
 
 
-class PrepareDataPageEdit(MainPage):
+class PrepareDataPageEdit(PrepareDataPage):
+    """Use instead of `PrepareDataPage`.
+    Do not combine in same app: will cause duplicate callbacks."""
     def __init__(self, dash_app):
         self.data_table_id = 'input_data_table'
         super().__init__(dash_app,
-                         page_name='Prepare Data Edit',
-                         page_id='prepare-data-edit',
-                         url='prepare-data-edit',
+                         page_name='Prepare Data(*)',
+                         page_id='prepare-data',
+                         url='prepare-data',
                          )
 
     def get_layout(self):
         input_tables = self.dash_app.get_input_table_names()
         layout = html.Div([
             dcc.Store(id="current_table_name"),
-            dbc.Card([
-                dbc.CardHeader('Input Table', style= {'fullscreen':True}),
-                dbc.CardBody(
-                    dcc.Dropdown(id='input_table_drpdwn',
-                                 options=[ {'label': i, 'value': i}
-                                           for i in input_tables],
-                                 value=input_tables[0],
-                                 style = {'width': '75vw','height':'2vw'},
-                                 ),
-                ),
-            ], style = {'width': '80vw'}),
+
+            self.get_input_table_selection_card(),
 
             dbc.Card([
                 # dbc.CardHeader('Input Table'),
-                dbc.CardBody(id = 'input_data_table_card',style = {'width': '79vw'},
+                dbc.CardBody(id='input_data_table_card', style={'width': '79vw'},
                              children=get_data_table_card_children(df=pd.DataFrame(), table_name='None', data_table_id=self.data_table_id)  # We need to initialize a DataTable, otherwise issues with registering callbacks
                              ),
 
@@ -56,40 +50,9 @@ class PrepareDataPageEdit(MainPage):
                 html.Div(id="my_data_table_output")
             ], style = {'width': '80vw'}),
 
-            dbc.Card([
-
-                dbc.CardBody(id = 'input_pivot_table_card',style = {'width': '79vw'}),
-                html.Div(id="input_pivot_table_div"),
-            ], style = {'width': '80vw'})
-
+            self.get_pivot_table_card(),
         ])
         return layout
-
-
-    def update_data_and_pivot_input_table_callback(self, scenario_name, table_name):
-        """Body for the Dash callback.
-
-        Usage::
-
-            @app.callback([Output('input_data_table_card', 'children'),
-            Output('input_pivot_table_card', 'children')],
-            [Input('top_menu_scenarios_drpdwn', 'value'),
-            Input('input_table_drpdwn', 'value')])
-            def update_data_and_pivot_input_table(scenario_name, table_name):
-                data_table_children, pivot_table_children = DA.update_data_and_pivot_input_table_callback(scenario_name, table_name)
-                return [data_table_children, pivot_table_children]
-
-        """
-        # print(f"update_data_and_pivot_input_table for {table_name} in {scenario_name}")
-        input_table_names = [table_name]
-        pm = self.dash_app.get_plotly_manager(scenario_name, input_table_names, [])
-        dm = pm.dm
-        df = self.dash_app.get_table_by_name(dm=dm, table_name=table_name, index=False, expand=False)
-        table_schema = self.dash_app.get_table_schema(table_name)
-        pivot_table_config = self.dash_app.get_pivot_table_config(table_name)
-        data_table_children = get_data_table_card_children(df, table_name, table_schema, editable=True, data_table_id=self.data_table_id)
-        pivot_table_children = get_pivot_table_card_children(df, scenario_name, table_name, pivot_table_config)
-        return data_table_children, pivot_table_children
 
     def get_db_cell_updates(self, diff_store_data, ) -> List[DbCellUpdate]:
         """Get the changes in the diff store as DbCellUpdate.
@@ -149,15 +112,8 @@ class PrepareDataPageEdit(MainPage):
         Will be called to register any callbacks
         :return:
         """
+        super().set_dash_callbacks()
         app = self.dash_app.app
-
-        @app.callback([Output('input_data_table_card', 'children'),
-                       Output('input_pivot_table_card', 'children')],
-                      [Input('top_menu_scenarios_drpdwn', 'value'),
-                       Input('input_table_drpdwn', 'value')])
-        def update_data_and_pivot_input_table(scenario_name:str, table_name:str):
-            data_table_children, pivot_table_children = self.update_data_and_pivot_input_table_callback(scenario_name, table_name)
-            return [data_table_children, pivot_table_children]
 
         @app.callback([Output('commit_changes_button', 'style'),
                        Output('commit_changes_button', 'children')
@@ -187,7 +143,6 @@ class PrepareDataPageEdit(MainPage):
                 return red_button_style, f"Commit {len(data)} changes to DB"
             else:
                 return white_button_style, "No changes to commit"
-
 
         @app.callback(
             [
