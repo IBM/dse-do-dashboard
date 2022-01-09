@@ -389,22 +389,34 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         Work-around: rename kpis.name to kpis.NAME
         For some reason we do not get the right case.
         """
-        print(f"++++++Override of read_scenario_from_db for scenario {scenario_name}")
+        if self.enable_transactions:
+            with self.engine.begin() as connection:
+                inputs, outputs = self._read_scenario_from_db(scenario_name, connection)
+        else:
+            inputs, outputs = self._read_scenario_from_db(scenario_name, self.engine)
+        return inputs, outputs
+
+    def _read_scenario_from_db(self, scenario_name: str, connection) -> (Inputs, Outputs):
+        """Single scenario load.
+        Main API to read a complete scenario.
+        Reads all tables for a single scenario.
+        Returns all tables in one dict
+        """
         inputs = {}
         for scenario_table_name, db_table in self.input_db_tables.items():
             # print(f"scenario_table_name = {scenario_table_name}")
             if scenario_table_name != 'Scenario':  # Skip the Scenario table as an input
-                inputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table)
+                inputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table, connection=connection)
 
         outputs = {}
         for scenario_table_name, db_table in self.output_db_tables.items():
-            outputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table)
+            outputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table, connection=connection)
             # if scenario_table_name == 'kpis':
             #     # print(f"kpis table columns = {outputs[scenario_table_name].columns}")
             #     outputs[scenario_table_name] = outputs[scenario_table_name].rename(columns={'name': 'NAME'})  #HACK!!!!!
         return inputs, outputs
 
-    def _read_scenario_db_table_from_db(self, scenario_name: str, db_table: ScenarioDbTable) -> pd.DataFrame:
+    def _read_scenario_db_table_from_db(self, scenario_name: str, db_table: ScenarioDbTable, connection) -> pd.DataFrame:
         """Read one table from the DB.
         Removes the `scenario_name` column.
 
@@ -416,7 +428,8 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         t = db_table.table_metadata
         sql = t.select().where(t.c.scenario_name == scenario_name)  # This is NOT a simple string!
         # print(f"_read_scenario_db_table_from_db SQL = {sql}")
-        df = pd.read_sql(sql, con=self.engine)
+        # df = pd.read_sql(sql, con=self.engine)
+        df = pd.read_sql(sql, con=connection)
         if db_table_name != 'scenario':
             df = df.drop(columns=['scenario_name'])
 
