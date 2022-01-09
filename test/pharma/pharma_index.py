@@ -11,8 +11,9 @@ if 'PROJECT_NAME' in os.environ:  # This works in CP4D v4.0.2
     DB2_credentials = wslib.get_connection("DB2Cloud_DO_Dashboards")
 else:
     host_env = HostEnvironment.Local  # 'local'
-    from my_secrets.db2wh import DB2Cloud_DO_Dashboards_credentials
-    DB2_credentials = DB2Cloud_DO_Dashboards_credentials
+    from my_secrets.db2wh import DB2Cloud_DO_Dashboards_credentials, DB2_Pharma_CPD_credentials
+    # DB2_credentials = DB2Cloud_DO_Dashboards_credentials
+    DB2_credentials = DB2_Pharma_CPD_credentials
 
 DA = PharmaDashApp(db_credentials = DB2_credentials, schema='PHARMA_V1', dash_debug=True, host_env=host_env,
                    db_echo=True,

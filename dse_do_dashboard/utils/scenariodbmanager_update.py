@@ -3,9 +3,13 @@
 
 from typing import Dict, List, NamedTuple, Any, Optional
 
+import pandas as pd
 import sqlalchemy
 from dse_do_utils.scenariodbmanager import ScenarioDbManager, ScenarioDbTable
 
+#  Typing aliases
+Inputs = Dict[str, pd.DataFrame]
+Outputs = Dict[str, pd.DataFrame]
 
 #########################################
 # Added to dse-do-utils v 0.5.3.2b
@@ -148,6 +152,7 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
             connection.execute(sql_insert)
 
         # 2. Insert data tables
+        sa_scenario_table = list(self.input_db_tables.values())[0].table_metadata  # Scenario table must be the first
         for scenario_table_name, db_table in self.db_tables.items():
             if scenario_table_name == 'Scenario':
                 continue
@@ -177,12 +182,23 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
             # source_columns = ','.join(f'"{n}"' for n in source_column_names[1:])
             # source_columns_txt = f"'{target_scenario_name}', {source_columns}"
 
-            # t = db_table.table_metadata
-            # print("+++++++++++SQLAlchemy insert-select")
-            # print(t.insert().from_select(target_column_names, t.select().where(t.c.scenario_name == source_scenario_name)))
+            t: sqlalchemy.table = db_table.table_metadata
+            s: sqlalchemy.table = sa_scenario_table
+            print("+++++++++++SQLAlchemy insert-select")
+            # table_columns = [c for c in t.columns]
+            # print(table_columns)
+            select_columns = [s.c.scenario_name if c.name == 'scenario_name' else c for c in t.columns]
+            print(f"select columns = {select_columns}")
+            # Note: `*my_list` to convert a list into a set of input arguments
+            select_sql = (sqlalchemy.select(select_columns)
+                          .where(sqlalchemy.and_(t.c.scenario_name == source_scenario_name, s.c.scenario_name == target_scenario_name)))
+            # print(f"select_sql = {select_sql}")
+            target_columns = [c for c in t.columns]
+            sa_sql = t.insert().from_select(target_columns, select_sql)
+            print(f"sa_sql = {sa_sql}")
 
-            sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE scenario_name = '{source_scenario_name}'"
-            # sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE {db_table.db_table_name}.scenario_name = '{source_scenario_name}'"
+            # sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE scenario_name = '{source_scenario_name}'"
+            sql_insert = sa_sql
             if batch_sql:
                 sql_statements.append(sql_insert)
             else:
@@ -293,6 +309,7 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         Note that it only deletes rows from tables defined in the self.db_tables, i.e. will NOT delete rows in 'auto-inserted' tables!
         Must do a 'cascading' delete to ensure not violating FK constraints. In reverse order of how they are inserted.
         Also deletes entry in scenario table
+        Uses SQLAlchemy syntax to generate SQL
         TODO: batch all sql statements in single execute. Faster? And will that do the defer integrity checks?
         """
         batch_sql=False
@@ -301,7 +318,9 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         sql_statements = []
         for scenario_table_name, db_table in reversed(self.db_tables.items()):  # Note this INCLUDES the SCENARIO table!
             if db_table.db_table_name in tables_in_db:
-                sql = f"DELETE FROM {db_table.db_table_name} WHERE scenario_name = '{scenario_name}'"
+                # sql = f"DELETE FROM {db_table.db_table_name} WHERE scenario_name = '{scenario_name}'"  # Old
+                t = db_table.table_metadata  # A Table()
+                sql = t.delete().where(t.c.scenario_name == scenario_name)
                 if batch_sql:
                     sql_statements.append(sql)
                 else:
@@ -359,3 +378,46 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         #     # Delete scenario entry in scenario table:
         #     sql = f"DELETE FROM SCENARIO WHERE scenario_name = '{scenario_name}'"
         #     connection.execute(sql)
+    #############################################
+    def read_scenario_from_db(self, scenario_name: str) -> (Inputs, Outputs):
+        """Single scenario load.
+        Main API to read a complete scenario.
+        Reads all tables for a single scenario.
+        Returns all tables in one dict
+
+        Fixed: omit reading scenario table as an input.
+        Work-around: rename kpis.name to kpis.NAME
+        For some reason we do not get the right case.
+        """
+        print(f"++++++Override of read_scenario_from_db for scenario {scenario_name}")
+        inputs = {}
+        for scenario_table_name, db_table in self.input_db_tables.items():
+            # print(f"scenario_table_name = {scenario_table_name}")
+            if scenario_table_name != 'Scenario':  # Skip the Scenario table as an input
+                inputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table)
+
+        outputs = {}
+        for scenario_table_name, db_table in self.output_db_tables.items():
+            outputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table)
+            # if scenario_table_name == 'kpis':
+            #     # print(f"kpis table columns = {outputs[scenario_table_name].columns}")
+            #     outputs[scenario_table_name] = outputs[scenario_table_name].rename(columns={'name': 'NAME'})  #HACK!!!!!
+        return inputs, outputs
+
+    def _read_scenario_db_table_from_db(self, scenario_name: str, db_table: ScenarioDbTable) -> pd.DataFrame:
+        """Read one table from the DB.
+        Removes the `scenario_name` column.
+
+        Modification: based on SQLAlchemy syntax. If doing the plain text SQL, then some column names not properly extracted
+        """
+        db_table_name = db_table.db_table_name
+        # sql = f"SELECT * FROM {db_table_name} WHERE scenario_name = '{scenario_name}'"  # Old
+        # db_table.table_metadata is a Table()
+        t = db_table.table_metadata
+        sql = t.select().where(t.c.scenario_name == scenario_name)  # This is NOT a simple string!
+        # print(f"_read_scenario_db_table_from_db SQL = {sql}")
+        df = pd.read_sql(sql, con=self.engine)
+        if db_table_name != 'scenario':
+            df = df.drop(columns=['scenario_name'])
+
+        return df

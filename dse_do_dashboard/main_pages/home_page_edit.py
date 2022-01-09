@@ -1,7 +1,10 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 import ast
+import base64
+import io
 import os
+import pathlib
 import tempfile
 import zipfile
 
@@ -86,7 +89,39 @@ class HomePageEdit(MainPage):
                      html.Div(children=self.get_scenario_operations_table(scenarios_df)),
                      ]
                 ),
-            ], style={'width': '80vw'}),
+            ], # style={'width': '80vw'}
+            ),
+
+            dbc.Accordion(
+                [
+                    dbc.AccordionItem(
+                        [
+                            dcc.Upload(
+                                id='upload_scenario', # 'upload-data',
+                                children=html.Div([
+                                    'Drag and Drop or ',
+                                    html.A('Select Files')
+                                ]),
+                                style={
+                                    'width': '100%',
+                                    'height': '60px',
+                                    'lineHeight': '60px',
+                                    'borderWidth': '1px',
+                                    'borderStyle': 'dashed',
+                                    'borderRadius': '5px',
+                                    'textAlign': 'center',
+                                    'margin': '10px'
+                                },
+                                # Allow multiple files to be uploaded
+                                multiple=True
+                            ),
+                            html.Div(id='output_data_upload'),
+                        ],
+                        title="Upload Scenarios",
+                    ),
+                ],
+                # start_collapsed=True,
+            ),
 
             dbc.Card([
                 dbc.CardBody(
@@ -244,12 +279,85 @@ class HomePageEdit(MainPage):
         )
         return modal
 
+    def parse_scenario_upload_contents_callback(self, contents, filename, date):
+        """Called for each uploaded scenario"""
+        content_type, content_string = contents.split(',')
+        print(f"Upload file. filename={filename}, content_type={content_type}")
+        decoded = base64.b64decode(content_string)
+        # root, file_extension = os.path.splitext(filename)
+        file_extension = pathlib.Path(filename).suffix
+        scenario_name = pathlib.Path(filename).stem
+
+        print(f"scenario_name = {scenario_name}, extension = {file_extension}")
+        try:
+            if file_extension == '.xlsx':
+                # pass
+                # Assume that the user uploaded an excel file
+                # df = pd.read_excel(io.BytesIO(decoded))
+                xl = pd.ExcelFile(io.BytesIO(decoded))
+                # Read data from Excel
+                inputs, outputs = ScenarioManager.load_data_from_excel_s(xl)
+                # s = f"inputs = {inputs.keys()}, outputs = {outputs.keys()}"
+                # print(s)
+                print("Input tables: {}".format(", ".join(inputs.keys())))
+                print("Output tables: {}".format(", ".join(outputs.keys())))
+                self.dash_app.dbm.replace_scenario_in_db(scenario_name=scenario_name, inputs=inputs, outputs=outputs)
+                child = html.Div([
+                    html.P(f"Uploaded scenario: '{scenario_name}' from '{filename}'"),
+                    html.P(f"Input tables: {', '.join(inputs.keys())}"),
+                    html.P(f"Output tables: {', '.join(outputs.keys())}"),
+                ])
+                return child
+            elif file_extension == '.zip':
+                zip_file = zipfile.ZipFile(io.BytesIO(decoded))
+                # unzip_results = [html.P(f"Support for zip archives (of .xslx) is pending: {filename}")]
+                unzip_results = []
+                for info in zip_file.infolist():
+                    scenario_name = pathlib.Path(info.filename).stem
+                    file_extension = pathlib.Path(info.filename).suffix
+                    if file_extension == '.xlsx':
+                        print(f"file in zip : {info.filename}")
+                        filecontents = zip_file.read(info)
+                        xl = pd.ExcelFile(filecontents)
+                        inputs, outputs = ScenarioManager.load_data_from_excel_s(xl)
+                        print("Input tables: {}".format(", ".join(inputs.keys())))
+                        print("Output tables: {}".format(", ".join(outputs.keys())))
+                        self.dash_app.dbm.replace_scenario_in_db(scenario_name=scenario_name, inputs=inputs, outputs=outputs)  #
+                        unzip_results.append(html.P(f"Uploaded scenario: '{scenario_name}' from '{filename}'"),)
+                    else:
+                        unzip_results.append(html.P(f"File: '{info.filename}' is not a .xlsx. Skipped."),)
+                child = html.Div(unzip_results)
+                return child
+            else:
+                return html.P(f"Unsupported file type: {filename}")
+        except Exception as e:
+            print(e)
+            return html.Div([
+                f'There was an error processing this file: {e}'
+            ])
+
+        return html.P(f"Uploaded scenario {filename}")
+
     def set_dash_callbacks(self):
         app = self.dash_app.app
 
         #############################################################################
         # Scenario operations callbacks
         #############################################################################
+        @app.callback(Output('output_data_upload', 'children'),
+                      Input('upload_scenario', 'contents'),
+                      State('upload_scenario', 'filename'),
+                      State('upload_scenario', 'last_modified'))
+        def update_output(list_of_contents, list_of_names, list_of_dates):
+            """Supports uploading a set of scenarios"""
+            if list_of_contents is not None:
+                children = [
+                    # f"{n}, {d}" for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)
+                    self.parse_scenario_upload_contents_callback(c, n, d) for c, n, d in zip(list_of_contents, list_of_names, list_of_dates)
+                ]
+                return children
+
+
         @app.callback([
             Output('download_scenarios_button', 'n_clicks'),
             Output('download_scenarios_download', 'data'),

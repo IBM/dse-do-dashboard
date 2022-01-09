@@ -1,5 +1,11 @@
 from typing import Dict, List
 
+from dse_do_dashboard.main_pages.explore_solution_page import ExploreSolutionPage
+from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
+from dse_do_dashboard.main_pages.main_page import MainPage
+from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
+from dse_do_dashboard.main_pages.run_model_page import RunModelPage
+from dse_do_dashboard.main_pages.visualization_tabs_page import VisualizationTabsPage
 from pharma.visualization_pages.capacity_page import CapacityPage
 from pharma.visualization_pages.demand_fulfillment_page import DemandFulfillmentPage
 from pharma.visualization_pages.demand_fulfillment_scroll_page import DemandFulfillmentScrollPage
@@ -69,6 +75,21 @@ class PharmaDashApp(DoDashApp):
                          data_manager_class=data_manager_class,
                          plotly_manager_class=plotly_manager_class,
                          port=port, dash_debug=dash_debug, host_env=host_env)
+
+    def create_main_pages(self) -> List[MainPage]:
+        """Creates the ordered list of main pages for the DO app.
+        Can be overridden to replace by subclasses (not typical).
+        """
+        main_pages = [
+            # HomePage(self),
+            HomePageEdit(self),
+            # PrepareDataPage(self),
+            PrepareDataPageEdit(self),
+            RunModelPage(self),
+            ExploreSolutionPage(self),
+            VisualizationTabsPage(self)
+        ]
+        return main_pages
 
     def get_pivot_table_configs(self) -> Dict[str, PivotTableConfig]:
         input_pivots: List[PivotTableConfig] = [

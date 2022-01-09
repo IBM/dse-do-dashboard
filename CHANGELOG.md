@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DoDashApp.db_echo flag for DB connection debugging
 - HomePage: Download scenario as Excel file
 - HomePage: Download all scenarios as zip archive
+- HomePage: Upload scenarios (from individual .xlsx or multiple in .zip)
+- Read and Delete scenario using SQLAlchemy
+- Duplicate scenario using SQLAlchemy insert-select
 
 ## [0.1.0.0b5] - 2022-01-05
 ### Changed
