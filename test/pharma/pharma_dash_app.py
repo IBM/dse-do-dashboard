@@ -280,6 +280,12 @@ class PharmaDashApp(DoDashApp):
                 value_columns = [],
                 foreign_tables = [],
             ),
+            ScenarioTableSchema(
+                table_name = 'Parameter',
+                index_columns = ['param'],
+                value_columns = [],
+                foreign_tables = [],
+            ),
         ]
 
         output_tables: List[ScenarioTableSchema]= [

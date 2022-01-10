@@ -451,6 +451,7 @@ class DoDashApp(DashApp):
 
     def get_table_schema(self, table_name: str) -> Optional[ScenarioTableSchema]:
         table_schema = None
+        # print(f"get_table_schema - {self.table_schemas}")
         if self.table_schemas is not None and table_name in self.table_schemas:
             table_schema = self.table_schemas[table_name]
         return table_schema

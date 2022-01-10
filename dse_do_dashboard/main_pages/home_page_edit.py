@@ -37,34 +37,7 @@ class HomePageEdit(MainPage):
     def get_layout(self):
         scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
 
-        # rename_scenario_modal = html.Div(
-        #     [
-        #         dbc.Button("Rename Scenario", id="open"),
-        #         # dbc.Modal(
-        #         #     [
-        #         #         dbc.ModalHeader("Rename Scenario"),
-        #         #         dbc.ModalBody("BODY OF MODAL"),
-        #         #         dbc.ModalFooter([
-        #         #             dbc.Button("Rename", id="rename", className="ml-auto"),
-        #         #             # dbc.Button("Cancel", id="cancel", className="ml-auto")
-        #         #             dbc.Button("Close", id="close", className="ml-auto"),
-        #         #         ]),
-        #         #     ],
-        #         #     id="modal",
-        #         # ),
-        #     ]
-        # )
-
         layout = html.Div([
-            # rename_scenario_modal,
-            # dbc.Button(
-            #     "Download all scenarios",
-            #     id="download_scenarios_button",
-            #     className="mb-3",
-            #     color="primary",
-            #     n_clicks=0,
-            # ),
-            # dcc.Download(id='download_scenarios_download'),
 
             dbc.Card([
                 dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
@@ -97,6 +70,24 @@ class HomePageEdit(MainPage):
                 [
                     dbc.AccordionItem(
                         [
+                            html.P("Download all scenarios in a .zip archive. May take a long time."),
+                            html.Hr(),
+                            dbc.Button(
+                                "Download all scenarios",
+                                id="download_scenarios_button",
+                                className="mb-3",
+                                color="primary",
+                                n_clicks=0,
+                            ),
+                            dcc.Download(id='download_scenarios_download'),
+                        ],
+                        title="Download All Scenarios",
+                    ),
+
+                    dbc.AccordionItem(
+                        [
+                            html.P("Select or drop one or more .xlsx or one .zip (with multiple .xlsx)"),
+                            html.Hr(),
                             dcc.Upload(
                                 id='upload_scenario', # 'upload-data',
                                 children=html.Div([
@@ -120,36 +111,49 @@ class HomePageEdit(MainPage):
                         ],
                         title="Upload Scenarios",
                     ),
+
+                    dbc.AccordionItem(
+                        [
+                            daq.StopButton(
+                                id='stop_server_button',
+                                label=f'Stop the Dash server. '
+                                      f'Will release the port number {self.dash_app.port}.',
+                                n_clicks=0
+                            ),
+                            html.Div(id='stop_server_button_output')
+                        ],
+                        title="Stop Server",
+                    ),
                 ],
-                # start_collapsed=True,
+                start_collapsed=True,
             ),
 
-            dbc.Card([
-                dbc.CardBody(
-                    [
-                        dbc.Button(
-                            "Show 'Stop Server' Button",
-                            id="collapse_stop_server_button",
-                            className="mb-3",
-                            color="primary",
-                            n_clicks=0,
-                        ),
-                        dbc.Collapse(
-                            dbc.Card(dbc.CardBody([
-                                daq.StopButton(
-                                    id='stop_server_button',
-                                    label=f'Stop the Dash server. '
-                                          f'Will release the port number {self.dash_app.port}.',
-                                    n_clicks=0
-                                ),
-                                html.Div(id='stop_server_button_output')
-                            ])),
-                            id="collapse_stop_server_button_state",
-                            is_open=False,
-                        ),
-                    ]
-                ),
-            ], style={'width': '80vw'}),
+            # dbc.Card([
+            #     dbc.CardBody(
+            #         [
+            #             dbc.Button(
+            #                 "Show 'Stop Server' Button",
+            #                 id="collapse_stop_server_button",
+            #                 className="mb-3",
+            #                 color="primary",
+            #                 n_clicks=0,
+            #             ),
+            #             dbc.Collapse(
+            #                 dbc.Card(dbc.CardBody([
+            #                     # daq.StopButton(
+            #                     #     id='stop_server_button',
+            #                     #     label=f'Stop the Dash server. '
+            #                     #           f'Will release the port number {self.dash_app.port}.',
+            #                     #     n_clicks=0
+            #                     # ),
+            #                     html.Div(id='stop_server_button_output')
+            #                 ])),
+            #                 id="collapse_stop_server_button_state",
+            #                 is_open=False,
+            #             ),
+            #         ]
+            #     ),
+            # ], style={'width': '80vw'}),
 
         ])
         return layout
@@ -164,17 +168,17 @@ class HomePageEdit(MainPage):
                     dbc.Col(self.get_scenario_edit_dropdown(scenario_name, scenarios_df), width=1),
                     dbc.Col(scenario_name),])),
             )
-        layout.extend([
-            dbc.Button(
-                "Download all scenarios",
-                id="download_scenarios_button",
-                className="mb-3",
-                color="primary",
-                n_clicks=0,
-            ),
-            dcc.Download(id='download_scenarios_download'),
-        ]
-        )
+        # layout.extend([
+        #     dbc.Button(
+        #         "Download all scenarios",
+        #         id="download_scenarios_button",
+        #         className="mb-3",
+        #         color="primary",
+        #         n_clicks=0,
+        #     ),
+        #     dcc.Download(id='download_scenarios_download'),
+        # ]
+        # )
             # break
         return layout
 
