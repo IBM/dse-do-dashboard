@@ -212,7 +212,8 @@ class WarehouseTable(ScenarioDbTable):
             Column('locationName', String(256), primary_key=False, nullable=False),
         ]
         constraints_metadata = [
-            ForeignKeyConstraint(['locationName'], ['location.locationName'])
+            # TODO: enable FK constraint!  Disabled to test Pharma use-case
+            # ForeignKeyConstraint(['locationName'], ['location.locationName'])  # HACK!!!!!!!!!
         ]
         columns_metadata.extend(extended_columns_metadata)
         super().__init__(db_table_name, columns_metadata, constraints_metadata)
@@ -373,7 +374,8 @@ class WarehouseInventoryTable(ScenarioDbTable):
             Column('xInvSol', Float(), primary_key=False),
         ]
         constraints_metadata = [
-            ForeignKeyConstraint(['locationName'], ['location.locationName']),
+            # TODO: re-enable FK constraint!
+            # ForeignKeyConstraint(['locationName'], ['location.locationName']),  # HACK!!!!! TODO: re-enable after fixing Pharma scenario data
             ForeignKeyConstraint(['productName'], ['product.productName']),
             ForeignKeyConstraint(['timePeriodSeq'], ['time_period.timePeriodSeq']),
         ]

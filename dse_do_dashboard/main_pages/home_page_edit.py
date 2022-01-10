@@ -35,7 +35,7 @@ class HomePageEdit(MainPage):
                          )
 
     def get_layout(self):
-        scenarios_df = self.dash_app.read_scenarios_table_from_db_cached().reset_index()  # SCDB2.get_scenarios_df().reset_index()
+        scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
 
         # rename_scenario_modal = html.Div(
         #     [
@@ -74,7 +74,8 @@ class HomePageEdit(MainPage):
                         id='reference_scenario',
                         options=[
                             {'label': i, 'value': i}
-                            for i in scenarios_df.scenario_name
+                            # for i in scenarios_df.reset_index().scenario_name
+                            for i in scenarios_df.index
                         ],  style = {'width': '28vw'})
                 ])
             ], style = {'width': '30vw'}),
@@ -156,7 +157,8 @@ class HomePageEdit(MainPage):
     def get_scenario_operations_table(self, scenarios_df, ):
         """Create a layout which allows a user to select an operation on a scenario: duplicate, rename, delete"""
         layout = []
-        for scenario_name in scenarios_df.scenario_name:
+        # for scenario_name in scenarios_df.reset_index().scenario_name:
+        for scenario_name in scenarios_df.index:
             layout.append(
                 dbc.Card(dbc.Row([
                     dbc.Col(self.get_scenario_edit_dropdown(scenario_name, scenarios_df), width=1),
@@ -378,7 +380,7 @@ class HomePageEdit(MainPage):
                     for scenario_name in scenarios_df.index:
                         print(f"Download scenario {scenario_name}")
                         inputs, outputs = self.dash_app.dbm.read_scenario_from_db(scenario_name)
-                        filename = f'{scenario_name}_export.xlsx'
+                        filename = f'{scenario_name}.xlsx'
                         filepath = os.path.join(tmpdir, filename)
                         with pd.ExcelWriter(filepath) as writer:
                             ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
@@ -413,12 +415,13 @@ class HomePageEdit(MainPage):
             # writer.save()
             # href = './{}'.format(relative_filename)
 
-            inputs, outputs = self.dash_app.dbm.read_scenario_from_db(scenario_name)
+            multi_threaded = False  # Enabling multi-threading does NOT result in speedup. In fact for small scenarios it is slower!
+            inputs, outputs = self.dash_app.dbm.read_scenario_from_db(scenario_name, multi_threaded)
             #TODO: inputs include a scenario table. Remove.
 
             data = None
             with tempfile.TemporaryDirectory() as tmpdir:
-                filename = f'{scenario_name}_export.xlsx'
+                filename = f'{scenario_name}.xlsx'
                 filepath = os.path.join(tmpdir, filename)
                 with pd.ExcelWriter(filepath) as writer:
                     ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)

@@ -40,7 +40,7 @@ class PrepareDataPageEdit(PrepareDataPage):
             dbc.Card([
                 # dbc.CardHeader('Input Table'),
                 dbc.CardBody(id='input_data_table_card', style={'width': '79vw'},
-                             children=get_data_table_card_children(df=pd.DataFrame(), table_name='None', data_table_id=self.data_table_id)  # We need to initialize a DataTable, otherwise issues with registering callbacks
+                             children=get_data_table_card_children(df=pd.DataFrame(), table_name='None', editable=True, data_table_id=self.data_table_id)  # We need to initialize a DataTable, otherwise issues with registering callbacks
                              ),
 
                 html.Button("No table updates", id="commit_changes_button", disabled=True),
@@ -53,6 +53,30 @@ class PrepareDataPageEdit(PrepareDataPage):
             self.get_pivot_table_card(),
         ])
         return layout
+
+    def update_data_and_pivot_input_table_callback(self, scenario_name, table_name):
+        """Body for the Dash callback.
+        Usage::
+            @app.callback([Output('input_data_table_card', 'children'),
+            Output('input_pivot_table_card', 'children')],
+            [Input('top_menu_scenarios_drpdwn', 'value'),
+            Input('input_table_drpdwn', 'value')])
+            def update_data_and_pivot_input_table(scenario_name, table_name):
+                data_table_children, pivot_table_children = DA.update_data_and_pivot_input_table_callback(scenario_name, table_name)
+                return [data_table_children, pivot_table_children]
+
+        TODO: share parts with parent
+        """
+        # print(f"update_data_and_pivot_input_table for {table_name} in {scenario_name}")
+        input_table_names = [table_name]
+        pm = self.dash_app.get_plotly_manager(scenario_name, input_table_names, [])
+        dm = pm.dm
+        df = self.dash_app.get_table_by_name(dm=dm, table_name=table_name, index=False, expand=False)
+        table_schema = self.dash_app.get_table_schema(table_name)
+        pivot_table_config = self.dash_app.get_pivot_table_config(table_name)
+        data_table_children = get_data_table_card_children(df, table_name, table_schema, editable=True, data_table_id=self.data_table_id)
+        pivot_table_children = get_pivot_table_card_children(df, scenario_name, table_name, pivot_table_config)
+        return data_table_children, pivot_table_children
 
     def get_db_cell_updates(self, diff_store_data, ) -> List[DbCellUpdate]:
         """Get the changes in the diff store as DbCellUpdate.
@@ -112,6 +136,7 @@ class PrepareDataPageEdit(PrepareDataPage):
         Will be called to register any callbacks
         :return:
         """
+        print("Set dash callbacks for PrepareDataPageEdit")
         super().set_dash_callbacks()
         app = self.dash_app.app
 
@@ -144,6 +169,7 @@ class PrepareDataPageEdit(PrepareDataPage):
             else:
                 return white_button_style, "No changes to commit"
 
+        print("Set dash callbacks for PrepareDataPageEdit.capture_and_commit_edits")
         @app.callback(
             [
              Output("my_data_table_diff_store", "data"),
@@ -163,10 +189,14 @@ class PrepareDataPageEdit(PrepareDataPage):
             Editing a cell detects and stores changes in the diff store.
             The commit button performs updates in the DB and clears the diff store.
             """
+            print("Edit")
             ctx = dash.callback_context
             if not ctx.triggered:
+                print("not triggered!")
                 raise PreventUpdate
             triggered_component_id = ctx.triggered[0]['prop_id'].split('.')[0]
+
+            print(triggered_component_id)
 
             if triggered_component_id == self.data_table_id:
                 # print("Triggered by a table edit")

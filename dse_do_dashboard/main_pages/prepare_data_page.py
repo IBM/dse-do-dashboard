@@ -93,7 +93,7 @@ class PrepareDataPage(MainPage):
                 return [data_table_children, pivot_table_children]
 
         """
-        print(f"update_data_and_pivot_input_table for {table_name} in {scenario_name}")
+        # print(f"update_data_and_pivot_input_table for {table_name} in {scenario_name}")
         input_table_names = [table_name]
         pm = self.dash_app.get_plotly_manager(scenario_name, input_table_names, [])
         dm = pm.dm

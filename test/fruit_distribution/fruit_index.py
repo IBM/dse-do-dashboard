@@ -19,7 +19,7 @@ else:
 
 DA = FruitDashApp(db_credentials=DB2_credentials, schema='FRUIT_V2', dash_debug=True, host_env=host_env,
                   #                   port=8051,
-                  db_echo=True,
+                  # db_echo=True,
                   )
 
 

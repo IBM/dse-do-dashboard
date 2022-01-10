@@ -1,6 +1,6 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
+from multiprocessing.pool import ThreadPool
 from typing import Dict, List, NamedTuple, Any, Optional
 
 import pandas as pd
@@ -61,12 +61,19 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
 
     def _update_cell_change_in_db(self, db_cell_update: DbCellUpdate, connection):
         """Update a single value (cell) change in the DB."""
-        db_table_name = self.db_tables[db_cell_update.table_name].db_table_name
-        column_change = f"{db_cell_update.column_name} = '{db_cell_update.current_value}'"
-        scenario_condition = f"scenario_name = '{db_cell_update.scenario_name}'"
-        pk_conditions = ' AND '.join([f"{pk['column']} = '{pk['value']}'" for pk in db_cell_update.row_index])
-        sql = f"UPDATE {db_table_name} SET {column_change} WHERE {pk_conditions} AND {scenario_condition};"
-        # print(f"_update_cell_change_in_db = {sql}")
+        # db_table_name = self.db_tables[db_cell_update.table_name].db_table_name
+        # column_change = f"{db_cell_update.column_name} = '{db_cell_update.current_value}'"
+        # scenario_condition = f"scenario_name = '{db_cell_update.scenario_name}'"
+        # pk_conditions = ' AND '.join([f"{pk['column']} = '{pk['value']}'" for pk in db_cell_update.row_index])
+        # old_sql = f"UPDATE {db_table_name} SET {column_change} WHERE {pk_conditions} AND {scenario_condition};"
+
+        db_table: ScenarioDbTable = self.db_tables[db_cell_update.table_name]
+        t: sqlalchemy.Table = db_table.get_sa_table()
+        pk_conditions = [(db_table.get_sa_column(pk['column']) == pk['value']) for pk in db_cell_update.row_index]
+        target_col: sqlalchemy.Column = db_table.get_sa_column(db_cell_update.column_name)
+        sql = t.update().where(sqlalchemy.and_((t.c.scenario_name == db_cell_update.scenario_name), *pk_conditions)).values({target_col:db_cell_update.current_value})
+        print(f"_update_cell_change_in_db = {sql}")
+
         connection.execute(sql)
 
     ############################################################################################
@@ -130,7 +137,8 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         Problem is that you CANNOT do that for other columns, since these are in upper-case in the DB.
         Note that the kpis table uses upper case 'VALUE' and that seems to work fine
 
-        TODO: test with mixed-case column names!
+        Resolution: use SQLAlchemy to construct the SQL. Do NOT create SQL expressions by text manipulation.
+        SQLAlchemy has the smarts to properly deal with these complex names.
         """
         if target_scenario_name is None:
             new_scenario_name = self._find_free_duplicate_scenario_name(source_scenario_name)
@@ -139,66 +147,57 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         else:
             raise ValueError(f"Target name for duplicate scenario '{target_scenario_name}' already exists.")
 
-        # TODO: find out why `batch_sql` mode doesn't work
-        # 1. Insert a scenario in the scenario table
-        # 2. Do 'insert into select' to duplicate rows in each table
         batch_sql=False  # BEWARE: batch = True does NOT work!
         sql_statements = []
+
         # 1. Insert scenario in scenario table
-        sql_insert = f"INSERT INTO SCENARIO (scenario_name) VALUES ('{new_scenario_name}')"
+        # sql_insert = f"INSERT INTO SCENARIO (scenario_name) VALUES ('{new_scenario_name}')"  # Old
+        # sa_scenario_table = list(self.input_db_tables.values())[0].table_metadata  # Scenario table must be the first
+        sa_scenario_table = list(self.input_db_tables.values())[0].get_sa_table()  # Scenario table must be the first
+        sql_insert = sa_scenario_table.insert().values(scenario_name = new_scenario_name)
+        # print(f"_duplicate_scenario_in_db_sql - Insert SQL = {sql_insert}")
         if batch_sql:
             sql_statements.append(sql_insert)
         else:
             connection.execute(sql_insert)
 
-        # 2. Insert data tables
-        sa_scenario_table = list(self.input_db_tables.values())[0].table_metadata  # Scenario table must be the first
+        # 2. Do 'insert into select' to duplicate rows in each table
         for scenario_table_name, db_table in self.db_tables.items():
             if scenario_table_name == 'Scenario':
                 continue
-            # if scenario_table_name == 'Parameter':  # HACK!!!!!!!! The 'VALUE' column gives SQL exception in below sql
-            #     table_column_names = ['scenario_name','param','"value"']
-                # continue
-            else:
-                table_column_names = db_table.get_df_column_names()
+            # else:
+            #     table_column_names = db_table.get_df_column_names()
 
-            print(f"#####TABLE METADATA: {type(db_table.table_metadata)}")
+            # print(f"#####TABLE METADATA: {type(db_table.table_metadata)}")
             # print(t1.insert().from_select(['a', 'b'], t2.select().where(t2.c.y == 5)))
 
-            # table_column_names = ['"value"' if n == 'value' else n for n in table_column_names]  # HACK for Parameter table!!!
+            # print(f"Columns for {scenario_table_name}: {table_column_names}")
+            # target_column_names = table_column_names.copy()
+            # # target_column_names = [f"{db_table.db_table_name}.{n}" for n in target_column_names]
+            # target_columns_txt = ','.join(target_column_names)
+            # # target_columns_txt = ','.join([f'"{n}"' for n in target_column_names])
+            # source_column_names = table_column_names.copy()
+            # source_column_names[0] = f"'{target_scenario_name}'"
+            # # source_columns_txt = ','.join(source_column_names)
+            #
+            # # other_source_column_names =  table_column_names.copy()[1:]  # Drop the scenario_name column
+            # # other_source_column_names = [f"{db_table.db_table_name}.{n}" for n in other_source_column_names]
+            # other_source_columns_txt = ','.join(other_source_column_names)
+            # # source_columns = ','.join(f'"{n}"' for n in source_column_names[1:])
+            # # source_columns_txt = f"'{target_scenario_name}', {source_columns}"
 
-            print(f"Columns for {scenario_table_name}: {table_column_names}")
-            target_column_names = table_column_names.copy()
-            # target_column_names = [f"{db_table.db_table_name}.{n}" for n in target_column_names]
-            target_columns_txt = ','.join(target_column_names)
-            # target_columns_txt = ','.join([f'"{n}"' for n in target_column_names])
-            source_column_names = table_column_names.copy()
-            source_column_names[0] = f"'{target_scenario_name}'"
-            # source_columns_txt = ','.join(source_column_names)
-
-            other_source_column_names =  table_column_names.copy()[1:]  # Drop the scenario_name column
-            # other_source_column_names = [f"{db_table.db_table_name}.{n}" for n in other_source_column_names]
-            other_source_columns_txt = ','.join(other_source_column_names)
-            # source_columns = ','.join(f'"{n}"' for n in source_column_names[1:])
-            # source_columns_txt = f"'{target_scenario_name}', {source_columns}"
-
-            t: sqlalchemy.table = db_table.table_metadata
-            s: sqlalchemy.table = sa_scenario_table
-            print("+++++++++++SQLAlchemy insert-select")
-            # table_columns = [c for c in t.columns]
-            # print(table_columns)
-            select_columns = [s.c.scenario_name if c.name == 'scenario_name' else c for c in t.columns]
-            print(f"select columns = {select_columns}")
-            # Note: `*my_list` to convert a list into a set of input arguments
+            t: sqlalchemy.table = db_table.table_metadata  # The table at hand
+            s: sqlalchemy.table = sa_scenario_table  # The scenario table
+            # print("+++++++++++SQLAlchemy insert-select")
+            select_columns = [s.c.scenario_name if c.name == 'scenario_name' else c for c in t.columns]  # Replace the t.c.scenario_name with s.c.scenario_name, so we get the new value
+            # print(f"select columns = {select_columns}")
             select_sql = (sqlalchemy.select(select_columns)
                           .where(sqlalchemy.and_(t.c.scenario_name == source_scenario_name, s.c.scenario_name == target_scenario_name)))
-            # print(f"select_sql = {select_sql}")
             target_columns = [c for c in t.columns]
-            sa_sql = t.insert().from_select(target_columns, select_sql)
-            print(f"sa_sql = {sa_sql}")
+            sql_insert = t.insert().from_select(target_columns, select_sql)
+            # print(f"sql_insert = {sql_insert}")
 
             # sql_insert = f"INSERT INTO {db_table.db_table_name} ({target_columns_txt}) SELECT '{target_scenario_name}',{other_source_columns_txt} FROM {db_table.db_table_name} WHERE scenario_name = '{source_scenario_name}'"
-            sql_insert = sa_sql
             if batch_sql:
                 sql_statements.append(sql_insert)
             else:
@@ -379,58 +378,100 @@ class ScenarioDbManagerUpdate(ScenarioDbManager):
         #     sql = f"DELETE FROM SCENARIO WHERE scenario_name = '{scenario_name}'"
         #     connection.execute(sql)
     #############################################
-    def read_scenario_from_db(self, scenario_name: str) -> (Inputs, Outputs):
-        """Single scenario load.
-        Main API to read a complete scenario.
-        Reads all tables for a single scenario.
-        Returns all tables in one dict
+    # Migrated VT 2022-01-09:
+    # def read_scenario_from_db(self, scenario_name: str, multi_threaded: bool = False) -> (Inputs, Outputs):
+    #     """Single scenario load.
+    #     Main API to read a complete scenario.
+    #     Reads all tables for a single scenario.
+    #     Returns all tables in one dict
+    #
+    #     Fixed: omit reading scenario table as an input.
+    #     """
+    #     print(f"read_scenario_from_db.multi_threaded = {multi_threaded}")
+    #     if multi_threaded:
+    #         inputs, outputs = self._read_scenario_from_db_multi_threaded(scenario_name)
+    #     else:
+    #         if self.enable_transactions:
+    #             with self.engine.begin() as connection:
+    #                 inputs, outputs = self._read_scenario_from_db(scenario_name, connection)
+    #         else:
+    #             inputs, outputs = self._read_scenario_from_db(scenario_name, self.engine)
+    #     return inputs, outputs
 
-        Fixed: omit reading scenario table as an input.
-        Work-around: rename kpis.name to kpis.NAME
-        For some reason we do not get the right case.
-        """
-        if self.enable_transactions:
-            with self.engine.begin() as connection:
-                inputs, outputs = self._read_scenario_from_db(scenario_name, connection)
-        else:
-            inputs, outputs = self._read_scenario_from_db(scenario_name, self.engine)
-        return inputs, outputs
+    # Migrated VT 2022-01-09:
+    # def _read_scenario_from_db_multi_threaded(self, scenario_name) -> (Inputs, Outputs):
+    #     """Reads all tables from a scenario using multi-threading"""
+    #     class ReadTableFunction(object):
+    #         def __init__(self, dbm):
+    #             self.dbm = dbm
+    #         def __call__(self, scenario_table_name, db_table):
+    #             return self._read_scenario_db_table_from_db_thread(scenario_table_name, db_table)
+    #         def _read_scenario_db_table_from_db_thread(self, scenario_table_name, db_table):
+    #             with self.dbm.engine.begin() as connection:
+    #                 df = self.dbm._read_scenario_db_table_from_db(scenario_name, db_table, connection)
+    #                 dict = {scenario_table_name: df}
+    #             return dict
+    #
+    #     thread_number = 8
+    #     pool = ThreadPool(thread_number)
+    #     thread_worker = ReadTableFunction(self)
+    #     print("ThreadPool created")
+    #     # input_tables = [(scenario_table_name, db_table) for scenario_table_name, db_table in self.input_db_tables.items()]
+    #     # input_results = pool.starmap(thread_worker, input_tables)  # Returns a list of Dict: [{scenario_table_name: df}]
+    #     # inputs = {k:v for element in input_results for k,v in element.items()}  # Convert list of Dict to one Dict.
+    #     # # print(inputs)
+    #     # output_tables = [(scenario_table_name, db_table) for scenario_table_name, db_table in self.output_db_tables.items()]
+    #     # output_results = pool.starmap(thread_worker, output_tables)
+    #     # outputs = {k:v for element in output_results for k,v in element.items()}
+    #
+    #     all_tables = [(scenario_table_name, db_table) for scenario_table_name, db_table in self.db_tables.items() if scenario_table_name != 'Scenario']
+    #     # print(all_tables)
+    #     all_results = pool.starmap(thread_worker, all_tables)
+    #     inputs = {k:v for element in all_results for k,v in element.items() if k in self.input_db_tables.keys()}
+    #     outputs = {k:v for element in all_results for k,v in element.items() if k in self.output_db_tables.keys()}
+    #
+    #     print("All tables loaded")
+    #
+    #     return inputs, outputs
 
-    def _read_scenario_from_db(self, scenario_name: str, connection) -> (Inputs, Outputs):
-        """Single scenario load.
-        Main API to read a complete scenario.
-        Reads all tables for a single scenario.
-        Returns all tables in one dict
-        """
-        inputs = {}
-        for scenario_table_name, db_table in self.input_db_tables.items():
-            # print(f"scenario_table_name = {scenario_table_name}")
-            if scenario_table_name != 'Scenario':  # Skip the Scenario table as an input
-                inputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table, connection=connection)
 
-        outputs = {}
-        for scenario_table_name, db_table in self.output_db_tables.items():
-            outputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table, connection=connection)
-            # if scenario_table_name == 'kpis':
-            #     # print(f"kpis table columns = {outputs[scenario_table_name].columns}")
-            #     outputs[scenario_table_name] = outputs[scenario_table_name].rename(columns={'name': 'NAME'})  #HACK!!!!!
-        return inputs, outputs
+    # Migrated VT 2022-01-09:
+    # def _read_scenario_from_db(self, scenario_name: str, connection) -> (Inputs, Outputs):
+    #     """Single scenario load.
+    #     Main API to read a complete scenario.
+    #     Reads all tables for a single scenario.
+    #     Returns all tables in one dict
+    #     """
+    #     inputs = {}
+    #     for scenario_table_name, db_table in self.input_db_tables.items():
+    #         # print(f"scenario_table_name = {scenario_table_name}")
+    #         if scenario_table_name != 'Scenario':  # Skip the Scenario table as an input
+    #             inputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table, connection=connection)
+    #
+    #     outputs = {}
+    #     for scenario_table_name, db_table in self.output_db_tables.items():
+    #         outputs[scenario_table_name] = self._read_scenario_db_table_from_db(scenario_name, db_table, connection=connection)
+    #         # if scenario_table_name == 'kpis':
+    #         #     # print(f"kpis table columns = {outputs[scenario_table_name].columns}")
+    #         #     outputs[scenario_table_name] = outputs[scenario_table_name].rename(columns={'name': 'NAME'})  #HACK!!!!!
+    #     return inputs, outputs
 
-    def _read_scenario_db_table_from_db(self, scenario_name: str, db_table: ScenarioDbTable, connection) -> pd.DataFrame:
-        """Read one table from the DB.
-        Removes the `scenario_name` column.
-
-        Modification: based on SQLAlchemy syntax. If doing the plain text SQL, then some column names not properly extracted
-        """
-        db_table_name = db_table.db_table_name
-        # sql = f"SELECT * FROM {db_table_name} WHERE scenario_name = '{scenario_name}'"  # Old
-        # db_table.table_metadata is a Table()
-        t = db_table.table_metadata
-        sql = t.select().where(t.c.scenario_name == scenario_name)  # This is NOT a simple string!
-        # print(f"_read_scenario_db_table_from_db SQL = {sql}")
-        # df = pd.read_sql(sql, con=self.engine)
-        df = pd.read_sql(sql, con=connection)
-        if db_table_name != 'scenario':
-            df = df.drop(columns=['scenario_name'])
-
-        return df
+    # Migrated VT 2022-01-09:
+    # def _read_scenario_db_table_from_db(self, scenario_name: str, db_table: ScenarioDbTable, connection) -> pd.DataFrame:
+    #     """Read one table from the DB.
+    #     Removes the `scenario_name` column.
+    #
+    #     Modification: based on SQLAlchemy syntax. If doing the plain text SQL, then some column names not properly extracted
+    #     """
+    #     db_table_name = db_table.db_table_name
+    #     # sql = f"SELECT * FROM {db_table_name} WHERE scenario_name = '{scenario_name}'"  # Old
+    #     # db_table.table_metadata is a Table()
+    #     t = db_table.table_metadata
+    #     sql = t.select().where(t.c.scenario_name == scenario_name)  # This is NOT a simple string!
+    #     # print(f"_read_scenario_db_table_from_db SQL = {sql}")
+    #     # df = pd.read_sql(sql, con=self.engine)
+    #     df = pd.read_sql(sql, con=connection)
+    #     if db_table_name != 'scenario':
+    #         df = df.drop(columns=['scenario_name'])
+    #
+    #     return df
