@@ -7,6 +7,7 @@ import dash_bootstrap_components as dbc
 from dse_do_dashboard.do_dash_app import DoDashApp
 from dse_do_dashboard.main_pages.explore_solution_page import ExploreSolutionPage
 from dse_do_dashboard.main_pages.home_page import HomePage
+from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dse_do_dashboard.main_pages.prepare_data_page import PrepareDataPage
 from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
@@ -42,8 +43,8 @@ How-To create a DO Dashboard:
 """
 
 class FruitDashApp(DoDashApp):
-    def __init__(self, db_credentials: Dict, schema: str = None, cache_config: Dict = None,
-                 port: int = 8050, debug: bool = False, host_env: str = None):
+    def __init__(self, db_credentials: Dict, schema: str = None, db_echo: bool = False, cache_config: Dict = None,
+                 port: int = 8050, dash_debug: bool = False, host_env: str = None):
         visualization_pages = [
             KpiPage(self),
             DemandPage(self),
@@ -55,28 +56,30 @@ class FruitDashApp(DoDashApp):
         data_manager_class = FruitDataManager
         plotly_manager_class = FruitPlotlyManager
         super().__init__(db_credentials, schema,
+                         db_echo=db_echo,
                          logo_file_name=logo_file_name,
                          cache_config=cache_config,
                          visualization_pages = visualization_pages,
                          database_manager_class=database_manager_class,
                          data_manager_class=data_manager_class,
                          plotly_manager_class=plotly_manager_class,
-                         port=port, debug=debug, host_env=host_env)
+                         port=port, dash_debug=dash_debug, host_env=host_env)
 
 
-    def create_main_pages(self) -> List[MainPage]:
-        """Creates the ordered list of main pages for the DO app.
-        Can be overridden to replace by subclasses (not typical).
-        """
-        main_pages = [
-            HomePage(self),
-            # PrepareDataPage(self),
-            PrepareDataPageEdit(self),
-            RunModelPage(self),
-            ExploreSolutionPage(self),
-            VisualizationTabsPage(self)
-        ]
-        return main_pages
+    # def create_main_pages(self) -> List[MainPage]:
+    #     """Creates the ordered list of main pages for the DO app.
+    #     Can be overridden to replace by subclasses (not typical).
+    #     """
+    #     main_pages = [
+    #         # HomePage(self),
+    #         HomePageEdit(self),
+    #         # PrepareDataPage(self),
+    #         PrepareDataPageEdit(self),
+    #         RunModelPage(self),
+    #         ExploreSolutionPage(self),
+    #         VisualizationTabsPage(self)
+    #     ]
+    #     return main_pages
 
     # def shutdown(self):
     #     from flask import request

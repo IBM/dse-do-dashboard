@@ -111,3 +111,6 @@ mydjangosite/.idea/
 # Secrets
 my_secrets/
 secrets/
+
+# Downloads from Dash App. TODO: move to different folder?
+downloads/

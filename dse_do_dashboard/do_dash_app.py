@@ -4,6 +4,9 @@
 from typing import Dict, List, Optional
 
 import pandas as pd
+
+from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
+from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
 from dse_do_utils import DataManager
 from dse_do_utils.scenariodbmanager import ScenarioDbManager
 
@@ -45,6 +48,7 @@ class DoDashApp(DashApp):
     """
     def __init__(self, db_credentials: Dict,
                  schema: Optional[str] = None,
+                 db_echo: Optional[bool] = False,
                  logo_file_name: Optional[str] = 'IBM.png',
                  cache_config: Optional[Dict]= {},
                  visualization_pages: Optional[List[VisualizationPage]]= [],
@@ -52,7 +56,7 @@ class DoDashApp(DashApp):
                  data_manager_class=None,
                  plotly_manager_class=None,
                  port: Optional[int] = 8050,
-                 debug: Optional[bool] = False,
+                 dash_debug: Optional[bool] = False,
                  host_env: Optional[HostEnvironment] = None
                  ):
         """Create a Dashboard app.
@@ -70,13 +74,14 @@ class DoDashApp(DashApp):
         :param plotly_manager_class: class of the PlotlyManager.
         Either specify the `data_manager_class` and the `plotly_manager_class` or override the method `get_plotly_manager`
         :param port: Port for DashApp. Default = 8050.
-        :param debug: If true, runs dash app server in debug mode.
+        :param dash_debug: If true, runs dash app server in debug mode.
         :param host_env: If HostEnvironment.CPD402, will use the ws_applications import make_link to
         generate a requests_pathname_prefix for the Dash app. For use with custom environment in CPD v4.0.02.
         The alternative (None of HostEnvironment.Local) runs the Dash app regularly.
         """
         self.db_credentials = db_credentials
         self.schema = schema
+        self.db_echo = db_echo
         self.database_manager_class = database_manager_class
         # assert issubclass(self.database_manager_class, ScenarioDbManager)
         self.dbm = self.create_database_manager_instance()
@@ -118,7 +123,7 @@ class DoDashApp(DashApp):
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
 
-        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, debug=debug, host_env=host_env)
+        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, dash_debug=dash_debug, host_env=host_env)
 
     def create_database_manager_instance(self) -> ScenarioDbManager:
         """Create an instance of a ScenarioDbManager.
@@ -126,7 +131,7 @@ class DoDashApp(DashApp):
         Optionally, override this method."""
         if self.database_manager_class is not None and self.db_credentials is not None:
             print(f"Connecting to DB2 at {self.db_credentials['host']}")
-            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=False)
+            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo)
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
         return dbm
@@ -136,8 +141,8 @@ class DoDashApp(DashApp):
         Can be overridden to replace by subclasses (not typical).
         """
         main_pages = [
-            HomePage(self),
-            PrepareDataPage(self),
+            HomePageEdit(self),
+            PrepareDataPageEdit(self),
             RunModelPage(self),
             ExploreSolutionPage(self),
             VisualizationTabsPage(self)
@@ -449,6 +454,7 @@ class DoDashApp(DashApp):
 
     def get_table_schema(self, table_name: str) -> Optional[ScenarioTableSchema]:
         table_schema = None
+        # print(f"get_table_schema - {self.table_schemas}")
         if self.table_schemas is not None and table_name in self.table_schemas:
             table_schema = self.table_schemas[table_name]
         return table_schema

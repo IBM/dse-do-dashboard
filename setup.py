@@ -18,15 +18,16 @@ setuptools.setup(
     url="https://github.com/IBM/dse-do-dashboard",
     packages=setuptools.find_packages(),
     install_requires=[
-        'dse-do-utils>=0.5.3.1',
+        'dse-do-utils>=0.5.4.0',
         'dash>=2.0.0',
         'flask_caching',
         'dash_bootstrap_components',
         'dash_pivottable',
         'dash_daq',
-        'sqlalchemy',
+        'sqlalchemy>=1.3.23',
         'pandas',
-        'plotly'
+        'plotly',
+        'openpyxl',
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

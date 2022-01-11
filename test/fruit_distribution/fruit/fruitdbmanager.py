@@ -12,7 +12,7 @@ from dse_do_utils.scenariodbmanager import ScenarioTable, ParameterTable, KpiTab
 
 import pandas as pd
 
-from dse_do_dashboard.utils.scenariodbmanager_update import ScenarioDbManagerUpdate
+# from dse_do_dashboard.utils.scenariodbmanager_update import ScenarioDbManagerUpdate
 
 
 class ProductMarginTable(ScenarioDbTable):
@@ -96,7 +96,7 @@ class CustomerTruckOutputTable(ScenarioDbTable):
         super().__init__(db_table_name, columns_metadata, constraints_metadata)
 
 
-class FruitScenarioDbManager(ScenarioDbManagerUpdate):
+class FruitScenarioDbManager(ScenarioDbManager):
     def __init__(self, input_db_tables: Dict[str, ScenarioDbTable]=None, output_db_tables: Dict[str, ScenarioDbTable]=None, 
                  credentials=None, schema: str = None, echo=False, multi_scenario: bool = True):
         if input_db_tables is None:
@@ -114,4 +114,7 @@ class FruitScenarioDbManager(ScenarioDbManagerUpdate):
                 ('TruckOutput', CustomerTruckOutputTable()),
                 ('kpis', KpiTable()),
             ])
-        super().__init__(input_db_tables=input_db_tables, output_db_tables=output_db_tables, credentials=credentials, schema=schema, echo=echo, multi_scenario=multi_scenario)
+        super().__init__(input_db_tables=input_db_tables, output_db_tables=output_db_tables, credentials=credentials,
+                         schema=schema, echo=echo, multi_scenario=multi_scenario,
+                         # enable_transactions=False  # HACK!!!
+                         )
