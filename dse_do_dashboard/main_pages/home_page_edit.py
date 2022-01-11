@@ -26,6 +26,8 @@ class HomePageEdit(MainPage):
     - Duplicate Scenario
     - Rename Scenario
     - Delete Scenario
+    - Download Scenario(s)
+    - Upload Scenario(s)
     """
     def __init__(self, dash_app):
         super().__init__(dash_app,

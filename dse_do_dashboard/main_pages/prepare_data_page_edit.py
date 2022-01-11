@@ -21,7 +21,8 @@ from dse_do_dashboard.utils.scenariodbmanager_update import DbCellUpdate
 
 
 class PrepareDataPageEdit(PrepareDataPage):
-    """Use instead of `PrepareDataPage`.
+    """Includes feature to edit input tables.
+    Use instead of `PrepareDataPage`.
     Do not combine in same app: will cause duplicate callbacks."""
     def __init__(self, dash_app):
         self.data_table_id = 'input_data_table'
@@ -163,7 +164,7 @@ class PrepareDataPageEdit(PrepareDataPage):
         So one would need to re-apply the changes from the store.
         Seems like a lot of work for this feature.
         """
-        print(f"get_table_style_data_conditional_cell_edit diff_store_data = {diff_store_data}")
+        # print(f"get_table_style_data_conditional_cell_edit diff_store_data = {diff_store_data}")
         if diff_store_data is None:
             return []
         cell_edits = []
@@ -301,7 +302,7 @@ class PrepareDataPageEdit(PrepareDataPage):
             """
             ctx = dash.callback_context
             if not ctx.triggered:
-                print(f"Not triggered. diff_store_data = {diff_store_data}")
+                # print(f"Not triggered. diff_store_data = {diff_store_data}")
                 # raise PreventUpdate
                 # Attempt to enable Commit button if there are changes pending in the diff-store after a 'Refresh' button click
                 # Note that the value of the change in the table has been lost due to the refresh, but not the Store
