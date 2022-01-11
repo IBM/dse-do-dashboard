@@ -4,6 +4,9 @@
 from typing import Dict, List, Optional
 
 import pandas as pd
+
+from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
+from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
 from dse_do_utils import DataManager
 from dse_do_utils.scenariodbmanager import ScenarioDbManager
 
@@ -138,8 +141,8 @@ class DoDashApp(DashApp):
         Can be overridden to replace by subclasses (not typical).
         """
         main_pages = [
-            HomePage(self),
-            PrepareDataPage(self),
+            HomePageEdit(self),
+            PrepareDataPageEdit(self),
             RunModelPage(self),
             ExploreSolutionPage(self),
             VisualizationTabsPage(self)

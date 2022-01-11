@@ -66,20 +66,20 @@ class FruitDashApp(DoDashApp):
                          port=port, dash_debug=dash_debug, host_env=host_env)
 
 
-    def create_main_pages(self) -> List[MainPage]:
-        """Creates the ordered list of main pages for the DO app.
-        Can be overridden to replace by subclasses (not typical).
-        """
-        main_pages = [
-            # HomePage(self),
-            HomePageEdit(self),
-            # PrepareDataPage(self),
-            PrepareDataPageEdit(self),
-            RunModelPage(self),
-            ExploreSolutionPage(self),
-            VisualizationTabsPage(self)
-        ]
-        return main_pages
+    # def create_main_pages(self) -> List[MainPage]:
+    #     """Creates the ordered list of main pages for the DO app.
+    #     Can be overridden to replace by subclasses (not typical).
+    #     """
+    #     main_pages = [
+    #         # HomePage(self),
+    #         HomePageEdit(self),
+    #         # PrepareDataPage(self),
+    #         PrepareDataPageEdit(self),
+    #         RunModelPage(self),
+    #         ExploreSolutionPage(self),
+    #         VisualizationTabsPage(self)
+    #     ]
+    #     return main_pages
 
     # def shutdown(self):
     #     from flask import request

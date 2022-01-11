@@ -528,7 +528,7 @@ class BusinessKpiTable(ScenarioDbTable):
         columns_metadata.extend(extended_columns_metadata)
         super().__init__(db_table_name, columns_metadata)
         
-class ScnfoScenarioDbManager(ScenarioDbManagerUpdate):
+class ScnfoScenarioDbManager(ScenarioDbManager):
     def __init__(self, input_db_tables: Dict[str, ScenarioDbTable]=None, output_db_tables: Dict[str, ScenarioDbTable]=None, 
                  credentials=None, schema: str = None, echo=False, multi_scenario: bool = True):
         if input_db_tables is None:

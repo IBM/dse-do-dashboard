@@ -76,20 +76,20 @@ class PharmaDashApp(DoDashApp):
                          plotly_manager_class=plotly_manager_class,
                          port=port, dash_debug=dash_debug, host_env=host_env)
 
-    def create_main_pages(self) -> List[MainPage]:
-        """Creates the ordered list of main pages for the DO app.
-        Can be overridden to replace by subclasses (not typical).
-        """
-        main_pages = [
-            # HomePage(self),
-            HomePageEdit(self),
-            # PrepareDataPage(self),
-            PrepareDataPageEdit(self),
-            RunModelPage(self),
-            ExploreSolutionPage(self),
-            VisualizationTabsPage(self)
-        ]
-        return main_pages
+    # def create_main_pages(self) -> List[MainPage]:
+    #     """Creates the ordered list of main pages for the DO app.
+    #     Can be overridden to replace by subclasses (not typical).
+    #     """
+    #     main_pages = [
+    #         # HomePage(self),
+    #         HomePageEdit(self),
+    #         # PrepareDataPage(self),
+    #         PrepareDataPageEdit(self),
+    #         RunModelPage(self),
+    #         ExploreSolutionPage(self),
+    #         VisualizationTabsPage(self)
+    #     ]
+    #     return main_pages
 
     def get_pivot_table_configs(self) -> Dict[str, PivotTableConfig]:
         input_pivots: List[PivotTableConfig] = [

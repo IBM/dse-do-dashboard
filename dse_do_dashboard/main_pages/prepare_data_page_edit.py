@@ -27,7 +27,7 @@ class PrepareDataPageEdit(PrepareDataPage):
     def __init__(self, dash_app):
         self.data_table_id = 'input_data_table'
         super().__init__(dash_app,
-                         page_name='Prepare Data(*)',
+                         page_name='Prepare Data',
                          page_id='prepare-data',
                          url='prepare-data',
                          )
