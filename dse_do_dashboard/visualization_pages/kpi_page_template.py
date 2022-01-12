@@ -21,11 +21,11 @@ class KpiPageTemplate(VisualizationPage):
     def __init__(self, dash_app: DoDashApp, page_name: str = 'Default', page_id: str = 'default', url: str = 'default',
                  input_table_names: List[str] = [], output_table_names: List[str] = []):
         super().__init__(dash_app=dash_app,
-                         page_name='KPIs',
-                         page_id='kpi_tab',
-                         url='kpi',
-                         input_table_names=[],
-                         output_table_names=['kpis'],
+                         page_name=page_name,
+                         page_id=page_id,
+                         url=url,
+                         input_table_names=input_table_names,
+                         output_table_names=output_table_names,
                          )
 
     def get_plotly_figures(self, pm: PlotlyManager) -> List[List[go.Figure]]:
