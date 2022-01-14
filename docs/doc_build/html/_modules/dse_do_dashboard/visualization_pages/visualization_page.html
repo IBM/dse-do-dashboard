@@ -1,0 +1,230 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.visualization_pages.visualization_page &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.visualization_pages.visualization_page</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dse_do_dashboard.visualization_pages.visualization_page</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright IBM All Rights Reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">html</span>
+<span class="c1"># from dse_do_dashboard.do_dash_app import DoDashApp</span>
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.not_found</span> <span class="kn">import</span> <span class="n">NotFoundPage</span>
+<span class="kn">from</span> <span class="nn">dse_do_utils.plotlymanager</span> <span class="kn">import</span> <span class="n">PlotlyManager</span>
+
+
+<div class="viewcode-block" id="VisualizationPage"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage">[docs]</a><span class="k">class</span> <span class="nc">VisualizationPage</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Abstract class</span>
+
+<span class="sd">    Subclass should override/implement:</span>
+<span class="sd">    * get_layout_children(self)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">,</span> <span class="n">page_name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="n">page_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
+                 <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Best practice to specify the minimal set of input and output tables.</span>
+<span class="sd">        Loading less tables speeds of the response time of the dashboard.</span>
+<span class="sd">        Shortcut to load all (input or output) tables: [&#39;*&#39;]</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dash_app (DoDashApp)</span>
+<span class="sd">            page_name (str): Name of page in UI</span>
+<span class="sd">            page_id (str): Internal unique ID</span>
+<span class="sd">            url (str): url name</span>
+<span class="sd">            input_table_names (List[str]): list of input table names required loading by the combined visualizations on this page. Or [&#39;*&#39;] for all input tables.</span>
+<span class="sd">            output_table_names (List[str]): list of output table names required loading by the combined visualizations on this page. Or [&#39;*&#39;] for all output tables.</span>
+<span class="sd">        TODO:</span>
+<span class="sd">        * dash_app: DoDashApp. Due to circular imports, cannot specify type!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span> <span class="o">=</span> <span class="n">dash_app</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page_name</span> <span class="o">=</span> <span class="n">page_name</span>  <span class="c1"># As shown in UI</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">page_id</span> <span class="o">=</span> <span class="n">page_id</span>  <span class="c1"># Used for Dash pattern-matching callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>  <span class="c1"># URL, i.e. web address: `host:port/visualization/url`</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_table_names</span> <span class="o">=</span> <span class="n">input_table_names</span>  <span class="c1"># Names of input tables required for any of the plots in this page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_table_names</span> <span class="o">=</span> <span class="n">output_table_names</span>  <span class="c1"># Names of output tables required for any of the plots in this page</span>
+        <span class="c1"># if len(input_table_names) == 1 and input_table_names[0] == &#39;*&#39;:</span>
+        <span class="c1">#     self.input_table_names = dash_app.get_input_table_names()</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     self.input_table_names = input_table_names  # Names of input tables required for any of the plots in this page</span>
+
+<div class="viewcode-block" id="VisualizationPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Returns layout of visualization page.</span>
+<span class="sd">        TODO:</span>
+<span class="sd">        * We are NOT using pattern-matching callback anynore, so the `id` of the Div is no long relevant</span>
+<span class="sd">        * Do we need 2 Divs? (This is what worked so far)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;tab_layout&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_id</span>
+                <span class="p">},</span>
+                <span class="n">children</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_layout_children</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">layout</span></div>
+
+<div class="viewcode-block" id="VisualizationPage.get_layout_children"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_layout_children">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">get_layout_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pm</span><span class="p">:</span> <span class="n">PlotlyManager</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Abstract method. To be overridden.</span>
+<span class="sd">        Create a list of components that will be added as children of a Div.</span>
+<span class="sd">        Use dbc.Row and dbc.Column to create a layout.</span>
+<span class="sd">        Embed each Plotly figure in a dcc.Graph, within a dbc.Card.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pm (PlotlyManager): PlotlyManager subclass instantiated with the specified in- and output tables for this VisualizationPage</span>
+
+<span class="sd">        Typical usage::</span>
+
+<span class="sd">            def get_layout_children(self, pm: PlotlyManager):</span>
+<span class="sd">                layout_children = [</span>
+
+<span class="sd">                    dbc.Row(</span>
+<span class="sd">                        dbc.Col(</span>
+<span class="sd">                            dbc.Card([</span>
+<span class="sd">                                dbc.CardBody(</span>
+<span class="sd">                                    dcc.Graph(</span>
+<span class="sd">                                        figure=pm.create_my_plotly_figure(),</span>
+<span class="sd">                                    )</span>
+<span class="sd">                                )</span>
+<span class="sd">                            ])</span>
+<span class="sd">                        )</span>
+<span class="sd">                    ),</span>
+<span class="sd">                ]</span>
+<span class="sd">                return layout_children</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">NotFoundPage</span><span class="p">()</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="s2">&quot;Default Visualization Page. Need to override the `get_layout_children` method.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">layout</span></div>
+
+<div class="viewcode-block" id="VisualizationPage.get_input_table_names"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_input_table_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_table_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the specified table-names.</span>
+<span class="sd">        Does the &#39;pattern-matching&#39; based on the &#39;*&#39; option to include all tables.</span>
+<span class="sd">        Can only be done dynamically (i.e. not in the constructor), because the self.dash_app.dbm might not have been initialized properly</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_table_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_table_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="n">input_table_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_input_table_names</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">input_table_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_table_names</span>
+        <span class="k">return</span> <span class="n">input_table_names</span></div>
+
+<div class="viewcode-block" id="VisualizationPage.get_output_table_names"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_output_table_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_output_table_names</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the specified table-names.</span>
+<span class="sd">        Does the &#39;pattern-matching&#39; based on the &#39;*&#39; option to include all tables.</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_table_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_table_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+            <span class="n">output_table_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_output_table_names</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output_table_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_table_names</span>
+        <span class="k">return</span> <span class="n">output_table_names</span></div>
+
+<div class="viewcode-block" id="VisualizationPage.get_plotly_manager"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_plotly_manager">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotly_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input_table_names</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_table_names</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="VisualizationPage.set_dash_callbacks"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.set_dash_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">set_dash_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define Dash callbacks for this page.</span>
+<span class="sd">        Will be called to register any callbacks.</span>
+
+<span class="sd">        For the annotation `@app.callback`, get `app` from `app = self.dash_app.app`.</span>
+
+<span class="sd">        :return:</span>
+
+<span class="sd">        Usage::</span>
+
+<span class="sd">            def set_dash_callbacks(self):</span>
+<span class="sd">                app = self.dash_app.app</span>
+
+<span class="sd">                @app.callback(Output(&#39;container_button_basic&#39;, &#39;children&#39;),</span>
+<span class="sd">                              [Input(&#39;run_model&#39;, &#39;n_clicks&#39;)])</span>
+<span class="sd">                def run_model_callback(n_clicks):</span>
+<span class="sd">                    return self.run_model_callback(n_clicks)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">app</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.visualization_pages.visualization_page</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>

@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]## [0.1.1.1b0]
 ### Changed
 - Fixed bug in KpiPageTemplate.__init__
+- Changed documentation build folder to `docs/doc_build`
 
 ## [0.1.1.0] - 2022-01-11
 ### Changed

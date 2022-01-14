@@ -1,0 +1,510 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.utils.dash_common_utils &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.utils.dash_common_utils</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dse_do_dashboard.utils.dash_common_utils</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright IBM All Rights Reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Common functions for generating Dash components</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">l</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">html</span>
+<span class="c1"># import dash_html_components as html</span>
+<span class="kn">import</span> <span class="nn">dash_pivottable</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dash_table</span>
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+
+
+<span class="c1">##########################################################################</span>
+<span class="c1">#  Generic Schema NamedTuple classes</span>
+<span class="c1">##########################################################################</span>
+<div class="viewcode-block" id="ForeignKeySchema"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.ForeignKeySchema">[docs]</a><span class="k">class</span> <span class="nc">ForeignKeySchema</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">foreign_keys</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="ScenarioTableSchema"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.ScenarioTableSchema">[docs]</a><span class="k">class</span> <span class="nc">ScenarioTableSchema</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">index_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">value_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">foreign_tables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ForeignKeySchema</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="PivotTableConfig"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.PivotTableConfig">[docs]</a><span class="k">class</span> <span class="nc">PivotTableConfig</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">rows</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">vals</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">rendererName</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">aggregatorName</span><span class="p">:</span> <span class="nb">str</span></div>
+
+<span class="c1">##########################################################################</span>
+<span class="c1">#  VisualizationPage classes</span>
+<span class="c1">##########################################################################</span>
+<span class="c1"># class VisualizationPageConfig(NamedTuple):</span>
+<span class="c1">#     &quot;&quot;&quot;Specification of visualization pages/tabs.</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     page_name: str  # As used as the menu/tab name in the UI</span>
+<span class="c1">#     page_id: str  # The Tab.value when using Tabs</span>
+<span class="c1">#     module_name: str  # name of the Python module</span>
+<span class="c1">#     url: str  # Part of the url string</span>
+<span class="c1">#     input_table_names: List[str]  # Names of input tables used in page</span>
+<span class="c1">#     output_table_names:List[str]  # Names of output tables used in page</span>
+
+<span class="c1">##########################################################################</span>
+<span class="c1">#  Functions</span>
+<span class="c1">##########################################################################</span>
+
+<div class="viewcode-block" id="table_type"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.table_type">[docs]</a><span class="k">def</span> <span class="nf">table_type</span><span class="p">(</span><span class="n">df_column</span><span class="p">):</span>
+    <span class="c1"># Note - this only works with Pandas &gt;= 1.0.0</span>
+
+    <span class="c1"># if sys.version_info &lt; (3, 0):  # Pandas 1.0.0 does not support Python 2</span>
+    <span class="c1">#     return &#39;any&#39;</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DatetimeTZDtype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s1">&#39;datetime&#39;</span><span class="p">,</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">StringDtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">BooleanDtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">CategoricalDtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">PeriodDtype</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="s1">&#39;text&#39;</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">SparseDtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">IntervalDtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Int8Dtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Int16Dtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Int32Dtype</span><span class="p">)</span> <span class="ow">or</span>
+          <span class="nb">isinstance</span><span class="p">(</span><span class="n">df_column</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">Int64Dtype</span><span class="p">)):</span>
+        <span class="k">return</span> <span class="s1">&#39;numeric&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;any&#39;</span></div>
+
+
+<div class="viewcode-block" id="get_data_table"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.get_data_table">[docs]</a><span class="k">def</span> <span class="nf">get_data_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScenarioTableSchema</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">editable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">data_table_id</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a DataTable for a DataFrame. For use in &#39;Prepare Data&#39; and &#39;Explore Solution&#39; pages.</span>
+<span class="sd">    :param df:</span>
+<span class="sd">    :param table_schema:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">data_table_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">data_table_id</span> <span class="o">=</span> <span class="s1">&#39;my_data_table&#39;</span>
+    <span class="n">index_columns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">table_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>  <span class="c1"># ensures all index columns are first</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span>
+    <span class="k">return</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">(</span>
+        <span class="nb">id</span><span class="o">=</span><span class="n">data_table_id</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">table_type</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">])}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+        <span class="p">],</span>
+        <span class="n">fixed_rows</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;headers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="n">editable</span><span class="o">=</span><span class="n">editable</span><span class="p">,</span>
+        <span class="c1"># fixed_columns={&#39;headers&#39;: False, &#39;data&#39;: 0}, # Does NOT create a horizontal scroll bar</span>
+        <span class="n">filter_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+        <span class="n">sort_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+        <span class="n">sort_mode</span><span class="o">=</span><span class="s2">&quot;multi&quot;</span><span class="p">,</span>
+        <span class="n">style_cell</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;textOverflow&#39;</span><span class="p">:</span> <span class="s1">&#39;ellipsis&#39;</span><span class="p">,</span>  <span class="c1"># See https://dash.plotly.com/datatable/width to control column-name width</span>
+            <span class="s1">&#39;maxWidth&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>               <span class="c1"># Needs to be here for the &#39;ellipsis&#39; option to work</span>
+            <span class="s1">&#39;overflow&#39;</span> <span class="p">:</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;font_family&#39;</span><span class="p">:</span> <span class="s1">&#39;sans-serif&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;12px&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span><span class="p">},</span>
+        <span class="n">style_table</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;maxHeight&#39;</span><span class="p">:</span> <span class="s1">&#39;400px&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;overflowY&#39;</span><span class="p">:</span> <span class="s1">&#39;scroll&#39;</span>
+        <span class="p">},</span>
+        <span class="n">style_header</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">index_columns</span>
+            <span class="p">},</span>
+            <span class="c1"># &#39;backgroundColor&#39;: &#39;rgb(230, 230, 230)&#39;,</span>
+            <span class="s1">&#39;fontWeight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span>
+        <span class="p">},</span>
+        <span class="n">style_data_conditional</span><span class="o">=</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">index_columns</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;fontWeight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+                <span class="c1"># &#39;backgroundColor&#39;: &#39;#0074D9&#39;,</span>
+                <span class="c1"># &#39;color&#39;: &#39;white&#39;</span>
+            <span class="p">}</span>
+        <span class="p">]),</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_editable_data_table"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.get_editable_data_table">[docs]</a><span class="k">def</span> <span class="nf">get_editable_data_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScenarioTableSchema</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates an editable DataTable for a DataFrame. For use in &#39;Prepare Data&#39; page.</span>
+<span class="sd">    :param df:</span>
+<span class="sd">    :param table_schema:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">index_columns</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">table_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>  <span class="c1"># ensures all index columns are first</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span>
+    <span class="k">return</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">(</span>
+        <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+            <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">table_type</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">])}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+        <span class="p">],</span>
+        <span class="n">fixed_rows</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;headers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+        <span class="n">editable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="c1"># fixed_columns={&#39;headers&#39;: False, &#39;data&#39;: 0}, # Does NOT create a horizontal scroll bar</span>
+        <span class="n">filter_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+        <span class="n">sort_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+        <span class="n">sort_mode</span><span class="o">=</span><span class="s2">&quot;multi&quot;</span><span class="p">,</span>
+        <span class="n">style_cell</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;textOverflow&#39;</span><span class="p">:</span> <span class="s1">&#39;ellipsis&#39;</span><span class="p">,</span>  <span class="c1"># See https://dash.plotly.com/datatable/width to control column-name width</span>
+            <span class="s1">&#39;maxWidth&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>               <span class="c1"># Needs to be here for the &#39;ellipsis&#39; option to work</span>
+            <span class="s1">&#39;overflow&#39;</span> <span class="p">:</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;font_family&#39;</span><span class="p">:</span> <span class="s1">&#39;sans-serif&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;12px&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span><span class="p">},</span>
+        <span class="n">style_table</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;maxHeight&#39;</span><span class="p">:</span> <span class="s1">&#39;400px&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;overflowY&#39;</span><span class="p">:</span> <span class="s1">&#39;scroll&#39;</span>
+        <span class="p">},</span>
+        <span class="n">style_header</span><span class="o">=</span><span class="p">{</span>
+            <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">index_columns</span>
+            <span class="p">},</span>
+            <span class="c1"># &#39;backgroundColor&#39;: &#39;rgb(230, 230, 230)&#39;,</span>
+            <span class="s1">&#39;fontWeight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span>
+        <span class="p">},</span>
+        <span class="n">style_data_conditional</span><span class="o">=</span><span class="p">([</span>
+            <span class="p">{</span>
+                <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">index_columns</span>
+                <span class="p">},</span>
+                <span class="s1">&#39;fontWeight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+                <span class="c1"># &#39;backgroundColor&#39;: &#39;#0074D9&#39;,</span>
+                <span class="c1"># &#39;color&#39;: &#39;white&#39;</span>
+            <span class="p">}</span>
+        <span class="p">]),</span>
+    <span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_pivot_table"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.get_pivot_table">[docs]</a><span class="k">def</span> <span class="nf">get_pivot_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">pivot_config</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dash_pivottable</span><span class="o">.</span><span class="n">PivotTable</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generates a PivotTable for a DataFrame. For use in &#39;Prepare Data&#39; and &#39;Explore Solution&#39; pages.</span>
+<span class="sd">    :param df:</span>
+<span class="sd">    :param scenario_name:</span>
+<span class="sd">    :param table_name:</span>
+<span class="sd">    :return:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">pivot_config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">pivot</span> <span class="o">=</span> <span class="n">dash_pivottable</span><span class="o">.</span><span class="n">PivotTable</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;pivot-</span><span class="si">{</span><span class="n">scenario_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">),</span>  <span class="c1"># What is difference between rows and records?</span>
+            <span class="c1"># cols=[&#39;timePeriodSeq&#39;],</span>
+            <span class="n">colOrder</span><span class="o">=</span><span class="s2">&quot;key_a_to_z&quot;</span><span class="p">,</span>
+            <span class="c1"># rows=[&#39;lineName&#39;],</span>
+            <span class="n">rowOrder</span><span class="o">=</span><span class="s2">&quot;key_a_to_z&quot;</span><span class="p">,</span>
+            <span class="n">rendererName</span><span class="o">=</span><span class="s2">&quot;Table&quot;</span><span class="p">,</span>
+            <span class="n">aggregatorName</span><span class="o">=</span><span class="s2">&quot;Sum&quot;</span><span class="p">,</span>
+        <span class="c1"># vals=[&quot;line_capacity_utilization&quot;],</span>
+        <span class="c1"># valueFilter={&#39;Day of Week&#39;: {&#39;Thursday&#39;: False}}</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># print(pivot_config)</span>
+        <span class="n">pivot</span> <span class="o">=</span> <span class="n">dash_pivottable</span><span class="o">.</span><span class="n">PivotTable</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;pivot-</span><span class="si">{</span><span class="n">scenario_name</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">table_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">),</span>  <span class="c1"># What is difference between rows and records?</span>
+            <span class="n">cols</span> <span class="o">=</span> <span class="n">pivot_config</span><span class="o">.</span><span class="n">cols</span><span class="p">,</span>
+            <span class="n">colOrder</span><span class="o">=</span><span class="s2">&quot;key_a_to_z&quot;</span><span class="p">,</span>
+            <span class="n">rows</span> <span class="o">=</span> <span class="n">pivot_config</span><span class="o">.</span><span class="n">rows</span><span class="p">,</span>
+            <span class="n">rowOrder</span><span class="o">=</span><span class="s2">&quot;key_a_to_z&quot;</span><span class="p">,</span>
+            <span class="n">rendererName</span><span class="o">=</span><span class="n">pivot_config</span><span class="o">.</span><span class="n">rendererName</span><span class="p">,</span>
+            <span class="n">aggregatorName</span><span class="o">=</span><span class="n">pivot_config</span><span class="o">.</span><span class="n">aggregatorName</span><span class="p">,</span>
+            <span class="n">vals</span><span class="o">=</span><span class="n">pivot_config</span><span class="o">.</span><span class="n">vals</span><span class="p">,</span>
+            <span class="c1"># valueFilter={&#39;Day of Week&#39;: {&#39;Thursday&#39;: False}}</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pivot</span></div>
+
+
+<div class="viewcode-block" id="get_data_table_card_children"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.get_data_table_card_children">[docs]</a><span class="k">def</span> <span class="nf">get_data_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScenarioTableSchema</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">editable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">data_table_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span>
+            <span class="n">table_name</span>
+            <span class="c1"># title=table_name,</span>
+            <span class="c1"># fullscreen=True</span>
+        <span class="p">),</span>
+        <span class="n">get_data_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">,</span> <span class="n">editable</span><span class="p">,</span> <span class="n">data_table_id</span><span class="p">)</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_pivot_table_card_children"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.get_pivot_table_card_children">[docs]</a><span class="k">def</span> <span class="nf">get_pivot_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">pivot_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PivotTableConfig</span><span class="p">]</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span>
+            <span class="n">table_name</span>
+            <span class="c1"># title=table_name,</span>
+            <span class="c1"># fullscreen=True</span>
+        <span class="p">),</span>
+        <span class="n">get_pivot_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">pivot_config</span><span class="p">)</span>
+    <span class="p">]</span></div>
+
+<span class="c1">#####################################</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
+
+<div class="viewcode-block" id="plotly_figure_exception_handler"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.plotly_figure_exception_handler">[docs]</a><span class="k">def</span> <span class="nf">plotly_figure_exception_handler</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+    <span class="c1"># type: (Callable[..., Any]) -&gt; Callable[..., Any]</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A function wrapper/decorator for catching all exceptions on methods that generate a Plotly Figure.</span>
+<span class="sd">    Returns a default Figure in case of an exception</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">inner</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># type: (*Any, **Any) -&gt; Any</span>
+
+        <span class="c1"># TODO: only handle exception in &#39;deployed&#39; Dash app, so that we can use the regular Dash exception handling in the UI for debugging.</span>
+        <span class="c1"># If in &#39;deployed&#39; mode: </span>
+        <span class="c1"># return f(self, *args, **kwargs)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">ex</span><span class="p">:</span>
+            <span class="c1"># print(ex)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Exception handled by utils.dash_common_utils.plotly_figure_exception_handler decorator:&quot;</span><span class="p">)</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">()</span>
+            <span class="c1"># fig = px.scatter(x=[0, 1, 2, 3, 4], y=[0, 1, 4, 9, 16])</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="n">go</span><span class="o">.</span><span class="n">Table</span><span class="p">(</span><span class="n">header</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Exception in </span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">]),</span>
+                 <span class="n">cells</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">values</span><span class="o">=</span><span class="p">[[</span><span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">()]]))</span>
+                     <span class="p">])</span>
+            <span class="k">return</span> <span class="n">fig</span>
+
+    <span class="k">return</span> <span class="n">inner</span></div>
+
+
+<span class="c1">################################</span>
+<span class="c1"># def diff_dashtable(data, data_previous, row_id_name=None) -&gt; List[Dict]:</span>
+<span class="c1">#     &quot;&quot;&quot;Generate a diff of Dash DataTable data.</span>
+<span class="c1">#</span>
+<span class="c1">#     From: https://community.plotly.com/t/detecting-changed-cell-in-editable-datatable/26219/4</span>
+<span class="c1">#     Modified from: https://community.plotly.com/t/detecting-changed-cell-in-editable-datatable/26219/2</span>
+<span class="c1">#</span>
+<span class="c1">#     Parameters</span>
+<span class="c1">#     ----------</span>
+<span class="c1">#     data: DataTable property (https://dash.plot.ly/datatable/reference)</span>
+<span class="c1">#         The contents of the table (list of dicts)</span>
+<span class="c1">#     data_previous: DataTable property</span>
+<span class="c1">#         The previous state of `data` (list of dicts).</span>
+<span class="c1">#</span>
+<span class="c1">#     Returns</span>
+<span class="c1">#     -------</span>
+<span class="c1">#     A list of dictionaries in form of [{row_id_name:, column_name:, current_value:,</span>
+<span class="c1">#         previous_value:}]</span>
+<span class="c1">#     &quot;&quot;&quot;</span>
+<span class="c1">#     df, df_previous = pd.DataFrame(data=data), pd.DataFrame(data_previous)</span>
+<span class="c1">#</span>
+<span class="c1">#     if row_id_name is not None:</span>
+<span class="c1">#         # If using something other than the index for row id&#39;s, set it here</span>
+<span class="c1">#         for _df in [df, df_previous]:</span>
+<span class="c1">#</span>
+<span class="c1">#             # Why do this?  Guess just to be sure?</span>
+<span class="c1">#             assert row_id_name in _df.columns</span>
+<span class="c1">#</span>
+<span class="c1">#             _df = _df.set_index(row_id_name)</span>
+<span class="c1">#     else:</span>
+<span class="c1">#         row_id_name = &quot;index&quot;</span>
+<span class="c1">#</span>
+<span class="c1">#     # Pandas/Numpy says NaN != NaN, so we cannot simply compare the dataframes.  Instead we can either replace the</span>
+<span class="c1">#     # NaNs with some unique value (which is fastest for very small arrays, but doesn&#39;t scale well) or we can do</span>
+<span class="c1">#     # (from https://stackoverflow.com/a/19322739/5394584):</span>
+<span class="c1">#     # Mask of elements that have changed, as a dataframe.  Each element indicates True if df!=df_prev</span>
+<span class="c1">#     df_mask = ~((df == df_previous) | ((df != df) &amp; (df_previous != df_previous)))</span>
+<span class="c1">#</span>
+<span class="c1">#     # ...and keep only rows that include a changed value</span>
+<span class="c1">#     df_mask = df_mask.loc[df_mask.any(axis=1)]</span>
+<span class="c1">#</span>
+<span class="c1">#     changes = []</span>
+<span class="c1">#</span>
+<span class="c1">#     # This feels like a place I could speed this up if needed</span>
+<span class="c1">#     for idx, row in df_mask.iterrows():</span>
+<span class="c1">#         row_id = row.name</span>
+<span class="c1">#</span>
+<span class="c1">#         # Act only on columns that had a change</span>
+<span class="c1">#         row = row[row.eq(True)]</span>
+<span class="c1">#</span>
+<span class="c1">#         for change in row.iteritems():</span>
+<span class="c1">#</span>
+<span class="c1">#             changes.append(</span>
+<span class="c1">#                 {</span>
+<span class="c1">#                     row_id_name: row_id,</span>
+<span class="c1">#                     &quot;column_name&quot;: change[0],</span>
+<span class="c1">#                     &quot;current_value&quot;: df.at[row_id, change[0]],</span>
+<span class="c1">#                     &quot;previous_value&quot;: df_previous.at[row_id, change[0]],</span>
+<span class="c1">#                 }</span>
+<span class="c1">#             )</span>
+<span class="c1">#</span>
+<span class="c1">#     return changes</span>
+
+<div class="viewcode-block" id="diff_dashtable_mi"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.dash_common_utils.diff_dashtable_mi">[docs]</a><span class="k">def</span> <span class="nf">diff_dashtable_mi</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_previous</span><span class="p">,</span> <span class="n">index_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                      <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Generate a diff of Dash DataTable data.</span>
+<span class="sd">    Allow for multi-index tables.</span>
+
+<span class="sd">    Based on idea in: https://community.plotly.com/t/detecting-changed-cell-in-editable-datatable/26219/4</span>
+<span class="sd">    Modified from: https://community.plotly.com/t/detecting-changed-cell-in-editable-datatable/26219/2</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    data: DataTable property (https://dash.plot.ly/datatable/reference)</span>
+<span class="sd">        The contents of the table (list of dicts)</span>
+<span class="sd">    data_previous: DataTable property</span>
+<span class="sd">        The previous state of `data` (list of dicts).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    A list of dictionaries in form of [{row_id_name:, column_name:, current_value:,</span>
+<span class="sd">        previous_value:}]</span>
+<span class="sd">        :param data: data from DataTable</span>
+<span class="sd">        :param data_previous: data_previous from DataTable</span>
+<span class="sd">        :param index_columns: names of the index/primary-key columns</span>
+<span class="sd">        :param table_name: name of table</span>
+<span class="sd">        :param scenario_name: name of scenario</span>
+<span class="sd">        :returns changes: A list of dictionaries in form of [{row_idx:, column_name:, current_value:,</span>
+<span class="sd">        previous_value:, row_index:, table_name:, scenario_name:}]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">df</span><span class="p">,</span> <span class="n">df_previous</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">),</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data_previous</span><span class="p">)</span>
+    <span class="c1"># df, df_previous = data=data, data_previous</span>
+
+    <span class="k">if</span> <span class="n">index_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">index_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">index_column</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">for</span> <span class="n">index_column</span> <span class="ow">in</span> <span class="n">index_columns</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_columns</span><span class="p">,</span> <span class="n">verify_integrity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Just to test?</span>
+        <span class="n">df_previous</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_columns</span><span class="p">,</span> <span class="n">verify_integrity</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="c1"># Just to test?</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Grab all columns</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+
+    <span class="c1"># Pandas/Numpy says NaN != NaN, so we cannot simply compare the dataframes.  Instead we can either replace the</span>
+    <span class="c1"># NaNs with some unique value (which is fastest for very small arrays, but doesn&#39;t scale well) or we can do</span>
+    <span class="c1"># (from https://stackoverflow.com/a/19322739/5394584):</span>
+    <span class="c1"># Mask of elements that have changed, as a dataframe.  Each element indicates True if df!=df_prev</span>
+    <span class="n">df_mask</span> <span class="o">=</span> <span class="o">~</span><span class="p">((</span><span class="n">df</span> <span class="o">==</span> <span class="n">df_previous</span><span class="p">)</span> <span class="o">|</span> <span class="p">((</span><span class="n">df</span> <span class="o">!=</span> <span class="n">df</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">df_previous</span> <span class="o">!=</span> <span class="n">df_previous</span><span class="p">)))</span>
+
+    <span class="c1"># ...and keep only rows that include a changed value</span>
+    <span class="n">df_mask</span> <span class="o">=</span> <span class="n">df_mask</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_mask</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span>
+
+    <span class="n">changes</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># This feels like a place I could speed this up if needed</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_mask</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+        <span class="n">row_id</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># Act only on columns that had a change</span>
+        <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="kc">True</span><span class="p">)]</span>
+
+        <span class="c1">#         print(f&quot;row={row}&quot;)</span>
+        <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">change</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;row_idx&quot;</span><span class="p">:</span> <span class="n">row_id</span><span class="p">,</span>
+                <span class="s2">&quot;column_name&quot;</span><span class="p">:</span> <span class="n">change</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;current_value&quot;</span><span class="p">:</span> <span class="n">df</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">row_id</span><span class="p">,</span> <span class="n">change</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                <span class="s2">&quot;previous_value&quot;</span><span class="p">:</span> <span class="n">df_previous</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">row_id</span><span class="p">,</span> <span class="n">change</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">index_columns</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">change</span><span class="p">[</span><span class="s1">&#39;row_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;column&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">df_previous</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">row_id</span><span class="p">,</span> <span class="n">i</span><span class="p">]}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">index_columns</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">change</span><span class="p">[</span><span class="s1">&#39;table_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">table_name</span>
+            <span class="k">if</span> <span class="n">scenario_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">change</span><span class="p">[</span><span class="s1">&#39;scenario_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scenario_name</span>
+            <span class="n">changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">change</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">changes</span></div>
+
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.utils.dash_common_utils</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>
