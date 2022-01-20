@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Fixed bug in KpiPageTemplate.__init__
 - Changed documentation build folder to `docs/doc_build`
+- Install requirement of SQLAlchemy >=1.3.23, <1.4 (setup.py)
 
 ## [0.1.1.0] - 2022-01-11
 ### Changed

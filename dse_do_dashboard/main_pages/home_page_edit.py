@@ -331,7 +331,7 @@ class HomePageEdit(MainPage):
                         print("Input tables: {}".format(", ".join(inputs.keys())))
                         print("Output tables: {}".format(", ".join(outputs.keys())))
                         self.dash_app.dbm.replace_scenario_in_db(scenario_name=scenario_name, inputs=inputs, outputs=outputs)  #
-                        unzip_results.append(html.P(f"Uploaded scenario: '{scenario_name}' from '{filename}'"),)
+                        unzip_results.append(html.P(f"Uploaded scenario: '{scenario_name}' from '{info.filename}'"),)
                     else:
                         unzip_results.append(html.P(f"File: '{info.filename}' is not a .xlsx. Skipped."),)
                 child = html.Div(unzip_results)
