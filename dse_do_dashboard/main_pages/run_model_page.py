@@ -1,10 +1,15 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+import time
 
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dash import dcc, html, Output, Input
 import dash_bootstrap_components as dbc
 
+# import diskcache
+# from dash.long_callback import DiskcacheLongCallbackManager
+# cache = diskcache.Cache("./cache")
+# long_callback_manager = DiskcacheLongCallbackManager(cache)
 
 class RunModelPage(MainPage):
     def __init__(self, dash_app):
@@ -17,7 +22,8 @@ class RunModelPage(MainPage):
     def get_layout(self):
         layout = html.Div([
 
-            html.Button('Run Model', id='run_model', n_clicks=0),
+            dbc.Button('Run Model', id='run_model', n_clicks=0, color="primary", className="me-1"),
+            # html.Button('Run Model', id='run_model', n_clicks=0),
 
             html.Div(id='container_button_basic',
                      children='Enter a value and press submit'),
@@ -76,7 +82,10 @@ class RunModelPage(MainPage):
         app = self.dash_app.app
 
         @app.callback(Output('container_button_basic', 'children'),
-                      [Input('run_model', 'n_clicks')])
+                      [Input('run_model', 'n_clicks')],
+                      manager=self.dash_app.long_callback_manager,
+        )
         def run_model_callback(n_clicks):
+            time.sleep(2.0)
             return self.run_model_callback(n_clicks)
 

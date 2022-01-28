@@ -25,6 +25,8 @@ from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema, PivotT
 from dse_do_utils.plotlymanager import PlotlyManager
 from dse_do_dashboard.visualization_pages.visualization_page import VisualizationPage
 
+import diskcache
+from dash.long_callback import DiskcacheLongCallbackManager
 
 class DoDashApp(DashApp):
     """Abstract class.
@@ -122,6 +124,10 @@ class DoDashApp(DashApp):
 
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
+
+        # Long running callbacks:
+        cache = diskcache.Cache("./cache")
+        self.long_callback_manager = DiskcacheLongCallbackManager(cache)
 
         super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, dash_debug=dash_debug, host_env=host_env)
 

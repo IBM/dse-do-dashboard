@@ -70,8 +70,8 @@ class DashApp(ABC):
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path)
-        app.config.external_stylesheets = [dbc.themes.BOOTSTRAP]
-        # app.config.external_stylesheets = [dbc.themes.SOLAR]
+        # app.config.external_stylesheets = [dbc.themes.BOOTSTRAP]
+        app.config.external_stylesheets = [dbc.themes.SOLAR]
         app.config.suppress_callback_exceptions = True
         return app
 
