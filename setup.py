@@ -25,9 +25,12 @@ setuptools.setup(
         'dash_pivottable',
         'dash_daq',
         'sqlalchemy>=1.3.23, <1.4',
-        'pandas',
+        'pandas<1.4',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
         'plotly',
         'openpyxl',
+        'diskcache',
+        'multiprocess',
+        'psutil',
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

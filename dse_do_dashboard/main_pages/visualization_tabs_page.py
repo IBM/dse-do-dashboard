@@ -1,7 +1,7 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
-from typing import Dict
+from typing import Dict, List
 
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dash import dcc, html, Output, Input
@@ -42,7 +42,7 @@ class VisualizationTabsPage(MainPage):
         )
         return layout
 
-    def get_visualization_tab_layout_callback(self, page_id, scenario_name):
+    def get_visualization_tab_layout_callback(self, page_id, scenario_name: str, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         """
         Callback to render the visualization tabs.
         Call from DoDashApp, which is in turn is called from index.py::
@@ -87,4 +87,9 @@ class VisualizationTabsPage(MainPage):
                        Input('top_menu_scenarios_drpdwn', 'value')])
         def get_visualization_tab_layout_callback(page_id, scenario_name):
             """To update the tabbed-visualization page."""
-            return self.get_visualization_tab_layout_callback(page_id, scenario_name)
+            #, reference_scenario_name: str = None, multi_scenario_names: List[str] = None
+            reference_scenario_name: str = None  # TODO
+            multi_scenario_names: List[str] = None  # TODO
+            return self.get_visualization_tab_layout_callback(page_id, scenario_name,
+                                                              reference_scenario_name=reference_scenario_name,
+                                                              multi_scenario_names=multi_scenario_names)

@@ -226,6 +226,8 @@ class DashApp(ABC):
         # The scenario-bar is the section on the right with the scenario-dropdown and the refresh button
         scenario_bar = dbc.Row(
             [
+                dcc.Store(id='reference_scenario_name_store'),
+                dcc.Store(id='multi_scenario_names_store'),
                 dbc.Col(
                     dcc.Dropdown(
                         id='top_menu_scenarios_drpdwn',
@@ -371,11 +373,21 @@ class DashApp(ABC):
 
         @app.callback(
             Output('content', 'children'),
-            [Input('url', 'pathname'), Input('top_menu_scenarios_drpdwn', 'value')])
-        def display_content(pathname, scenario_name):
+            [Input('url', 'pathname'), Input('top_menu_scenarios_drpdwn', 'value')],
+            [State('reference_scenario_name_store', 'data'),
+             State('multi_scenario_names_store', 'data')
+             ]
+        )
+        def display_content(pathname, scenario_name, reference_scenario_name, multi_scenario_names):
             """High level call back to update the content section of the app.
             Triggers when either the URL or the scenario-dropdown changes."""
-            return self.display_content_callback(pathname, scenario_name)
+            # reference_scenario_name = None,  #TODO
+            # multi_scenario_names = None  #TODO
+
+            print(f"Reference scenario = {reference_scenario_name}")
+            print(f"Multi scenario names = {multi_scenario_names}")
+
+            return self.display_content_callback(pathname, scenario_name, reference_scenario_name, multi_scenario_names)
 
         @app.callback(
             [Output('top_menu_scenarios_drpdwn', 'options'), Output('top_menu_scenarios_drpdwn', 'value')],

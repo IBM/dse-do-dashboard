@@ -46,14 +46,35 @@ class HomePageEdit(MainPage):
                 dbc.CardBody([
                     # dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
                     dcc.Dropdown(
-                        id='reference_scenario',
+                        id='reference_scenario_drpdwn',
                         options=[
                             {'label': i, 'value': i}
                             # for i in scenarios_df.reset_index().scenario_name
                             for i in scenarios_df.index
                         ],  style = {'width': '28vw'})
                 ])
-            ], style = {'width': '30vw'}),
+            ], #style = {'width': '30vw'}
+            ),
+
+            dbc.Card([
+                dbc.CardHeader(html.Div("Reference Scenarios", style={'width': '28vw'})),
+                dbc.CardBody([
+                    # dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
+                    dcc.Checklist(
+                        id='reference_scenarios_checklist',
+                        options=[
+                            {'label': i, 'value': i}
+                            # for i in scenarios_df.reset_index().scenario_name
+                            for i in scenarios_df.index
+                        ],
+                        value=[],
+                        labelStyle={'display': 'block'},
+                        # style={"overflow":"auto"}
+                        # style = {'width': '28vw'}
+                    )
+                ])
+            ], #style = {'width': '30vw'}
+            ),
 
             dbc.Card([
                 dbc.CardHeader(html.Div("Scenarios", style={'width': '80vw'})),
@@ -612,3 +633,22 @@ class HomePageEdit(MainPage):
         def update_output(n_clicks):
             self.dash_app.shutdown()
             return 'The stop button has been clicked {} times.'.format(n_clicks)
+
+        ##############################################################################
+        #  Select Reference Scenarios
+        ##############################################################################
+        @app.callback(
+            Output('reference_scenario_name_store', 'data'),
+            Input('reference_scenario_drpdwn', 'value'),
+        )
+        def store_reference_scenario(reference_scenario_name):
+            # print(f"Selected ref scenario = {reference_scenario_name}")
+            return reference_scenario_name
+
+        @app.callback(
+            Output('multi_scenario_names_store', 'data'),
+            Input('reference_scenarios_checklist', 'value'),
+        )
+        def store_multi_scenario_names(multi_scenario_names):
+            # print(f"Multi scenario names = {multi_scenario_names}")
+            return multi_scenario_names

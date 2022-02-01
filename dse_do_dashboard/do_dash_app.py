@@ -335,8 +335,9 @@ class DoDashApp(DashApp):
         Same as `read_scenario_tables_from_db`, but calls `read_scenario_table_from_db_cached`.
         Is called from dse_do_dashboard.DoDashApp to create the PlotlyManager."""
 
-        if input_table_names is None:  # load all tables by default
-            input_table_names = list(self.dbm.input_db_tables.keys())
+        if input_table_names is None:
+            # input_table_names = list(self.dbm.input_db_tables.keys())  #This is not consistent with implementation in ScenarioDbManager! Replace by empty list
+            input_table_names = []
             if 'Scenario' in input_table_names: input_table_names.remove('Scenario')  # Remove the scenario table
         if output_table_names is None:  # load all tables by default
             output_table_names = self.dbm.output_db_tables.keys()
@@ -351,11 +352,13 @@ class DoDashApp(DashApp):
             # print(f"read output table {scenario_table_name}")
             outputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
         return inputs, outputs
+
     ########################################################################################
     # End DB caching callbacks
     ########################################################################################
 
-    def display_content_callback(self, pathname: str, scenario_name: str):
+    def display_content_callback(self, pathname: str, scenario_name: str,
+                                 reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         """Callback for main content area. Will update the content area.
         Will need to be called through callback in index.py, where `DA` is the instance of the DashApp.
 
@@ -382,7 +385,7 @@ class DoDashApp(DashApp):
             layout = page.get_layout()
         elif page_name in self.visualization_pages_dict_by_url_page_name:
             vp = self.visualization_pages_dict_by_url_page_name[page_name]
-            layout = vp.get_layout(scenario_name)
+            layout = vp.get_layout(scenario_name, reference_scenario_name, multi_scenario_names)
         else:
             layout = self.get_not_found_page().get_layout(f"Page '{pathname}' not found")
         return layout
@@ -394,7 +397,13 @@ class DoDashApp(DashApp):
     #
     ###########################################################################################################
 
-    def get_plotly_manager(self, scenario_name: str, input_table_names: List[str] = None, output_table_names: List[str] = None) -> PlotlyManager:
+    def get_plotly_manager(self, scenario_name: str,
+                           input_table_names: List[str] = None,
+                           output_table_names: List[str] = None,
+                           reference_scenario_name: str = None,  # TODO: support single reference scenario
+                           multi_scenario_names: List[str] = None,
+                           enable_reference_scenario: bool = False,
+                           enable_multi_scenario: bool = False) -> PlotlyManager:
         """Creates the PlotlyManager based on the plotly_manager_class and the data_manager_class.
         Loads data for selected input and output tables from the DB, creates a DataManager and embeds into a PlotlyManager.
 
@@ -408,6 +417,25 @@ class DoDashApp(DashApp):
             dm = self.data_manager_class(inputs, outputs)
             dm.prepare_data_frames()
             pm = self.plotly_manager_class(dm)
+
+            # print(f"get_plotly_manager. Input tables = {input_table_names}")
+            if enable_reference_scenario and reference_scenario_name is not None:
+                inputs, outputs = self.read_scenario_tables_from_db_cached(reference_scenario_name, input_table_names, output_table_names)
+                ref_dm = self.data_manager_class(inputs, outputs)
+                ref_dm.prepare_data_frames()
+                pm.ref_dm = ref_dm  # TODO: add to pm via constructor
+            else:
+                pm.ref_dm = None
+
+            if enable_multi_scenario and multi_scenario_names is not None:
+                # TODO: this is not (yet) cached. Add caching.
+                ms_inputs, ms_outputs = self.dbm.read_multi_scenario_tables_from_db(multi_scenario_names, input_table_names, output_table_names)
+                # TODO: for now just add as properties of the pm, since the dm is for one scenario. Maybe we'll need a `MultiScenarioDataManager`?
+                pm.ms_inputs = ms_inputs
+                pm.ms_outputs = ms_outputs
+            else:
+                pm.ms_inputs = None
+                pm.ms_outputs = None
         else:
             print("Error: either specify the `data_manager_class` and the `plotly_manager_class` or override the method `get_plotly_manager`.")
             pm = None

@@ -15,13 +15,17 @@ from dse_do_utils.plotlymanager import PlotlyManager
 
 class Plotly1ColumnVisualizationPage(VisualizationPage):
     def __init__(self, dash_app, page_name:str='Default', page_id:str='default', url:str='default',
-                 input_table_names: List[str] = [], output_table_names: List[str] = []):
+                 input_table_names: List[str] = [], output_table_names: List[str] = [],
+                 enable_reference_scenario: bool = False,
+                 enable_multi_scenario: bool = False):
         super().__init__(dash_app=dash_app,
                          page_name=page_name,
                          page_id=page_id,
                          url=url,
                          input_table_names = input_table_names,
                          output_table_names = output_table_names,
+                         enable_reference_scenario=enable_reference_scenario,
+                         enable_multi_scenario=enable_multi_scenario
                          )
 
     @abstractmethod
