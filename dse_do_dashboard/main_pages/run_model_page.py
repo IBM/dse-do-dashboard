@@ -3,7 +3,7 @@
 import time
 
 from dse_do_dashboard.main_pages.main_page import MainPage
-from dash import dcc, html, Output, Input
+from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
 
 # import diskcache
@@ -55,7 +55,7 @@ class RunModelPage(MainPage):
     # @app.callback(
     #         Output('container-button-basic', 'children'),
     #         [Input('run_model', 'n_clicks')])
-    def run_model_callback(self, n_clicks):
+    def run_model_callback(self, n_clicks, scenario_name):
         """Callback for pressing `run-model` button
         Usage:
         1. On index.py add::
@@ -71,7 +71,8 @@ class RunModelPage(MainPage):
             def run_model_callback(self, n_clicks):
                 self.get_run_model_page().run_model_callback(n_clicks)
         """
-        return f"The button has been clicked {n_clicks} times"
+        # self.dash_app.tmp_run_notebook(scenario_name)  # HACK!!!!!!!
+        return f"The button has been clicked {n_clicks} times for {scenario_name}"
 
     def set_dash_callbacks(self):
         """Define Dash callbacks for this page
@@ -83,9 +84,11 @@ class RunModelPage(MainPage):
 
         @app.callback(Output('container_button_basic', 'children'),
                       [Input('run_model', 'n_clicks')],
+                      State('top_menu_scenarios_drpdwn', 'value'),
                       manager=self.dash_app.long_callback_manager,
+                      prevent_initial_call=True
         )
-        def run_model_callback(n_clicks):
-            time.sleep(2.0)
-            return self.run_model_callback(n_clicks)
+        def run_model_callback(n_clicks, scenario_name):
+            # time.sleep(2.0)
+            return self.run_model_callback(n_clicks, scenario_name)
 

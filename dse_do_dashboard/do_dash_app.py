@@ -136,7 +136,7 @@ class DoDashApp(DashApp):
         The default implementation uses the database_manager_class from the constructor.
         Optionally, override this method."""
         if self.database_manager_class is not None and self.db_credentials is not None:
-            print(f"Connecting to DB2 at {self.db_credentials['host']}")
+            print(f"Connecting to DB2 at {self.db_credentials['host']}, schema = {self.schema}")
             dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo)
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
