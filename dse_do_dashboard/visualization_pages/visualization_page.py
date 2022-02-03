@@ -57,17 +57,23 @@ class VisualizationPage(ABC):
         * We are NOT using pattern-matching callback anynore, so the `id` of the Div is no long relevant
         * Do we need 2 Divs? (This is what worked so far)
         """
+        self.pm = self.get_plotly_manager(scenario_name,
+                                          reference_scenario_name=reference_scenario_name,
+                                          multi_scenario_names=multi_scenario_names,
+                                          enable_reference_scenario=self.enable_reference_scenario,
+                                          enable_multi_scenario=self.enable_multi_scenario)
         layout = html.Div([
             html.Div(
                 id={
                     'type': 'tab_layout',
                     'index': self.page_id
                 },
-                children=self.get_layout_children(self.get_plotly_manager(scenario_name,
-                                                                          reference_scenario_name=reference_scenario_name,
-                                                                          multi_scenario_names=multi_scenario_names,
-                                                                          enable_reference_scenario=self.enable_reference_scenario,
-                                                                          enable_multi_scenario=self.enable_multi_scenario))
+                children=self.get_layout_children(self.pm),
+                # children=self.get_layout_children(self.get_plotly_manager(scenario_name,
+                #                                                           reference_scenario_name=reference_scenario_name,
+                #                                                           multi_scenario_names=multi_scenario_names,
+                #                                                           enable_reference_scenario=self.enable_reference_scenario,
+                #                                                           enable_multi_scenario=self.enable_multi_scenario))
             )
         ])
         return layout
