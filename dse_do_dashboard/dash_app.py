@@ -384,9 +384,9 @@ class DashApp(ABC):
             # reference_scenario_name = None,  #TODO
             # multi_scenario_names = None  #TODO
 
-            print(f"Reference scenario = {reference_scenario_name}")
-            print(f"Multi scenario names = {multi_scenario_names}")
-
+            # print(f"Reference scenario = {reference_scenario_name}")
+            # print(f"Multi scenario names = {multi_scenario_names}")
+            print(f"Showing URL = {pathname}")
             return self.display_content_callback(pathname, scenario_name, reference_scenario_name, multi_scenario_names)
 
         @app.callback(

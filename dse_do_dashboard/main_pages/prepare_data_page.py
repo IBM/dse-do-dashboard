@@ -1,5 +1,6 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+from typing import Optional
 
 import pandas as pd
 from dash.exceptions import PreventUpdate
@@ -64,7 +65,7 @@ class PrepareDataPage(MainPage):
                 dcc.Dropdown(id='input_table_drpdwn',
                              options=[ {'label': i, 'value': i}
                                        for i in input_tables],
-                             value=input_tables[0],
+                             value=(input_tables[0] if len(input_tables) > 0 else None),  # Handle zero input tables (rare)
                              style = {'width': '75vw', 'height': '2vw'},
                              ),
             ),
@@ -78,9 +79,11 @@ class PrepareDataPage(MainPage):
         ], style={'width': '80vw'})
         return card
 
-
-    def update_data_and_pivot_input_table_callback(self, scenario_name, table_name):
+    def update_data_and_pivot_input_table_callback(self, scenario_name: str, table_name: Optional[str]):
         """Body for the Dash callback.
+
+        :param scenario_name: name of scenario
+        :param table_name: name of input table. Theoretically can be None if no input tables
 
         Usage::
 
@@ -94,6 +97,9 @@ class PrepareDataPage(MainPage):
 
         """
         # print(f"update_data_and_pivot_input_table for {table_name} in {scenario_name}")
+        if table_name is None:
+            # In case there are no input tables (rare)
+            raise PreventUpdate
         input_table_names = [table_name]
         pm = self.dash_app.get_plotly_manager(scenario_name, input_table_names, [])
         dm = pm.dm
@@ -103,7 +109,6 @@ class PrepareDataPage(MainPage):
         data_table_children = get_data_table_card_children(df, table_name, table_schema, editable=True)
         pivot_table_children = get_pivot_table_card_children(df, scenario_name, table_name, pivot_table_config)
         return data_table_children, pivot_table_children
-
 
     def set_dash_callbacks(self):
         """Define Dash callbacks for this page
