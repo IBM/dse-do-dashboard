@@ -3,7 +3,7 @@
 
 import setuptools
 # import dse_do_dashboard
-from dse_do_dashboard.version import __version__  # Prevents loading the whole package?
+# from dse_do_dashboard.version import __version__  # Prevents loading the whole package?
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
@@ -11,7 +11,8 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="dse_do_dashboard",
     # version=dse_do_dashboard.__version__,
-    version=__version__,
+    # version=__version__,
+    version='0.1.1.1b',
     author="Victor Terpstra",
     author_email="vterpstra@us.ibm.com",
     description="Decision Optimization Dashboard for IBM Cloud Pak for Data DO projects",
