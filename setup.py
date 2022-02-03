@@ -3,7 +3,7 @@
 
 import setuptools
 # import dse_do_dashboard
-from dse_do_dashboard import __version__  # Prevents loading the whole package?
+from dse_do_dashboard.version import __version__  # Prevents loading the whole package?
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
