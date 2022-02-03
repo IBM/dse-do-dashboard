@@ -4,7 +4,7 @@
 from typing import Dict, List
 
 from dse_do_dashboard.main_pages.main_page import MainPage
-from dash import dcc, html, Output, Input
+from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
 
 from dse_do_dashboard.visualization_pages.visualization_page import VisualizationPage
@@ -87,12 +87,11 @@ class VisualizationTabsPage(MainPage):
 
         @app.callback(Output("page_content", "children"),
                       [Input("tabs", "value"),
-                       Input('top_menu_scenarios_drpdwn', 'value')])
-        def get_visualization_tab_layout_callback(page_id, scenario_name):
+                       Input('top_menu_scenarios_drpdwn', 'value')],
+                      [State('reference_scenario_name_store', 'data'),
+                       State('multi_scenario_names_store', 'data')])
+        def get_visualization_tab_layout_callback(page_id, scenario_name, reference_scenario_name, multi_scenario_names):
             """To update the tabbed-visualization page."""
-            #, reference_scenario_name: str = None, multi_scenario_names: List[str] = None
-            reference_scenario_name: str = None  # TODO
-            multi_scenario_names: List[str] = None  # TODO
             return self.get_visualization_tab_layout_callback(page_id, scenario_name,
                                                               reference_scenario_name=reference_scenario_name,
                                                               multi_scenario_names=multi_scenario_names)
