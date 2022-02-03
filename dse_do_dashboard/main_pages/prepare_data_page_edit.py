@@ -102,7 +102,7 @@ class PrepareDataPageEdit(PrepareDataPage):
             data_table_id = 'my_data_table'
         index_columns = []
         if table_schema is not None:
-            print(f"prepare_data_page_edit - get_data_table table_schema.index_columns={table_schema.index_columns}")
+            # print(f"prepare_data_page_edit - get_data_table table_schema.index_columns={table_schema.index_columns}")
             if len(table_schema.index_columns) > 0:
                 df = df.set_index(table_schema.index_columns).reset_index()  # ensures all index columns are first
             index_columns = table_schema.index_columns

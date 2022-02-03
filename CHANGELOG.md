@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Upgraded to dse-do-utils v0.5.4.1
 - Fixed bug in PrepareDataPageEdit.get_data_table when zero index-columns
 - Fixed bug in dash_common_utils.get_data_table when zero index-columns
+- Fix in VisualizationTabsPage (hard-coded 'demand_tab' initial value)
 ### Added
 - Reference scenario - PlotlyManager gets a pm.ref_dm based on the selected reference_scenario
 - Multi scenario compare - PlotlyManager gets a pm.ms_inputs and pm.ms_outputs dict of DataFrames for scenario compare

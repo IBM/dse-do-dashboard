@@ -11,7 +11,10 @@ from dse_do_dashboard.visualization_pages.visualization_page import Visualizatio
 
 
 class VisualizationTabsPage(MainPage):
-    """Visualization pages in tabbed layout"""
+    """Visualization pages in tabbed layout
+
+    TODO (minor): handle case when there are no visualization pages (i.e. len(self.dash_app.visualization_pages) == 0)
+    """
     def __init__(self, dash_app):
         super().__init__(dash_app,
                          page_name='Visualization',
@@ -32,7 +35,7 @@ class VisualizationTabsPage(MainPage):
         ]
         tabs = dcc.Tabs(
             id="tabs",
-            value="demand_tab",
+            value=visualization_pages[0].page_id,
             children=tab_children,
         )
         layout = html.Div([
