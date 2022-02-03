@@ -2,17 +2,28 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import setuptools
+
+###########################################################
+# Problem:
+# * `import dse_do_dashboard` is going to run the __init__.py,
+# * which is going to do an import of `DoDashApp`,
+# * which starts to load from required packages that have not been installed yet
+# So we're back at the question of how to load the __version__ without triggering importing dependent packages
+# * For now go back to manually defining the version here
+###########################################################
 # import dse_do_dashboard
-# from dse_do_dashboard.version import __version__  # Prevents loading the whole package?
+# from dse_do_dashboard.version import __version__  # Prevents loading the whole package? No!
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
+
+version = '0.1.1.1b'
 
 setuptools.setup(
     name="dse_do_dashboard",
     # version=dse_do_dashboard.__version__,
     # version=__version__,
-    version='0.1.1.1b',
+    version=version,
     author="Victor Terpstra",
     author_email="vterpstra@us.ibm.com",
     description="Decision Optimization Dashboard for IBM Cloud Pak for Data DO projects",
