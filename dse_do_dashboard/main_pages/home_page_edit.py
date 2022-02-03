@@ -40,7 +40,7 @@ class HomePageEdit(MainPage):
     def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
 
-        print(f"get_layout ref_scenario={reference_scenario_name} , ms={multi_scenario_names}")
+        # print(f"get_layout ref_scenario={reference_scenario_name} , ms={multi_scenario_names}")
         selected_ref_scenarios = [] if multi_scenario_names is None else multi_scenario_names
 
         # Reconcile reference_scenario_name and multi_scenario_names with actual scenarios? (if in the mean time a scenario got deleted)

@@ -2,14 +2,16 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import setuptools
-import dse_do_dashboard
+# import dse_do_dashboard
+from dse_do_dashboard import __version__  # Prevents loading the whole package?
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="dse_do_dashboard",
-    version=dse_do_dashboard.__version__,
+    # version=dse_do_dashboard.__version__,
+    version=__version__,
     author="Victor Terpstra",
     author_email="vterpstra@us.ibm.com",
     description="Decision Optimization Dashboard for IBM Cloud Pak for Data DO projects",
