@@ -22,7 +22,7 @@ class VisualizationTabsPage(MainPage):
                          url='visualization',
                          )
 
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         tab_style = {"fontWeight": "bold"}
         visualization_pages = self.dash_app.visualization_pages
         tab_children = [
@@ -64,7 +64,7 @@ class VisualizationTabsPage(MainPage):
             try:
                 print(f"Getting layout for {page_id}")
                 # tab_layout = getattr(sys.modules[f"visualization_pages.{vp.module_name}"], 'layout')
-                tab_layout = vp.get_layout(scenario_name)
+                tab_layout = vp.get_layout(scenario_name, reference_scenario_name, multi_scenario_names)
                 return tab_layout
 
             except KeyError:
@@ -92,6 +92,7 @@ class VisualizationTabsPage(MainPage):
                        State('multi_scenario_names_store', 'data')])
         def get_visualization_tab_layout_callback(page_id, scenario_name, reference_scenario_name, multi_scenario_names):
             """To update the tabbed-visualization page."""
+            print("xxxxxxxxxxxxxxxxxxxxxx")
             return self.get_visualization_tab_layout_callback(page_id, scenario_name,
                                                               reference_scenario_name=reference_scenario_name,
                                                               multi_scenario_names=multi_scenario_names)

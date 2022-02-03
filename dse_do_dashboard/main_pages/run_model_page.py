@@ -1,6 +1,7 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 import time
+from typing import List
 
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dash import dcc, html, Output, Input, State
@@ -19,7 +20,7 @@ class RunModelPage(MainPage):
                          url='run-model',
                          )
 
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         layout = html.Div([
 
             dbc.Button('Run Model', id='run_model', n_clicks=0, color="primary", className="me-1"),

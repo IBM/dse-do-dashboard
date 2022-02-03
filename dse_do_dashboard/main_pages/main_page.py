@@ -2,6 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from abc import ABC, abstractmethod
+from typing import List
+
 from dash import html, dcc
 from dse_do_dashboard.dash_app import DashApp
 
@@ -13,7 +15,7 @@ class MainPage(ABC):
         self.url = url  # URL, i.e. web address: `host:port/url`
 
     @abstractmethod
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         layout = html.Div([
             html.H1("Error 404 - Page not found"),
             dcc.Textarea(

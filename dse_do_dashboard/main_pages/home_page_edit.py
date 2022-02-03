@@ -7,6 +7,7 @@ import os
 import pathlib
 import tempfile
 import zipfile
+from typing import List
 
 import flask
 import pandas as pd
@@ -36,8 +37,15 @@ class HomePageEdit(MainPage):
                          url='',
                          )
 
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
+
+        print(f"get_layout ref_scenario={reference_scenario_name} , ms={multi_scenario_names}")
+        selected_ref_scenarios = [] if multi_scenario_names is None else multi_scenario_names
+
+        # Reconcile reference_scenario_name and multi_scenario_names with actual scenarios? (if in the mean time a scenario got deleted)
+        selected_ref_scenario = reference_scenario_name if reference_scenario_name in scenarios_df.index else None
+        selected_ref_scenarios = [i for i in selected_ref_scenarios if i in scenarios_df.index]
 
         layout = html.Div([
 
@@ -51,7 +59,9 @@ class HomePageEdit(MainPage):
                             {'label': i, 'value': i}
                             # for i in scenarios_df.reset_index().scenario_name
                             for i in scenarios_df.index
-                        ],  style = {'width': '28vw'})
+                        ],
+                        value=selected_ref_scenario,
+                        style = {'width': '28vw'})
                 ])
             ], #style = {'width': '30vw'}
             ),
@@ -67,7 +77,7 @@ class HomePageEdit(MainPage):
                             # for i in scenarios_df.reset_index().scenario_name
                             for i in scenarios_df.index
                         ],
-                        value=[],
+                        value=selected_ref_scenarios,
                         labelStyle={'display': 'block'},
                         # style={"overflow":"auto"}
                         # style = {'width': '28vw'}

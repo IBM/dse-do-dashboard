@@ -1,6 +1,6 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-from typing import Optional
+from typing import Optional, List
 
 from dash.exceptions import PreventUpdate
 
@@ -20,7 +20,7 @@ class ExploreSolutionPage(MainPage):
                          url='explore-solution',
                          )
 
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         output_tables = self.dash_app.get_output_table_names()
         layout = html.Div([
 

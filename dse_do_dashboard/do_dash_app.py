@@ -382,7 +382,7 @@ class DoDashApp(DashApp):
         #     return self.get_visualization_tabs_page().get_layout()
         if page_name in self.main_pages_dict_by_url_page_name:
             page = self.main_pages_dict_by_url_page_name[page_name]
-            layout = page.get_layout()
+            layout = page.get_layout(scenario_name, reference_scenario_name, multi_scenario_names)
         elif page_name in self.visualization_pages_dict_by_url_page_name:
             vp = self.visualization_pages_dict_by_url_page_name[page_name]
             layout = vp.get_layout(scenario_name, reference_scenario_name, multi_scenario_names)

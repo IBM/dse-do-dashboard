@@ -32,7 +32,7 @@ class PrepareDataPageEdit(PrepareDataPage):
                          url='prepare-data',
                          )
 
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         input_tables = self.dash_app.get_input_table_names()
         layout = html.Div([
             dcc.Store(id="current_table_name"),
