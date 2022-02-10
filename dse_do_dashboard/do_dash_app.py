@@ -59,7 +59,9 @@ class DoDashApp(DashApp):
                  plotly_manager_class=None,
                  port: Optional[int] = 8050,
                  dash_debug: Optional[bool] = False,
-                 host_env: Optional[HostEnvironment] = None
+                 host_env: Optional[HostEnvironment] = None,
+                 bootstrap_theme=dbc.themes.BOOTSTRAP,
+                 bootstrap_figure_template:str="bootstrap"
                  ):
         """Create a Dashboard app.
 
@@ -129,7 +131,9 @@ class DoDashApp(DashApp):
         cache = diskcache.Cache("./cache")
         self.long_callback_manager = DiskcacheLongCallbackManager(cache)
 
-        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, dash_debug=dash_debug, host_env=host_env)
+        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port,
+                         dash_debug=dash_debug, host_env=host_env,
+                         bootstrap_theme=bootstrap_theme, bootstrap_figure_template=bootstrap_figure_template)
 
     def create_database_manager_instance(self) -> ScenarioDbManager:
         """Create an instance of a ScenarioDbManager.

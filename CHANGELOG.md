@@ -17,6 +17,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reference scenario - PlotlyManager gets a pm.ref_dm based on the selected reference_scenario
 - Multi scenario compare - PlotlyManager gets a pm.ms_inputs and pm.ms_outputs dict of DataFrames for scenario compare
 - Improved support for interactive visualization pages: VisualizationPage stores PlotlyManager in `self.pm` in `VisualizationPage.get_layout`
+- DashApp.get_app_layout: added `className="dbc"` to support Bootstrap CSS, see https://hellodash.pythonanywhere.com/about_dbc_css
+- DashApp and DoDashApp constructors: added bootstrap_theme and bootstrap_figure_template to support Bootstrap CSS
 
 ## [0.1.1.0] - 2022-01-11
 ### Changed

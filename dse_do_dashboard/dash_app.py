@@ -7,6 +7,7 @@ from typing import Dict, Optional
 import dash
 from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import load_figure_template
 import os
 
 from flask_caching import Cache
@@ -26,10 +27,14 @@ class DashApp(ABC):
                  cache_config: Dict = {},
                  port: int = 8050,
                  dash_debug: bool = False,
-                 host_env: Optional[HostEnvironment] = None):
+                 host_env: Optional[HostEnvironment] = None,
+                 bootstrap_theme=dbc.themes.BOOTSTRAP,
+                 bootstrap_figure_template:str="bootstrap"):
         self.port = port
         self.host_env = host_env
         self.dash_debug = dash_debug
+        self.bootstrap_theme = bootstrap_theme
+        self.set_bootstrap_figure_template(bootstrap_figure_template)
         self.app = self.create_dash_app()
 
         # Margins to layout the header, sidebar and content area:
@@ -46,6 +51,11 @@ class DashApp(ABC):
 
         self.set_cache_callbacks()
         self.set_dash_callbacks()
+
+    def set_bootstrap_figure_template(self, bootstrap_figure_template: str):
+        """See https://hellodash.pythonanywhere.com/theme_explorer"""
+        load_figure_template(bootstrap_figure_template)
+        self.bootstrap_figure_template = bootstrap_figure_template
 
     def create_dash_app(self):
         """Creates the Dash app. Called from the DashApp constructor.
@@ -70,8 +80,9 @@ class DashApp(ABC):
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path)
-        # app.config.external_stylesheets = [dbc.themes.BOOTSTRAP]
-        app.config.external_stylesheets = [dbc.themes.SOLAR]
+        dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.css"
+        app.config.external_stylesheets = [self.bootstrap_theme, dbc_css]
+        # app.config.external_stylesheets = [dbc.themes.SOLAR]
         app.config.suppress_callback_exceptions = True
         return app
 
@@ -95,7 +106,9 @@ class DashApp(ABC):
             dcc.Location(id='url'),
             self.get_navbar(),
             self.get_sidebar(),
-            self.get_content_template()])
+            self.get_content_template()],
+            className="dbc"  # Bootstrap CSS, see https://hellodash.pythonanywhere.com/about_dbc_css
+        )
         return layout
 
     def display_content_callback(self, pathname):

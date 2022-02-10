@@ -36,6 +36,7 @@ setuptools.setup(
         'dash~=2.0.0',
         'flask_caching==1.10.1',
         'dash_bootstrap_components==1.0.2',
+        'dash-bootstrap-templates==1.0.4',
         'dash_pivottable==0.0.2',
         'dash_daq==0.5.0',
         'sqlalchemy>=1.3.23, <1.4',
