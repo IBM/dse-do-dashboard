@@ -43,9 +43,9 @@ setuptools.setup(
         'pandas<1.4',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
         'plotly~=5.5.0',
         'openpyxl==3.0.9',
-        'diskcache==5.4.0',
-        'multiprocess==0.70.12.2',
-        'psutil==5.9.0',
+        'diskcache==5.4.0',  # For long-running callbacks
+        'multiprocess==0.70.12.2',  # For long-running callbacks
+        'psutil==5.9.0',  # For long-running callbacks
     ],
     classifiers=[
         "Development Status :: 4 - Beta",

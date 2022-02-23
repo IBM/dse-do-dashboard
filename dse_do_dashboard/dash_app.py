@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from abc import ABC
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import dash
 from dash import dcc, html, Output, Input, State
@@ -28,8 +28,8 @@ class DashApp(ABC):
                  port: int = 8050,
                  dash_debug: bool = False,
                  host_env: Optional[HostEnvironment] = None,
-                 bootstrap_theme=dbc.themes.BOOTSTRAP,
-                 bootstrap_figure_template:str="bootstrap"):
+                 bootstrap_theme = dbc.themes.BOOTSTRAP,
+                 bootstrap_figure_template: str = "bootstrap"):
         self.port = port
         self.host_env = host_env
         self.dash_debug = dash_debug
@@ -104,6 +104,7 @@ class DashApp(ABC):
         """Layout of whole app"""
         layout = html.Div([
             dcc.Location(id='url'),
+            self.get_app_stores_div(),
             self.get_navbar(),
             self.get_sidebar(),
             self.get_content_template()],
@@ -377,6 +378,19 @@ class DashApp(ABC):
             ], vertical=True, pills=True,)], style = sidebar_style
         )
         return sidebar
+
+    def get_app_stores_div(self) -> html.Div:
+        """A Div container with all globally (and thus permanently available) dcc.Stores in the app."""
+        stores = html.Div(
+            id = 'global_stores',  # Not necessary
+            children = self.get_app_stores()
+        )
+        return stores
+
+    def get_app_stores(self) -> List[dcc.Store]:
+        """To be overridden"""
+        stores = []
+        return stores
 
     def set_cache_callbacks(self):
         pass

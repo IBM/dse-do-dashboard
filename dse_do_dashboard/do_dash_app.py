@@ -11,7 +11,7 @@ from dse_do_utils import DataManager
 from dse_do_utils.scenariodbmanager import ScenarioDbManager
 
 from dse_do_dashboard.dash_app import DashApp, HostEnvironment
-from dash import html, Output, Input, State
+from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
 
 from dse_do_dashboard.main_pages.explore_solution_page import ExploreSolutionPage
@@ -61,7 +61,8 @@ class DoDashApp(DashApp):
                  dash_debug: Optional[bool] = False,
                  host_env: Optional[HostEnvironment] = None,
                  bootstrap_theme=dbc.themes.BOOTSTRAP,
-                 bootstrap_figure_template:str="bootstrap"
+                 bootstrap_figure_template:str="bootstrap",
+                 enable_long_running_callbacks: bool = True,
                  ):
         """Create a Dashboard app.
 
@@ -82,6 +83,7 @@ class DoDashApp(DashApp):
         :param host_env: If HostEnvironment.CPD402, will use the ws_applications import make_link to
         generate a requests_pathname_prefix for the Dash app. For use with custom environment in CPD v4.0.02.
         The alternative (None of HostEnvironment.Local) runs the Dash app regularly.
+        :param enable_long_running_callbacks. Default = True. Enables the use of Dash long-running callbacks for model runs. If False, it only allows for in-line runs.
         """
         self.db_credentials = db_credentials
         self.schema = schema
@@ -127,9 +129,11 @@ class DoDashApp(DashApp):
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
 
-        # Long running callbacks:
-        cache = diskcache.Cache("./cache")
-        self.long_callback_manager = DiskcacheLongCallbackManager(cache)
+        # # Long running callbacks:
+        self.enable_long_running_callbacks = enable_long_running_callbacks
+        if self.enable_long_running_callbacks:
+            cache = diskcache.Cache("./cache")
+            self.long_callback_manager = DiskcacheLongCallbackManager(cache)
 
         super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port,
                          dash_debug=dash_debug, host_env=host_env,
@@ -145,6 +149,21 @@ class DoDashApp(DashApp):
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
         return dbm
+
+    def get_app_stores(self) -> List[dcc.Store]:
+        """Add global dcc.Stores"""
+        stores = [
+            # For reference scenario(s):
+            # TODO
+        ]
+        if self.enable_long_running_callbacks:
+            stores.extend([
+                # For long-running callbacks for model runs:
+                dcc.Store(id='lrc_job_trigger_store'),
+                dcc.Store(id='lrc_job_log_store'),
+                dcc.Store(id='lrc_job_queue_data_store'),
+            ])
+        return stores
 
     def create_main_pages(self) -> List[MainPage]:
         """Creates the ordered list of main pages for the DO app.
