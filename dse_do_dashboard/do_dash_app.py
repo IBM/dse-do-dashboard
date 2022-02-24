@@ -1,6 +1,6 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
+import time
 from typing import Dict, List, Optional
 
 import pandas as pd
@@ -25,8 +25,7 @@ from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema, PivotT
 from dse_do_utils.plotlymanager import PlotlyManager
 from dse_do_dashboard.visualization_pages.visualization_page import VisualizationPage
 
-import diskcache
-from dash.long_callback import DiskcacheLongCallbackManager
+
 
 class DoDashApp(DashApp):
     """Abstract class.
@@ -62,7 +61,7 @@ class DoDashApp(DashApp):
                  host_env: Optional[HostEnvironment] = None,
                  bootstrap_theme=dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template:str="bootstrap",
-                 enable_long_running_callbacks: bool = True,
+                 enable_long_running_callbacks: bool = False,
                  ):
         """Create a Dashboard app.
 
@@ -129,15 +128,12 @@ class DoDashApp(DashApp):
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
 
-        # # Long running callbacks:
-        self.enable_long_running_callbacks = enable_long_running_callbacks
-        if self.enable_long_running_callbacks:
-            cache = diskcache.Cache("./cache")
-            self.long_callback_manager = DiskcacheLongCallbackManager(cache)
+
 
         super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port,
                          dash_debug=dash_debug, host_env=host_env,
-                         bootstrap_theme=bootstrap_theme, bootstrap_figure_template=bootstrap_figure_template)
+                         bootstrap_theme=bootstrap_theme, bootstrap_figure_template=bootstrap_figure_template,
+                         enable_long_running_callbacks=enable_long_running_callbacks,)
 
     def create_database_manager_instance(self) -> ScenarioDbManager:
         """Create an instance of a ScenarioDbManager.
@@ -622,4 +618,51 @@ class DoDashApp(DashApp):
             if n:
                 return not is_open
             return is_open
+
+        if self.enable_long_running_callbacks:
+            app = self.app
+            runner_config_dict = {config.runner_id: config for config in self.get_do_model_runner_configs()}
+            @app.long_callback(
+                output=Output('lrc_job_log_store', 'data'),
+                inputs=(
+                        Input('lrc_job_trigger_store', 'data'),
+                ),
+                progress=Output('lrc_job_queue_data_store', 'data'), # Global store
+                progress_default=[],
+                prevent_initial_call=True,
+            )
+            def run_model_long_callback(
+                    set_progress,
+                    n_clicks,
+            ):
+                print(f"n_clicks = {n_clicks}")
+                trigger = n_clicks
+                if trigger is None:
+                    return "None"
+                scenario_name = n_clicks['scenario_name']
+                do_model_class_name = n_clicks['do_model_class_name']
+                print(f"RunModelPage2.run_model_callback_LRC model = {do_model_class_name}")
+                if do_model_class_name == 'None':
+                    return "None"
+                progress_dict = {'scenario': scenario_name, 'model': do_model_class_name, 'run_status': 'initializing'}
+                set_progress([progress_dict])
+                # time.sleep(1)
+
+                progress_dict['run_status'] = 'running'
+                set_progress([progress_dict])
+
+                runner_class = runner_config_dict[do_model_class_name].runner_class
+                runner = runner_class(scenario_name)
+                runner.run()
+
+                print("set_progress")
+                progress_dict['run_status'] = 'done'
+                set_progress([progress_dict])
+
+                # time.sleep(4)
+
+                log = f"Run {do_model_class_name} with scenario {scenario_name}\n" \
+                      "Log: \n" \
+                      f"{runner.log}"
+                return log
 

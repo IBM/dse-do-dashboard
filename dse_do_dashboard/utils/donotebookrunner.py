@@ -91,7 +91,11 @@ class NotebookRunner():
         f = StringIO()  # For grabbing the log
         with redirect_stdout(f):
             # exec(ccode)
-            my_exec(ccode, self.exec_globals, self.exec_locals)  # Execute the compiled Python code
+            try:
+                my_exec(ccode, self.exec_globals, self.exec_locals)  # Execute the compiled Python code
+            except Exception as err:
+                print("Exception")
+                print(err)  # TODO: more info
         s = f.getvalue()  # get the log
         return s
 
@@ -144,3 +148,13 @@ class DoNotebookRunner(NotebookRunner):
         else:
             outputs = {}
         return outputs
+
+    def print_code(self):
+        def insert_line_numbers(txt):
+            return "\n".join([f"{n+1:03d} {line}" for n, line in enumerate(txt.split("\n"))])
+        print(insert_line_numbers(self.code))
+        # line_counter = 1
+        # for line in self.code:
+        #     print(f"{line_counter} - {line}")
+        #     line_counter += 1
+

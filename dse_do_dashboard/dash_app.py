@@ -9,10 +9,10 @@ from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import os
-
 from flask_caching import Cache
-
 import enum
+import diskcache
+from dash.long_callback import DiskcacheLongCallbackManager
 
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema
 
@@ -29,12 +29,23 @@ class DashApp(ABC):
                  dash_debug: bool = False,
                  host_env: Optional[HostEnvironment] = None,
                  bootstrap_theme = dbc.themes.BOOTSTRAP,
-                 bootstrap_figure_template: str = "bootstrap"):
+                 bootstrap_figure_template: str = "bootstrap",
+                 enable_long_running_callbacks: bool = False,
+                 ):
         self.port = port
         self.host_env = host_env
         self.dash_debug = dash_debug
         self.bootstrap_theme = bootstrap_theme
         self.set_bootstrap_figure_template(bootstrap_figure_template)
+
+        # Long running callbacks:
+        self.enable_long_running_callbacks = enable_long_running_callbacks
+        if self.enable_long_running_callbacks:
+            cache = diskcache.Cache("./cache")
+            self.long_callback_manager = DiskcacheLongCallbackManager(cache)
+        else:
+            self.long_callback_manager = None
+
         self.app = self.create_dash_app()
 
         # Margins to layout the header, sidebar and content area:
@@ -51,6 +62,9 @@ class DashApp(ABC):
 
         self.set_cache_callbacks()
         self.set_dash_callbacks()
+
+
+
 
     def set_bootstrap_figure_template(self, bootstrap_figure_template: str):
         """See https://hellodash.pythonanywhere.com/theme_explorer"""
@@ -72,14 +86,18 @@ class DashApp(ABC):
             from ws_applications import make_link
             requests_prefix = make_link(self.port)
             app = dash.Dash(__name__,
-                    serve_locally=False,
-                    requests_pathname_prefix=requests_prefix,
-                    # suppress_callback_exceptions = True,
-                    assets_folder=assets_path)
+                            serve_locally=False,
+                            requests_pathname_prefix=requests_prefix,
+                            # suppress_callback_exceptions = True,
+                            assets_folder=assets_path,
+                            long_callback_manager=self.long_callback_manager,
+                            )
         else:
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
-                            assets_folder=assets_path)
+                            assets_folder=assets_path,
+                            long_callback_manager=self.long_callback_manager,
+                            )
         dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.css"
         app.config.external_stylesheets = [self.bootstrap_theme, dbc_css]
         # app.config.external_stylesheets = [dbc.themes.SOLAR]
