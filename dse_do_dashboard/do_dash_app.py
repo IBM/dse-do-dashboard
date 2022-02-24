@@ -7,6 +7,7 @@ import pandas as pd
 
 from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
 from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
+from dse_do_dashboard.utils.domodelrunner import DoModelRunner, DoModelRunnerConfig
 from dse_do_utils import DataManager
 from dse_do_utils.scenariodbmanager import ScenarioDbManager
 
@@ -128,7 +129,7 @@ class DoDashApp(DashApp):
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
 
-
+        self.job_queue: List[DoModelRunner] = []  # TODO: migrate to Store. Using global variables is dangerous
 
         super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port,
                          dash_debug=dash_debug, host_env=host_env,
@@ -666,3 +667,9 @@ class DoDashApp(DashApp):
                       f"{runner.log}"
                 return log
 
+    def get_do_model_runner_configs(self) -> List[DoModelRunnerConfig]:
+        """Returns the model runners for the 'Run Model' page.
+        Needs to be overridden.
+        """
+        configs = []
+        return configs

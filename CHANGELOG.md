@@ -4,12 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.1.1b0]
+## [Unreleased]## [0.1.2.1b]
 ### Changed
+
+## [Unreleased]## [0.1.2.0]
+### Changed
+- Version bump-up from 0.1.1.1b to 0.1.2.0 due to new features
 - Fixed bug in KpiPageTemplate.__init__
 - Changed documentation build folder to `docs/doc_build`
 - Install requirement of SQLAlchemy >=1.3.23, <1.4 (setup.py)
-- Upgraded to dse-do-utils v0.5.4.1
+- Fixed versions of all required packages to match CPD 4.0.5
+- Upgraded to dse-do-utils v0.5.4.2
 - Fixed bug in PrepareDataPageEdit.get_data_table when zero index-columns
 - Fixed bug in dash_common_utils.get_data_table when zero index-columns
 - Fix in VisualizationTabsPage (hard-coded 'demand_tab' initial value)

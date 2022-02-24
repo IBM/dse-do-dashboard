@@ -136,7 +136,7 @@ class RunModelPage(MainPage):
                 do_model_class_name: str,
                 ):
 
-            print("RunModelPage2.run_model_callback_inline")
+            # print("RunModelPage2.run_model_callback_inline")
 
             if do_model_class_name == 'None':
                 raise PreventUpdate

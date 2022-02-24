@@ -17,7 +17,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-version = '0.1.1.1b'
+version = '0.1.2.0'
 
 setuptools.setup(
     name="dse_do_dashboard",
@@ -32,7 +32,7 @@ setuptools.setup(
     url="https://github.com/IBM/dse-do-dashboard",
     packages=setuptools.find_packages(),
     install_requires=[
-        'dse-do-utils>=0.5.4.1',
+        'dse-do-utils>=0.5.4.2',
         'dash~=2.0.0',
         'flask_caching==1.10.1',
         'dash_bootstrap_components==1.0.2',
