@@ -17,7 +17,7 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-version = '0.1.2.0'
+version = '0.1.2.1b'
 
 setuptools.setup(
     name="dse_do_dashboard",
