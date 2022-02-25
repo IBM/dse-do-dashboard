@@ -32,31 +32,31 @@ setuptools.setup(
     url="https://github.com/IBM/dse-do-dashboard",
     packages=setuptools.find_packages(),
     install_requires=[
-        'dse-do-utils>=0.5.3.1',
-        'dash>=2.0.0',
-        'flask_caching',
-        'dash_bootstrap_components',
-        'dash_pivottable',
-        'dash_daq',
-        'sqlalchemy>=1.3.23',
-        'pandas',
-        'plotly'
+        # 'dse-do-utils>=0.5.3.1',
+        # 'dash>=2.0.0',
+        # 'flask_caching',
+        # 'dash_bootstrap_components',
+        # 'dash_pivottable',
+        # 'dash_daq',
+        # 'sqlalchemy>=1.3.23',
+        # 'pandas',
+        # 'plotly'
 
-        # 'dse-do-utils>=0.5.4.2',
+        'dse-do-utils>=0.5.4.2',
         # 'dash',
-        # 'dash~=2.0.0',
-        # 'flask_caching==1.10.1',
-        # 'dash_bootstrap_components==1.0.2',
-        # 'dash-bootstrap-templates==1.0.4',
-        # 'dash_pivottable==0.0.2',
-        # 'dash_daq==0.5.0',
-        # 'sqlalchemy>=1.3.23, <1.4',
-        # 'pandas<1.4',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
-        # 'plotly~=5.4.0',  # 5.5.0 is causing problems installing on CPD
-        # 'openpyxl==3.0.9',
-        # 'diskcache==5.4.0',  # For long-running callbacks
-        # 'multiprocess==0.70.12.2',  # For long-running callbacks
-        # 'psutil==5.9.0',  # For long-running callbacks
+        'dash~=2.0.0',
+        'flask_caching==1.10.1',
+        'dash_bootstrap_components==1.0.2',
+        'dash-bootstrap-templates==1.0.4',
+        'dash_pivottable==0.0.2',
+        'dash_daq==0.5.0',
+        'sqlalchemy>=1.3.23, <1.4',
+        'pandas<1.4',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
+        'plotly~=5.4.0',  # 5.5.0 is causing problems installing on CPD
+        'openpyxl==3.0.9',
+        'diskcache==5.4.0',  # For long-running callbacks
+        'multiprocess==0.70.12.2',  # For long-running callbacks
+        'psutil==5.9.0',  # For long-running callbacks
     ],
     classifiers=[
         "Development Status :: 4 - Beta",
