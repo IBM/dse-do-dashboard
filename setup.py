@@ -34,7 +34,7 @@ setuptools.setup(
     install_requires=[
         'dse-do-utils>=0.5.4.2',
         'dash~=2.0.0',
-        'flask_caching==1.10.1',
+        # 'flask_caching==1.10.1',
         'dash_bootstrap_components==1.0.2',
         'dash-bootstrap-templates==1.0.4',
         'dash_pivottable==0.0.2',
