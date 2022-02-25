@@ -35,10 +35,10 @@ setuptools.setup(
         'dse-do-utils>=0.5.4.2',
         'dash~=2.0.0',
         # 'flask_caching==1.10.1',
-        'dash_bootstrap_components==1.0.2',
-        'dash-bootstrap-templates==1.0.4',
-        'dash_pivottable==0.0.2',
-        'dash_daq==0.5.0',
+        # 'dash_bootstrap_components==1.0.2',
+        # 'dash-bootstrap-templates==1.0.4',
+        # 'dash_pivottable==0.0.2',
+        # 'dash_daq==0.5.0',
         # 'sqlalchemy>=1.3.23, <1.4',
         # 'pandas<1.4',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
         # 'plotly~=5.4.0',  # 5.5.0 is causing problems installing on CPD
