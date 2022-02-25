@@ -1,0 +1,339 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.main_pages.run_model_page &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.run_model_page</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dse_do_dashboard.main_pages.run_model_page</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">dash</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">Input</span><span class="p">,</span> <span class="n">State</span><span class="p">,</span> <span class="n">dash_table</span>
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+<span class="kn">from</span> <span class="nn">dash.exceptions</span> <span class="kn">import</span> <span class="n">PreventUpdate</span>
+
+
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.main_page</span> <span class="kn">import</span> <span class="n">MainPage</span>
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.utils.domodelrunner</span> <span class="kn">import</span> <span class="n">DoModelRunnerConfig</span>
+
+
+<div class="viewcode-block" id="RunModelPage"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.run_model_page.RunModelPage">[docs]</a><span class="k">class</span> <span class="nc">RunModelPage</span><span class="p">(</span><span class="n">MainPage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Challenge with long_callback:</span>
+<span class="sd">    If you navigate away from this page while the long_callback is running, Dash will generate errors</span>
+<span class="sd">    stating that input/output components do not exist:</span>
+<span class="sd">    All components (&#39;ids&#39;) that are used for inputs, outputs, states and progress (output) must continue to exists</span>
+<span class="sd">    while the callback is running.</span>
+<span class="sd">    Work-around:</span>
+<span class="sd">    Use dcc.Store(s) on a global level:</span>
+<span class="sd">    * lrc_job_trigger_store: the result of pressing the run button, along with the scenario_name and model_class</span>
+<span class="sd">    * lrc_job_log_store: the log, i.e. the output of the long_callback</span>
+<span class="sd">    * lrc_job_queue_data_store: the progress output of the long_callback</span>
+<span class="sd">    Next, we have:</span>
+<span class="sd">    * A button and a regular callback that store the trigger data (i.e. the user pressing the run button)</span>
+<span class="sd">    * A regular callback watching the log store and update the log text area</span>
+<span class="sd">    * A regular callback watching the queue data store and update the lrc job queue datatable</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">,</span>
+                 <span class="n">page_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Run Model&#39;</span><span class="p">,</span>
+                 <span class="n">page_id</span> <span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;run-model&#39;</span><span class="p">,</span>
+                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;run-model&#39;</span><span class="p">,</span>
+
+                 <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dash_app</span><span class="p">,</span>
+                         <span class="n">page_name</span><span class="o">=</span><span class="n">page_name</span><span class="p">,</span>
+                         <span class="n">page_id</span><span class="o">=</span><span class="n">page_id</span><span class="p">,</span>
+                         <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                         <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">runner_config_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">DoModelRunnerConfig</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">config</span><span class="o">.</span><span class="n">runner_id</span><span class="p">:</span> <span class="n">config</span> <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">dash_app</span><span class="o">.</span><span class="n">get_do_model_runner_configs</span><span class="p">()}</span>
+
+<div class="viewcode-block" id="RunModelPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.run_model_page.RunModelPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">configs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">runner_config_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+            <span class="c1"># dcc.Store(id=&#39;job_queue_data_store&#39;),</span>
+            <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span>
+                <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;do_model_class_drpdwn&#39;</span><span class="p">,</span>
+                <span class="n">options</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;None&#39;</span><span class="p">}]</span><span class="o">+</span><span class="p">[</span>
+                    <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">runner_name</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">config</span><span class="o">.</span><span class="n">runner_id</span><span class="p">}</span>
+                    <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">configs</span>
+                <span class="p">],</span>
+                <span class="c1"># value=(configs[0].runner_id if len(configs) &gt; 0 else None),</span>
+                <span class="n">value</span><span class="o">=</span><span class="p">(</span><span class="s1">&#39;None&#39;</span><span class="p">),</span>
+                <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;28vw&#39;</span><span class="p">,</span>
+                         <span class="c1"># &#39;background-color&#39;: &#39;#FF4136&#39;</span>
+                         <span class="p">}),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s1">&#39;Run Model inline&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;run_model_inline&#39;</span><span class="p">,</span> <span class="n">n_clicks</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;me-1&quot;</span><span class="p">),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s1">&#39;Run Model LRC&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;run_model_lrc&#39;</span><span class="p">,</span> <span class="n">n_clicks</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;me-1&quot;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">enable_long_running_callbacks</span><span class="p">)),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s1">&#39;Update JobQueue&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;refresh_queue_inline&#39;</span><span class="p">,</span> <span class="n">n_clicks</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;primary&quot;</span><span class="p">,</span> <span class="n">className</span><span class="o">=</span><span class="s2">&quot;me-1&quot;</span><span class="p">),</span>
+
+            <span class="c1"># html.H1(&quot;------------------------&quot;),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span><span class="s1">&#39;Job Queue (in-line)&#39;</span><span class="p">),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                    <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_job_queue_data_table</span><span class="p">(</span><span class="nb">id</span> <span class="o">=</span> <span class="s1">&#39;job_queue_table_inline&#39;</span><span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">]),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span><span class="s1">&#39;Job Queue (long-running)&#39;</span><span class="p">),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                    <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_job_queue_data_table</span><span class="p">(</span><span class="nb">id</span> <span class="o">=</span> <span class="s1">&#39;job_queue_table_lrc&#39;</span><span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">]),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span><span class="s1">&#39;Job Log (in-line)&#39;</span><span class="p">),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                    <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">dcc</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;log_inline&#39;</span><span class="p">,</span>
+                                     <span class="n">readOnly</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+                                     <span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">]),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span><span class="s1">&#39;Job Log (long-running)&#39;</span><span class="p">),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                    <span class="n">children</span><span class="o">=</span><span class="p">[</span>
+                        <span class="n">dcc</span><span class="o">.</span><span class="n">Textarea</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;log_lrc&#39;</span><span class="p">,</span>
+                                     <span class="n">readOnly</span> <span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                     <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;100%&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="mi">200</span><span class="p">},</span>
+                                     <span class="p">),</span>
+                    <span class="p">]</span>
+                <span class="p">),</span>
+            <span class="p">]),</span>
+        <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">layout</span></div>
+
+<div class="viewcode-block" id="RunModelPage.set_dash_callbacks"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.run_model_page.RunModelPage.set_dash_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">set_dash_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define Dash callbacks for this page</span>
+
+<span class="sd">        Will be called to register any callbacks</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">app</span>
+
+        <span class="c1"># Need to get the runner_config_dict as a &#39;global&#39; variable so that the long_callback can be pickled</span>
+        <span class="c1"># runner_config_dict = self.runner_config_dict</span>
+
+        <span class="k">def</span> <span class="nf">make_default_progress_data</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;We do not have to specify columns&quot;&quot;&quot;</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">)</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+            <span class="n">Output</span><span class="p">(</span><span class="s1">&#39;log_inline&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                           <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s1">&#39;run_model_inline&#39;</span><span class="p">,</span> <span class="s1">&#39;n_clicks&#39;</span><span class="p">)],</span>
+                           <span class="p">[</span><span class="n">State</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                            <span class="n">State</span><span class="p">(</span><span class="s1">&#39;do_model_class_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                            <span class="p">],</span>
+                           <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                           <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">run_model_inline_callback</span><span class="p">(</span>
+                <span class="n">n_clicks</span><span class="p">,</span>
+                <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="n">do_model_class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                <span class="p">):</span>
+
+            <span class="c1"># print(&quot;RunModelPage2.run_model_callback_inline&quot;)</span>
+
+            <span class="k">if</span> <span class="n">do_model_class_name</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PreventUpdate</span>
+
+            <span class="c1"># time.sleep(0.2)</span>
+
+            <span class="n">runner_class</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runner_config_dict</span><span class="p">[</span><span class="n">do_model_class_name</span><span class="p">]</span><span class="o">.</span><span class="n">runner_class</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Runner class = </span><span class="si">{</span><span class="n">runner_class</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">runner</span> <span class="o">=</span> <span class="n">runner_class</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">dash_app</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="p">)</span>
+            <span class="c1"># runner = FruitClassRunner(scenario_name)</span>
+            <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="c1"># time.sleep(4)</span>
+
+            <span class="n">log</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="n">do_model_class_name</span><span class="si">}</span><span class="s2"> with scenario </span><span class="si">{</span><span class="n">scenario_name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                  <span class="s2">&quot;Log: </span><span class="se">\n</span><span class="s2">&quot;</span> \
+                  <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">runner</span><span class="o">.</span><span class="n">log</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="n">log</span>
+
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;job_queue_table_lrc&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                      <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s1">&#39;lrc_job_queue_data_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)],</span>
+                      <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">refresh_queue_callback</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;The idea is to place the Store in the top-menu bar and this is always there.</span>
+<span class="sd">            That may prevent issues with the long_callback.</span>
+<span class="sd">            However, it seems to be also sensitive towards the input button.</span>
+<span class="sd">            So this work-around may not apply anyway.</span>
+<span class="sd">            Not in use currently. Here as a backup if we need it&quot;&quot;&quot;</span>
+            <span class="c1"># print(&quot;refresh_queue_callback&quot;)</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PreventUpdate</span>
+            <span class="c1"># print(f&quot;refresh_queue_callback with data {data}&quot;)</span>
+            <span class="k">return</span> <span class="n">data</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;job_queue_table_inline&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                      <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;refresh_queue_inline&#39;</span><span class="p">,</span> <span class="s1">&#39;n_clicks&#39;</span><span class="p">),</span>
+                      <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">refresh_job_queue_inline</span><span class="p">(</span><span class="n">n_clicks</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_job_queue_data</span><span class="p">()</span>
+
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;lrc_job_trigger_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                      <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;run_model_lrc&#39;</span><span class="p">,</span> <span class="s1">&#39;n_clicks&#39;</span><span class="p">),</span>
+                      <span class="p">[</span><span class="n">State</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                      <span class="n">State</span><span class="p">(</span><span class="s1">&#39;do_model_class_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),],</span>
+                      <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                      <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">lrc_job_trigger</span><span class="p">(</span><span class="n">n_clicks</span><span class="p">,</span>
+                            <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                            <span class="n">do_model_class_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,):</span>
+            <span class="c1"># TODO: as an extra precaution use the ctx to check it was the button that triggered the callback?</span>
+            <span class="c1"># Note that switching scenarios will trigger this callback. Despite the prevent_initial_call</span>
+            <span class="c1"># However, since switching scenarios will regenerate this page, the n_clicks will be 0</span>
+            <span class="n">trigger</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;n_clicks&#39;</span><span class="p">:</span><span class="n">n_clicks</span><span class="p">,</span> <span class="s1">&#39;scenario&#39;</span> <span class="p">:</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="s1">&#39;do_model_class_name&#39;</span><span class="p">:</span> <span class="n">do_model_class_name</span><span class="p">}</span>
+            <span class="c1"># print(f&quot;Initial Trigger = {trigger}&quot;)</span>
+            <span class="k">if</span> <span class="n">n_clicks</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">do_model_class_name</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PreventUpdate</span>
+            <span class="n">trigger</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;n_clicks&#39;</span><span class="p">:</span><span class="n">n_clicks</span><span class="p">,</span> <span class="s1">&#39;scenario_name&#39;</span> <span class="p">:</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="s1">&#39;do_model_class_name&#39;</span><span class="p">:</span> <span class="n">do_model_class_name</span><span class="p">}</span>
+            <span class="c1"># print(f&quot;Store Trigger = {trigger}&quot;)</span>
+            <span class="k">return</span> <span class="n">trigger</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;log_lrc&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                      <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;lrc_job_log_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                      <span class="c1"># prevent_initial_call=True,</span>
+                      <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">lrc_job_log_update</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="c1"># print(f&quot;lrc_job_log_update = {data}&quot;)</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PreventUpdate</span>
+            <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="RunModelPage.get_job_queue_data"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.run_model_page.RunModelPage.get_job_queue_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_job_queue_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return a List[Dict] with job DoModelRunner queue data.</span>
+<span class="sd">        As in df.to_dict(&#39;records&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">job_queue</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;id&#39;</span> <span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                   <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                   <span class="s1">&#39;scenario&#39;</span> <span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">scenario_name</span><span class="p">,</span>
+                   <span class="s1">&#39;run_status&#39;</span> <span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">run_status</span><span class="p">}</span>
+            <span class="n">rows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+        <span class="c1"># if len(rows) &gt; 0:</span>
+        <span class="c1">#     df = pd.DataFrame(rows)</span>
+        <span class="c1"># else:</span>
+        <span class="c1">#     df = pd.DataFrame(columns=[&#39;id&#39;, &#39;runner_class&#39;, &#39;scenario_name&#39;, &#39;run_status&#39;])</span>
+        <span class="k">return</span> <span class="n">rows</span></div>
+
+<div class="viewcode-block" id="RunModelPage.get_job_queue_data_table"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.run_model_page.RunModelPage.get_job_queue_data_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_job_queue_data_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;scenario&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;scenario&#39;</span><span class="p">},</span>
+                     <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;model&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;model&#39;</span><span class="p">},</span>
+                     <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;run_status&#39;</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="s1">&#39;run_status&#39;</span><span class="p">}</span>
+                     <span class="p">],</span>
+            <span class="n">fixed_rows</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;headers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="n">editable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="c1"># fixed_columns={&#39;headers&#39;: False, &#39;data&#39;: 0}, # Does NOT create a horizontal scroll bar</span>
+            <span class="n">filter_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+            <span class="n">sort_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+            <span class="n">sort_mode</span><span class="o">=</span><span class="s2">&quot;multi&quot;</span><span class="p">,</span>
+            <span class="n">style_cell</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;textOverflow&#39;</span><span class="p">:</span> <span class="s1">&#39;ellipsis&#39;</span><span class="p">,</span>  <span class="c1"># See https://dash.plotly.com/datatable/width to control column-name width</span>
+                <span class="s1">&#39;maxWidth&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>               <span class="c1"># Needs to be here for the &#39;ellipsis&#39; option to work</span>
+                <span class="s1">&#39;overflow&#39;</span> <span class="p">:</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;font_family&#39;</span><span class="p">:</span> <span class="s1">&#39;sans-serif&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;12px&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span><span class="p">},</span>
+            <span class="n">style_table</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;maxHeight&#39;</span><span class="p">:</span> <span class="s1">&#39;400px&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;overflowY&#39;</span><span class="p">:</span> <span class="s1">&#39;scroll&#39;</span>
+            <span class="p">},</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.run_model_page</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>

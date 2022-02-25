@@ -2,16 +2,17 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from abc import ABC
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 import dash
 from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
+from dash_bootstrap_templates import load_figure_template
 import os
-
 from flask_caching import Cache
-
 import enum
+import diskcache
+from dash.long_callback import DiskcacheLongCallbackManager
 
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema
 
@@ -26,10 +27,25 @@ class DashApp(ABC):
                  cache_config: Dict = {},
                  port: int = 8050,
                  dash_debug: bool = False,
-                 host_env: Optional[HostEnvironment] = None):
+                 host_env: Optional[HostEnvironment] = None,
+                 bootstrap_theme = dbc.themes.BOOTSTRAP,
+                 bootstrap_figure_template: str = "bootstrap",
+                 enable_long_running_callbacks: bool = False,
+                 ):
         self.port = port
         self.host_env = host_env
         self.dash_debug = dash_debug
+        self.bootstrap_theme = bootstrap_theme
+        self.set_bootstrap_figure_template(bootstrap_figure_template)
+
+        # Long running callbacks:
+        self.enable_long_running_callbacks = enable_long_running_callbacks
+        if self.enable_long_running_callbacks:
+            cache = diskcache.Cache("./cache")
+            self.long_callback_manager = DiskcacheLongCallbackManager(cache)
+        else:
+            self.long_callback_manager = None
+
         self.app = self.create_dash_app()
 
         # Margins to layout the header, sidebar and content area:
@@ -47,6 +63,14 @@ class DashApp(ABC):
         self.set_cache_callbacks()
         self.set_dash_callbacks()
 
+
+
+
+    def set_bootstrap_figure_template(self, bootstrap_figure_template: str):
+        """See https://hellodash.pythonanywhere.com/theme_explorer"""
+        load_figure_template(bootstrap_figure_template)
+        self.bootstrap_figure_template = bootstrap_figure_template
+
     def create_dash_app(self):
         """Creates the Dash app. Called from the DashApp constructor.
         Implements special process around running in CPDv4.0.2 (i.e. `ws_applications.make_link()`)
@@ -62,15 +86,20 @@ class DashApp(ABC):
             from ws_applications import make_link
             requests_prefix = make_link(self.port)
             app = dash.Dash(__name__,
-                    serve_locally=False,
-                    requests_pathname_prefix=requests_prefix,
-                    # suppress_callback_exceptions = True,
-                    assets_folder=assets_path)
+                            serve_locally=False,
+                            requests_pathname_prefix=requests_prefix,
+                            # suppress_callback_exceptions = True,
+                            assets_folder=assets_path,
+                            long_callback_manager=self.long_callback_manager,
+                            )
         else:
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
-                            assets_folder=assets_path)
-        app.config.external_stylesheets = [dbc.themes.BOOTSTRAP]
+                            assets_folder=assets_path,
+                            long_callback_manager=self.long_callback_manager,
+                            )
+        dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.css"
+        app.config.external_stylesheets = [self.bootstrap_theme, dbc_css]
         # app.config.external_stylesheets = [dbc.themes.SOLAR]
         app.config.suppress_callback_exceptions = True
         return app
@@ -93,9 +122,12 @@ class DashApp(ABC):
         """Layout of whole app"""
         layout = html.Div([
             dcc.Location(id='url'),
+            self.get_app_stores_div(),
             self.get_navbar(),
             self.get_sidebar(),
-            self.get_content_template()])
+            self.get_content_template()],
+            className="dbc"  # Bootstrap CSS, see https://hellodash.pythonanywhere.com/about_dbc_css
+        )
         return layout
 
     def display_content_callback(self, pathname):
@@ -226,6 +258,8 @@ class DashApp(ABC):
         # The scenario-bar is the section on the right with the scenario-dropdown and the refresh button
         scenario_bar = dbc.Row(
             [
+                dcc.Store(id='reference_scenario_name_store'),
+                dcc.Store(id='multi_scenario_names_store'),
                 dbc.Col(
                     dcc.Dropdown(
                         id='top_menu_scenarios_drpdwn',
@@ -363,6 +397,19 @@ class DashApp(ABC):
         )
         return sidebar
 
+    def get_app_stores_div(self) -> html.Div:
+        """A Div container with all globally (and thus permanently available) dcc.Stores in the app."""
+        stores = html.Div(
+            id = 'global_stores',  # Not necessary
+            children = self.get_app_stores()
+        )
+        return stores
+
+    def get_app_stores(self) -> List[dcc.Store]:
+        """To be overridden"""
+        stores = []
+        return stores
+
     def set_cache_callbacks(self):
         pass
 
@@ -371,11 +418,21 @@ class DashApp(ABC):
 
         @app.callback(
             Output('content', 'children'),
-            [Input('url', 'pathname'), Input('top_menu_scenarios_drpdwn', 'value')])
-        def display_content(pathname, scenario_name):
+            [Input('url', 'pathname'), Input('top_menu_scenarios_drpdwn', 'value')],
+            [State('reference_scenario_name_store', 'data'),
+             State('multi_scenario_names_store', 'data')
+             ]
+        )
+        def display_content(pathname, scenario_name, reference_scenario_name, multi_scenario_names):
             """High level call back to update the content section of the app.
             Triggers when either the URL or the scenario-dropdown changes."""
-            return self.display_content_callback(pathname, scenario_name)
+            # reference_scenario_name = None,  #TODO
+            # multi_scenario_names = None  #TODO
+
+            # print(f"Reference scenario = {reference_scenario_name}")
+            # print(f"Multi scenario names = {multi_scenario_names}")
+            print(f"Showing URL = {pathname}")
+            return self.display_content_callback(pathname, scenario_name, reference_scenario_name, multi_scenario_names)
 
         @app.callback(
             [Output('top_menu_scenarios_drpdwn', 'options'), Output('top_menu_scenarios_drpdwn', 'value')],

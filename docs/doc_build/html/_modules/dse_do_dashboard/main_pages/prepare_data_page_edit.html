@@ -1,0 +1,504 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.main_pages.prepare_data_page_edit &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.prepare_data_page_edit</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dse_do_dashboard.main_pages.prepare_data_page_edit</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright IBM All Rights Reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">dash</span>
+<span class="kn">from</span> <span class="nn">dash.exceptions</span> <span class="kn">import</span> <span class="n">PreventUpdate</span>
+
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.main_page</span> <span class="kn">import</span> <span class="n">MainPage</span>
+<span class="kn">from</span> <span class="nn">dash.dependencies</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dash_table</span>
+
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.prepare_data_page</span> <span class="kn">import</span> <span class="n">PrepareDataPage</span>
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.utils.dash_common_utils</span> <span class="kn">import</span> <span class="n">get_data_table_card_children</span><span class="p">,</span> <span class="n">get_pivot_table_card_children</span><span class="p">,</span> \
+    <span class="n">diff_dashtable_mi</span><span class="p">,</span> <span class="n">ScenarioTableSchema</span><span class="p">,</span> <span class="n">table_type</span>
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.utils.scenariodbmanager_update</span> <span class="kn">import</span> <span class="n">DbCellUpdate</span>
+
+
+<div class="viewcode-block" id="PrepareDataPageEdit"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit">[docs]</a><span class="k">class</span> <span class="nc">PrepareDataPageEdit</span><span class="p">(</span><span class="n">PrepareDataPage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Includes feature to edit input tables.</span>
+<span class="sd">    Use instead of `PrepareDataPage`.</span>
+<span class="sd">    Do not combine in same app: will cause duplicate callbacks.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span> <span class="o">=</span> <span class="s1">&#39;input_data_table&#39;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dash_app</span><span class="p">,</span>
+                         <span class="n">page_name</span><span class="o">=</span><span class="s1">&#39;Prepare Data&#39;</span><span class="p">,</span>
+                         <span class="n">page_id</span><span class="o">=</span><span class="s1">&#39;prepare-data&#39;</span><span class="p">,</span>
+                         <span class="n">url</span><span class="o">=</span><span class="s1">&#39;prepare-data&#39;</span><span class="p">,</span>
+                         <span class="p">)</span>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">input_tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_input_table_names</span><span class="p">()</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+            <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;current_table_name&quot;</span><span class="p">),</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_input_table_selection_card</span><span class="p">(),</span>
+
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+                <span class="c1"># dbc.CardHeader(&#39;Input Table&#39;),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;input_data_table_card&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;79vw&#39;</span><span class="p">},</span>
+                             <span class="n">children</span><span class="o">=</span><span class="n">get_data_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span> <span class="n">table_name</span><span class="o">=</span><span class="s1">&#39;None&#39;</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_table_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span><span class="p">)</span>  <span class="c1"># We need to initialize a DataTable, otherwise issues with registering callbacks</span>
+                             <span class="p">),</span>
+
+                <span class="n">html</span><span class="o">.</span><span class="n">Button</span><span class="p">(</span><span class="s2">&quot;No table updates&quot;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;commit_changes_button&quot;</span><span class="p">,</span> <span class="n">disabled</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;input_data_table_div&quot;</span><span class="p">),</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;my_data_table_diff_store&quot;</span><span class="p">),</span> <span class="c1"># Stores all changes</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;my_data_table_data_diff&quot;</span><span class="p">),</span>  <span class="c1"># Show the difference</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;my_data_table_output&quot;</span><span class="p">)</span>
+            <span class="p">],</span> <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;80vw&#39;</span><span class="p">}),</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_pivot_table_card</span><span class="p">(),</span>
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">layout</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.update_data_and_pivot_input_table_callback"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.update_data_and_pivot_input_table_callback">[docs]</a>    <span class="k">def</span> <span class="nf">update_data_and_pivot_input_table_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Body for the Dash callback.</span>
+<span class="sd">        Usage::</span>
+<span class="sd">            @app.callback([Output(&#39;input_data_table_card&#39;, &#39;children&#39;),</span>
+<span class="sd">            Output(&#39;input_pivot_table_card&#39;, &#39;children&#39;)],</span>
+<span class="sd">            [Input(&#39;top_menu_scenarios_drpdwn&#39;, &#39;value&#39;),</span>
+<span class="sd">            Input(&#39;input_table_drpdwn&#39;, &#39;value&#39;)])</span>
+<span class="sd">            def update_data_and_pivot_input_table(scenario_name, table_name):</span>
+<span class="sd">                data_table_children, pivot_table_children = DA.update_data_and_pivot_input_table_callback(scenario_name, table_name)</span>
+<span class="sd">                return [data_table_children, pivot_table_children]</span>
+
+<span class="sd">        TODO: share parts with parent</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># print(f&quot;update_data_and_pivot_input_table for {table_name} in {scenario_name}&quot;)</span>
+        <span class="n">input_table_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
+        <span class="n">pm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">input_table_names</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">dm</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_table_by_name</span><span class="p">(</span><span class="n">dm</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">table_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_table_schema</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="n">pivot_table_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_pivot_table_config</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="n">data_table_children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_data_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data_table_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="o">=</span><span class="n">diff_store_data</span><span class="p">)</span>
+        <span class="n">pivot_table_children</span> <span class="o">=</span> <span class="n">get_pivot_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">pivot_table_config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_table_children</span><span class="p">,</span> <span class="n">pivot_table_children</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.get_data_table_card_children"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.get_data_table_card_children">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_table_card_children</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScenarioTableSchema</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                     <span class="n">editable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">data_table_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span>
+                <span class="n">table_name</span>
+                <span class="c1"># title=table_name,</span>
+                <span class="c1"># fullscreen=True</span>
+            <span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_data_table</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">,</span> <span class="n">editable</span><span class="p">,</span> <span class="n">data_table_id</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">)</span>
+        <span class="p">]</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.get_data_table"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.get_data_table">[docs]</a>    <span class="k">def</span> <span class="nf">get_data_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ScenarioTableSchema</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">editable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">data_table_id</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generates a DataTable for a DataFrame. For use in &#39;Prepare Data&#39; and &#39;Explore Solution&#39; pages.</span>
+<span class="sd">        :param df:</span>
+<span class="sd">        :param table_schema:</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">data_table_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data_table_id</span> <span class="o">=</span> <span class="s1">&#39;my_data_table&#39;</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">table_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># print(f&quot;prepare_data_page_edit - get_data_table table_schema.index_columns={table_schema.index_columns}&quot;)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>  <span class="c1"># ensures all index columns are first</span>
+            <span class="n">index_columns</span> <span class="o">=</span> <span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span>
+        <span class="k">return</span> <span class="n">dash_table</span><span class="o">.</span><span class="n">DataTable</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="n">data_table_id</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="s1">&#39;records&#39;</span><span class="p">),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">table_type</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">i</span><span class="p">])}</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+            <span class="p">],</span>
+            <span class="n">fixed_rows</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;headers&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">},</span>
+            <span class="n">editable</span><span class="o">=</span><span class="n">editable</span><span class="p">,</span>
+            <span class="c1"># fixed_columns={&#39;headers&#39;: False, &#39;data&#39;: 0}, # Does NOT create a horizontal scroll bar</span>
+            <span class="n">filter_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+            <span class="n">sort_action</span><span class="o">=</span><span class="s2">&quot;native&quot;</span><span class="p">,</span>
+            <span class="n">sort_mode</span><span class="o">=</span><span class="s2">&quot;multi&quot;</span><span class="p">,</span>
+            <span class="n">style_cell</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;textOverflow&#39;</span><span class="p">:</span> <span class="s1">&#39;ellipsis&#39;</span><span class="p">,</span>  <span class="c1"># See https://dash.plotly.com/datatable/width to control column-name width</span>
+                <span class="s1">&#39;maxWidth&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>               <span class="c1"># Needs to be here for the &#39;ellipsis&#39; option to work</span>
+                <span class="s1">&#39;overflow&#39;</span> <span class="p">:</span> <span class="s1">&#39;hidden&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;font_family&#39;</span><span class="p">:</span> <span class="s1">&#39;sans-serif&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;font_size&#39;</span><span class="p">:</span> <span class="s1">&#39;12px&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;textAlign&#39;</span><span class="p">:</span> <span class="s1">&#39;left&#39;</span><span class="p">},</span>
+            <span class="n">style_table</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;maxHeight&#39;</span><span class="p">:</span> <span class="s1">&#39;400px&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;overflowY&#39;</span><span class="p">:</span> <span class="s1">&#39;scroll&#39;</span>
+            <span class="p">},</span>
+            <span class="n">style_header</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">index_columns</span>
+                <span class="p">},</span>
+                <span class="c1"># &#39;backgroundColor&#39;: &#39;rgb(230, 230, 230)&#39;,</span>
+                <span class="s1">&#39;fontWeight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span>
+            <span class="p">},</span>
+            <span class="n">style_data_conditional</span><span class="o">=</span><span class="p">([</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">index_columns</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;fontWeight&#39;</span><span class="p">:</span> <span class="s1">&#39;bold&#39;</span><span class="p">,</span>
+                    <span class="c1"># &#39;backgroundColor&#39;: &#39;#0074D9&#39;,</span>
+                    <span class="c1"># &#39;color&#39;: &#39;white&#39;</span>
+                <span class="p">},</span>
+                <span class="c1"># {</span>
+                <span class="c1">#     &#39;if&#39;: {</span>
+                <span class="c1">#         &#39;row_index&#39;: 2,</span>
+                <span class="c1">#         &#39;column_id&#39;: &#39;size&#39;</span>
+                <span class="c1">#     },</span>
+                <span class="c1">#     &#39;backgroundColor&#39;: &#39;#d62728&#39;</span>
+                <span class="c1"># },</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_table_style_data_conditional_cell_edit</span><span class="p">(</span><span class="n">diff_store_data</span><span class="p">)</span>
+            <span class="p">))</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.get_table_style_data_conditional_cell_edit"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.get_table_style_data_conditional_cell_edit">[docs]</a>    <span class="k">def</span> <span class="nf">get_table_style_data_conditional_cell_edit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return a list of dicts with conditional cell style. For each cell that has been edited.</span>
+<span class="sd">        Partly works:</span>
+<span class="sd">        - The coloring works, but</span>
+<span class="sd">        - The table needs to be refreshed/regenerated to get the color filtering active.</span>
+<span class="sd">        That refresh is not happening currently. Need to see how it can be triggered</span>
+<span class="sd">        That refresh will reset the edits in the table</span>
+<span class="sd">        So one would need to re-apply the changes from the store.</span>
+<span class="sd">        Seems like a lot of work for this feature.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># print(f&quot;get_table_style_data_conditional_cell_edit diff_store_data = {diff_store_data}&quot;)</span>
+        <span class="k">if</span> <span class="n">diff_store_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">cell_edits</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">diff_store_data</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+                <span class="n">cell_edits</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;if&#39;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s1">&#39;row_index&#39;</span><span class="p">:</span> <span class="n">diff</span><span class="p">[</span><span class="s1">&#39;row_idx&#39;</span><span class="p">],</span>
+                        <span class="s1">&#39;column_id&#39;</span><span class="p">:</span> <span class="n">diff</span><span class="p">[</span><span class="s1">&#39;column_name&#39;</span><span class="p">]</span>
+                    <span class="p">},</span>
+                    <span class="s1">&#39;backgroundColor&#39;</span><span class="p">:</span> <span class="s1">&#39;#d62728&#39;</span>
+                <span class="p">})</span>
+        <span class="k">return</span> <span class="n">cell_edits</span></div>
+
+
+<div class="viewcode-block" id="PrepareDataPageEdit.get_db_cell_updates"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.get_db_cell_updates">[docs]</a>    <span class="k">def</span> <span class="nf">get_db_cell_updates</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">,</span> <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DbCellUpdate</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Get the changes in the diff store as DbCellUpdate.</span>
+<span class="sd">        Note: from Python 3.7, a Dict maintains the order in which items are added. So no need to sort by time.</span>
+<span class="sd">        TODO: can we store the NamedTuple `DbCellUpdate` directly in the store? Saves us from converting from Dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">db_cell_updates</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DbCellUpdate</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ts</span><span class="p">,</span> <span class="n">diffs</span> <span class="ow">in</span> <span class="n">diff_store_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>  <span class="c1"># Potentially multiple changes in the value</span>
+            <span class="k">for</span> <span class="n">diff</span> <span class="ow">in</span> <span class="n">diffs</span><span class="p">:</span>
+                <span class="n">db_cell_update</span> <span class="o">=</span> <span class="n">DbCellUpdate</span><span class="p">(</span>
+                    <span class="n">scenario_name</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;scenario_name&#39;</span><span class="p">],</span>
+                    <span class="n">table_name</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;table_name&#39;</span><span class="p">],</span>
+                    <span class="n">row_index</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;row_index&#39;</span><span class="p">],</span>  <span class="c1"># e.g. [{&#39;column&#39;: &#39;col1&#39;, &#39;value&#39;: 1}, {&#39;column&#39;: &#39;col2&#39;, &#39;value&#39;: &#39;pear&#39;}]</span>
+                    <span class="n">column_name</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;column_name&#39;</span><span class="p">],</span>
+                    <span class="n">current_value</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;current_value&#39;</span><span class="p">],</span>
+                    <span class="n">previous_value</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;previous_value&#39;</span><span class="p">],</span>
+                    <span class="n">row_idx</span><span class="o">=</span><span class="n">diff</span><span class="p">[</span><span class="s1">&#39;row_idx&#39;</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="n">db_cell_updates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">db_cell_update</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">db_cell_updates</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.capture_diffs_callback"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.capture_diffs_callback">[docs]</a>    <span class="k">def</span> <span class="nf">capture_diffs_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_previous</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Capture diffs and store in my_data_table_diff_store.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ts</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PreventUpdate</span>
+        <span class="n">diff_store_data</span> <span class="o">=</span> <span class="n">diff_store_data</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="n">index_columns</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">table_schema</span><span class="p">:</span> <span class="n">ScenarioTableSchema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_table_schema</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">table_schema</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">index_columns</span> <span class="o">=</span> <span class="n">table_schema</span><span class="o">.</span><span class="n">index_columns</span>
+        <span class="n">diff_store_data</span><span class="p">[</span><span class="n">ts</span><span class="p">]</span> <span class="o">=</span> <span class="n">diff_dashtable_mi</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data_previous</span><span class="p">,</span> <span class="n">index_columns</span><span class="o">=</span><span class="n">index_columns</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">scenario_name</span><span class="o">=</span><span class="n">scenario_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">diff_store_data</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.commit_changes_to_db_callback"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.commit_changes_to_db_callback">[docs]</a>    <span class="k">def</span> <span class="nf">commit_changes_to_db_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_clicks</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">n_clicks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PreventUpdate</span>
+        <span class="k">if</span> <span class="n">diff_store_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PreventUpdate</span>
+        <span class="k">if</span> <span class="n">diff_store_data</span><span class="p">:</span>
+            <span class="n">dt_changes</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">ts</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">diff_store_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dt_changes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;* </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">ts</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># for v in diff_store_data.values():</span>
+            <span class="c1">#     dt_changes.append(f&quot;* {v}&quot;)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="p">[</span><span class="n">dcc</span><span class="o">.</span><span class="n">Markdown</span><span class="p">(</span><span class="n">change</span><span class="p">)</span> <span class="k">for</span> <span class="n">change</span> <span class="ow">in</span> <span class="n">dt_changes</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;No Changes to DataTable&quot;</span>
+
+        <span class="n">db_cell_updates</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_db_cell_updates</span><span class="p">(</span><span class="n">diff_store_data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">dbm</span><span class="o">.</span><span class="n">update_cell_changes_in_db</span><span class="p">(</span><span class="n">db_cell_updates</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">output</span></div>
+
+<div class="viewcode-block" id="PrepareDataPageEdit.set_dash_callbacks"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page_edit.PrepareDataPageEdit.set_dash_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">set_dash_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define Dash callbacks for this page</span>
+
+<span class="sd">        Will be called to register any callbacks</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># print(&quot;Set dash callbacks for PrepareDataPageEdit&quot;)</span>
+        <span class="c1"># super().set_dash_callbacks()</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">app</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">([</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;input_data_table_card&#39;</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">),</span>
+                       <span class="n">Output</span><span class="p">(</span><span class="s1">&#39;input_pivot_table_card&#39;</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">)],</span>
+                      <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                       <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;input_table_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)],</span>
+                      <span class="n">State</span><span class="p">(</span><span class="s2">&quot;my_data_table_diff_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">update_data_and_pivot_input_table_edit</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">):</span>
+            <span class="n">data_table_children</span><span class="p">,</span> <span class="n">pivot_table_children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data_and_pivot_input_table_callback</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">data_table_children</span><span class="p">,</span> <span class="n">pivot_table_children</span><span class="p">]</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">([</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;commit_changes_button&#39;</span><span class="p">,</span> <span class="s1">&#39;style&#39;</span><span class="p">),</span>
+                       <span class="n">Output</span><span class="p">(</span><span class="s1">&#39;commit_changes_button&#39;</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">)</span>
+                       <span class="p">],</span>
+                      <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;my_data_table_diff_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">))</span>
+        <span class="k">def</span> <span class="nf">change_button_style</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PreventUpdate</span>
+
+            <span class="n">white_button_style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;background-color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;black&#39;</span><span class="p">,</span>
+                                  <span class="c1"># &#39;height&#39;: &#39;50px&#39;,</span>
+                                  <span class="c1"># &#39;width&#39;: &#39;100px&#39;,</span>
+                                  <span class="c1"># &#39;margin-top&#39;: &#39;50px&#39;,</span>
+                                  <span class="c1"># &#39;margin-left&#39;: &#39;50px&#39;</span>
+                                  <span class="p">}</span>
+
+            <span class="n">red_button_style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;background-color&#39;</span><span class="p">:</span> <span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;white&#39;</span><span class="p">,</span>
+                                <span class="c1"># &#39;height&#39;: &#39;50px&#39;,</span>
+                                <span class="c1"># &#39;width&#39;: &#39;100px&#39;,</span>
+                                <span class="c1"># &#39;margin-top&#39;: &#39;50px&#39;,</span>
+                                <span class="c1"># &#39;margin-left&#39;: &#39;50px&#39;</span>
+                                <span class="p">}</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">red_button_style</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Commit </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> changes to DB&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">white_button_style</span><span class="p">,</span> <span class="s2">&quot;No changes to commit&quot;</span>
+
+        <span class="c1"># print(&quot;Set dash callbacks for PrepareDataPageEdit.capture_and_commit_edits&quot;)</span>
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span>
+            <span class="p">[</span>
+             <span class="n">Output</span><span class="p">(</span><span class="s2">&quot;my_data_table_diff_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+             <span class="n">Output</span><span class="p">(</span><span class="s1">&#39;commit_changes_button&#39;</span><span class="p">,</span> <span class="s1">&#39;disabled&#39;</span><span class="p">)],</span>
+            <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span><span class="p">,</span> <span class="s2">&quot;data_timestamp&quot;</span><span class="p">),</span>
+             <span class="n">Input</span><span class="p">(</span><span class="s2">&quot;commit_changes_button&quot;</span><span class="p">,</span> <span class="s2">&quot;n_clicks&quot;</span><span class="p">)],</span>
+            <span class="p">[</span>
+                <span class="n">State</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+                <span class="n">State</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span><span class="p">,</span> <span class="s2">&quot;data_previous&quot;</span><span class="p">),</span>
+                <span class="n">State</span><span class="p">(</span><span class="s2">&quot;my_data_table_diff_store&quot;</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">),</span>
+                <span class="n">State</span><span class="p">(</span><span class="s2">&quot;input_table_drpdwn&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
+                <span class="n">State</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">def</span> <span class="nf">capture_and_commit_edits</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span> <span class="n">n_clicks</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">data_previous</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;Combined callback for either editing cells in the DataTable, or pressing the commit button.</span>
+<span class="sd">            Editing a cell detects and stores changes in the diff store.</span>
+<span class="sd">            The commit button performs updates in the DB and clears the diff store.</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">ctx</span> <span class="o">=</span> <span class="n">dash</span><span class="o">.</span><span class="n">callback_context</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">ctx</span><span class="o">.</span><span class="n">triggered</span><span class="p">:</span>
+                <span class="c1"># print(f&quot;Not triggered. diff_store_data = {diff_store_data}&quot;)</span>
+                <span class="c1"># raise PreventUpdate</span>
+                <span class="c1"># Attempt to enable Commit button if there are changes pending in the diff-store after a &#39;Refresh&#39; button click</span>
+                <span class="c1"># Note that the value of the change in the table has been lost due to the refresh, but not the Store</span>
+                <span class="c1"># So the diff can still be committed, but doesn&#39;t properly show in the table</span>
+                <span class="k">if</span> <span class="n">diff_store_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">PreventUpdate</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">diff_store_data</span><span class="p">,</span> <span class="kc">False</span>
+
+            <span class="n">triggered_component_id</span> <span class="o">=</span> <span class="n">ctx</span><span class="o">.</span><span class="n">triggered</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;prop_id&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">triggered_component_id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_table_id</span><span class="p">:</span>
+                <span class="c1"># print(&quot;Triggered by a table edit&quot;)</span>
+                <span class="n">diff_store_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">capture_diffs_callback</span><span class="p">(</span><span class="n">ts</span><span class="p">,</span><span class="n">data</span><span class="p">,</span> <span class="n">data_previous</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">)</span>
+                <span class="n">commit_button_disabled</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">elif</span> <span class="n">triggered_component_id</span> <span class="o">==</span> <span class="s1">&#39;commit_changes_button&#39;</span><span class="p">:</span>
+                <span class="c1"># print(&quot;Triggered by commit button&quot;)</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">commit_changes_to_db_callback</span><span class="p">(</span><span class="n">n_clicks</span><span class="p">,</span> <span class="n">diff_store_data</span><span class="p">)</span>
+                <span class="n">diff_store_data</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># Clear diff store</span>
+                <span class="n">commit_button_disabled</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Triggered by unknown component </span><span class="si">{</span><span class="n">triggered_component_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">PreventUpdate</span>
+
+            <span class="k">return</span> <span class="n">diff_store_data</span><span class="p">,</span> <span class="n">commit_button_disabled</span></div></div>
+
+
+        <span class="c1"># @app.callback(</span>
+        <span class="c1">#     [Output(&quot;my_data_table_diff_store&quot;, &quot;data&quot;),</span>
+        <span class="c1">#      Output(&#39;commit_changes_button&#39;, &#39;disabled&#39;)],</span>
+        <span class="c1">#     [Input(&quot;my_data_table&quot;, &quot;data_timestamp&quot;)],</span>
+        <span class="c1">#     [</span>
+        <span class="c1">#         State(&quot;my_data_table&quot;, &quot;data&quot;),</span>
+        <span class="c1">#         State(&quot;my_data_table&quot;, &quot;data_previous&quot;),</span>
+        <span class="c1">#         State(&quot;my_data_table_diff_store&quot;, &quot;data&quot;),</span>
+        <span class="c1">#         State(&quot;input_table_drpdwn&quot;, &quot;value&quot;),</span>
+        <span class="c1">#         State(&#39;top_menu_scenarios_drpdwn&#39;, &#39;value&#39;),</span>
+        <span class="c1">#     ],</span>
+        <span class="c1"># )</span>
+        <span class="c1"># def capture_diffs(ts, data, data_previous, diff_store_data, table_name: str, scenario_name: str):</span>
+        <span class="c1">#     &quot;&quot;&quot;Capture diffs and store in my_data_table_diff_store.&quot;&quot;&quot;</span>
+        <span class="c1">#     if ts is None:</span>
+        <span class="c1">#         raise PreventUpdate</span>
+        <span class="c1">#     diff_store_data = diff_store_data or {}</span>
+        <span class="c1">#     index_columns = None</span>
+        <span class="c1">#     table_schema: ScenarioTableSchema = self.dash_app.get_table_schema(table_name)</span>
+        <span class="c1">#     if table_schema is not None:</span>
+        <span class="c1">#         index_columns = table_schema.index_columns</span>
+        <span class="c1">#     diff_store_data[ts] = diff_dashtable_mi(data, data_previous, index_columns=index_columns, table_name=table_name, scenario_name=scenario_name)</span>
+        <span class="c1">#     return diff_store_data, False</span>
+
+        <span class="c1"># @app.callback(</span>
+        <span class="c1">#     Output(&quot;my_data_table_data_diff&quot;, &quot;children&quot;),</span>
+        <span class="c1">#     # Output(&quot;my_data_table_diff_store&quot;, &quot;data&quot;),</span>
+        <span class="c1">#     [Input(&quot;commit_changes_button&quot;, &quot;n_clicks&quot;)],</span>
+        <span class="c1">#     [State(&quot;my_data_table_diff_store&quot;, &quot;data&quot;)],</span>
+        <span class="c1"># )</span>
+        <span class="c1"># def update_output(n_clicks, diff_store_data):</span>
+        <span class="c1">#     if n_clicks is None:</span>
+        <span class="c1">#         raise PreventUpdate</span>
+        <span class="c1">#     if diff_store_data is None:</span>
+        <span class="c1">#         raise PreventUpdate</span>
+        <span class="c1">#     if diff_store_data:</span>
+        <span class="c1">#         dt_changes = []</span>
+        <span class="c1">#         for ts, v in diff_store_data.items():</span>
+        <span class="c1">#             dt_changes.append(f&quot;* {v} {ts}&quot;)</span>
+        <span class="c1">#         # for v in diff_store_data.values():</span>
+        <span class="c1">#         #     dt_changes.append(f&quot;* {v}&quot;)</span>
+        <span class="c1">#         output = [dcc.Markdown(change) for change in dt_changes]</span>
+        <span class="c1">#     else:</span>
+        <span class="c1">#         output = &quot;No Changes to DataTable&quot;</span>
+        <span class="c1">#</span>
+        <span class="c1">#     db_cell_updates = self.get_db_cell_updates(diff_store_data)</span>
+        <span class="c1">#     self.dash_app.dbm.update_cell_changes_in_db(db_cell_updates)</span>
+        <span class="c1">#</span>
+        <span class="c1">#     diff_store_data = {}</span>
+        <span class="c1">#</span>
+        <span class="c1">#     return output #, diff_store_data</span>
+
+<span class="c1">###########################################################################</span>
+<span class="c1"># Test to use the dcc.Location to stor the table name as a html variable</span>
+<span class="c1"># Disadvantage/problem is that a change to the url causes a page-reload</span>
+<span class="c1">###########################################################################</span>
+        <span class="c1"># @app.callback(Output(&quot;my_data_table_data_diff&quot;, &quot;children&quot;),</span>
+        <span class="c1">#               Input(&#39;url&#39;, &#39;search&#39;))</span>
+        <span class="c1"># def test_url_vars(search):</span>
+        <span class="c1">#     print(f&quot;test_url_vars = {search}&quot;)</span>
+        <span class="c1">#     return &quot;Test&quot;</span>
+        <span class="c1">#</span>
+        <span class="c1"># @app.callback(Output(&#39;url&#39;, &#39;search&#39;),</span>
+        <span class="c1">#               Input(&#39;input_table_drpdwn&#39;, &#39;value&#39;),</span>
+        <span class="c1">#               prevent_initial_call=True)</span>
+        <span class="c1"># def test_url_vars_output(table_name):</span>
+        <span class="c1">#     return f&quot;?table={table_name}&quot;</span>
+
+<span class="c1">##################################################################################</span>
+<span class="c1"># Test using a dcc.Store to store the table_name, so switching scenarios keeps the same table</span>
+<span class="c1"># Not straightforward: the callback update_data_and_pivot_input_table would have to do a context test to see which input triggered the callback</span>
+<span class="c1"># Also, not sure the store gets retained when switching scenarios</span>
+<span class="c1"># (surprisingly, that DOES seem to be the case for the diff-store!)</span>
+<span class="c1">##################################################################################</span>
+        <span class="c1"># @app.callback(Output(&#39;current_table_name&#39;, &#39;data&#39;),</span>
+        <span class="c1">#               Input(&#39;input_table_drpdwn&#39;, &#39;value&#39;))</span>
+        <span class="c1"># def store_table_name(table_name):</span>
+        <span class="c1">#     return table_name</span>
+        <span class="c1">#</span>
+        <span class="c1"># @app.callback(Output(&quot;my_data_table_data_diff&quot;, &quot;children&quot;),</span>
+        <span class="c1">#               Input(&#39;current_table_name&#39;, &#39;data&#39;))</span>
+        <span class="c1"># def test_table_name(data):</span>
+        <span class="c1">#     return data</span>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.prepare_data_page_edit</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>

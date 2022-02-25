@@ -1,0 +1,244 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Read me &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
+    
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="dse_do_dashboard" href="modules.html" />
+    <link rel="prev" title="Welcome to DSE DO Dashboard’s documentation!" href="index.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="dse_do_dashboard"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to DSE DO Dashboard’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Read me</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="read-me">
+<h1>Read me<a class="headerlink" href="#read-me" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="dse-do-dashboard">
+<h1>DSE_DO_Dashboard<a class="headerlink" href="#dse-do-dashboard" title="Permalink to this headline">¶</a></h1>
+<p>Plotly/Dash-based dashboard for Decision Optimization projects in IBM Cloud Pak for Data.</p>
+<p><a class="reference external" href="https://github.com/IBM/dse-do-dashboard">Source (GitHub)</a><span class="raw-html-m2r"><br></span>
+<a class="reference external" href="https://ibm.github.io/dse-do-dashboard/">Documentation (GitHubPages)</a></p>
+<p>This repository contains the package <code class="docutils literal notranslate"><span class="pre">dse_do_dashboard</span></code>. This can be installed using pip.</p>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>This re-usable and extendable framework allows a data-scientist to quickly configure a Plotly/Dash-based dashboard
+for a project in IBM Cloud Pak for Data. This package is mainly focussed on Decision Optimization projects,
+but can be used for any CPD project.</p>
+<p>Data exchange between the CPD project and the dashboard is through a (DB2/DB2WH/DB-on-cloud) database.
+The database contains one or more ‘scenarios’.
+A scenario is a set of named DataFrames, divided in 2 sets: inputs and outputs.</p>
+<p>A user would typically define a set of custom VisualizationPages, each containing one or more Plotly plots.
+In addition, Folium maps are supported.</p>
+<a class="reference external image-reference" href="docs/source/_static/MainDashboardLayout.jpg?raw=true"><img alt="DO Dashboard Layout" src="docs/source/_static/MainDashboardLayout.jpg?raw=true" /></a>
+<a class="reference external image-reference" href="_static/MainDashboardLayout.jpg?raw=true"><img alt="DO Dashboard Layout" src="_static/MainDashboardLayout.jpg?raw=true" /></a>
+</div>
+<div class="section" id="main-classes">
+<h2>Main classes<a class="headerlink" href="#main-classes" title="Permalink to this headline">¶</a></h2>
+<ol class="arabic simple">
+<li><p>DoDashApp. Main class that contains the framework code for the dashboard. Subclass to define your dashboard.</p></li>
+<li><p>VisualizationPage. Subclass for each visualization page in your dashboard.</p></li>
+</ol>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>Main steps:</p>
+<ol class="arabic simple">
+<li><p>In your CPD project, define subclasses for <code class="docutils literal notranslate"><span class="pre">dse_do_utils.DataManager</span></code>, <code class="docutils literal notranslate"><span class="pre">dse_do_utils.ScenarioDbManager</span></code>, and <code class="docutils literal notranslate"><span class="pre">dse_do_utils.PlotlyManager</span></code></p></li>
+<li><p>Subclass <code class="docutils literal notranslate"><span class="pre">dse_do_dashboard.DoDashApp</span></code>.</p></li>
+<li><p>For each custom visualization page, define a subclass of <code class="docutils literal notranslate"><span class="pre">dse_do_dashboard.VisualizationPage</span></code>.</p></li>
+<li><p>Provision a database (DB2 or Db2-on-cloud), get the credentials.</p></li>
+<li><p>Use the <code class="docutils literal notranslate"><span class="pre">dse_do_utils.ScenarioDbManager</span></code> in your CPD project to insert one or more scenarios in the DB.</p></li>
+<li><p>Create an <code class="docutils literal notranslate"><span class="pre">index.py</span></code> file that creates and instance of the DoDashApp and runs the server.</p></li>
+<li><p>Run <code class="docutils literal notranslate"><span class="pre">index.py</span></code> to start the dashboard. Open link with browser.</p></li>
+</ol>
+</div>
+<div class="section" id="dodashapp-ui-structure">
+<h2>DoDashApp UI structure<a class="headerlink" href="#dodashapp-ui-structure" title="Permalink to this headline">¶</a></h2>
+<p>An instance of a DoDashApp will have the following UI layout:</p>
+<ol class="arabic simple">
+<li><p>A top-menu bar with the logo and a drop-down menu to select the scenario.</p></li>
+<li><p>A left side-bar menu with 5 ‘main’ pages:</p>
+<ol class="arabic simple">
+<li><p>Home: Select reference scenarios. To be further developed.</p></li>
+<li><p>Prepare Data: Out-of-the-box UI to review the input tables.</p></li>
+<li><p>Run Model: run a deployed DO. To be further developed.</p></li>
+<li><p>Explore Solution: Out-of-the-box UI to review the output tables.</p></li>
+<li><p>Visualization: A tabbed-view of the custom VisualizationPages.</p></li>
+</ol>
+</li>
+<li><p>In the left side-bar a collapsable menu with the custom VisualizationPages</p></li>
+</ol>
+</div>
+<div class="section" id="dodashapp-example">
+<h2>DoDashApp Example<a class="headerlink" href="#dodashapp-example" title="Permalink to this headline">¶</a></h2>
+<p>An example of a dashboard class that contains 2 custom VisualizationPages: KpiPage and DemandPage.
+Most important:</p>
+<ol class="arabic simple">
+<li><p>Create instances of the VisualizationPages</p></li>
+<li><p>Specify the class names of the DataManager, ScenarioDbManager and PlotlyManager</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">FruitDashApp</span><span class="p">(</span><span class="n">DoDashApp</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">db_credentials</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">schema</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">cache_config</span><span class="p">:</span> <span class="n">Dict</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">port</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8050</span><span class="p">,</span> <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">host_env</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">visualization_pages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">KpiPage</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="n">DemandPage</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="n">logo_file_name</span> <span class="o">=</span> <span class="s2">&quot;logistics.jpg&quot;</span>
+
+        <span class="n">database_manager_class</span> <span class="o">=</span> <span class="n">FruitScenarioDbManager</span>
+        <span class="n">data_manager_class</span> <span class="o">=</span> <span class="n">FruitDataManager</span>
+        <span class="n">plotly_manager_class</span> <span class="o">=</span> <span class="n">FruitPlotlyManager</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">db_credentials</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span>
+                         <span class="n">logo_file_name</span><span class="o">=</span><span class="n">logo_file_name</span><span class="p">,</span>
+                         <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span><span class="p">,</span>
+                         <span class="n">visualization_pages</span> <span class="o">=</span> <span class="n">visualization_pages</span><span class="p">,</span>
+                         <span class="n">database_manager_class</span><span class="o">=</span><span class="n">database_manager_class</span><span class="p">,</span>
+                         <span class="n">data_manager_class</span><span class="o">=</span><span class="n">data_manager_class</span><span class="p">,</span>
+                         <span class="n">plotly_manager_class</span><span class="o">=</span><span class="n">plotly_manager_class</span><span class="p">,</span>
+                         <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">,</span> <span class="n">host_env</span><span class="o">=</span><span class="n">host_env</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualizationpage-example">
+<h2>VisualizationPage example<a class="headerlink" href="#visualizationpage-example" title="Permalink to this headline">¶</a></h2>
+<p>Example of a custom VisualizationPage.
+It uses the Plotly1ColumnVisualizationPage that creates a one-column vertical layout of a set of Plotly figures.
+Most important:</p>
+<ol class="arabic simple">
+<li><p>Create a subclass of VisualizationPage (in this case of a Plotly1ColumnVisualizationPage). Specify the name, url and id.</p></li>
+<li><p>Specify the names of the input and output tables that need to be loaded for the visualizations on this page.</p></li>
+<li><p>Define methods on the PlotlyManager that create Plotly Figures and add to method <code class="docutils literal notranslate"><span class="pre">get_plotly_figures</span></code>.</p></li>
+</ol>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">DemandPage</span><span class="p">(</span><span class="n">Plotly1ColumnVisualizationPage</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">:</span> <span class="n">DoDashApp</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dash_app</span><span class="o">=</span><span class="n">dash_app</span><span class="p">,</span>
+                         <span class="n">page_name</span><span class="o">=</span><span class="s1">&#39;Demand&#39;</span><span class="p">,</span>
+                         <span class="n">page_id</span><span class="o">=</span><span class="s1">&#39;demand_tab&#39;</span><span class="p">,</span>
+                         <span class="n">url</span><span class="o">=</span><span class="s1">&#39;demand&#39;</span><span class="p">,</span>
+                         <span class="n">input_table_names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Demand&#39;</span><span class="p">,</span><span class="s1">&#39;Inventory&#39;</span><span class="p">],</span>  <span class="c1"># Use [&#39;*&#39;] to include all tables</span>
+                         <span class="n">output_table_names</span><span class="o">=</span><span class="p">[],</span>
+                         <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_plotly_figures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pm</span><span class="p">:</span> <span class="n">PlotlyManager</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Figure</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">pm</span><span class="o">.</span><span class="n">plotly_demand_pie</span><span class="p">(),</span>
+            <span class="n">pm</span><span class="o">.</span><span class="n">plotly_demand_vs_inventory_bar</span><span class="p">(),</span>
+        <span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Read me</a></li>
+<li><a class="reference internal" href="#dse-do-dashboard">DSE_DO_Dashboard</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#main-classes">Main classes</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+<li><a class="reference internal" href="#dodashapp-ui-structure">DoDashApp UI structure</a></li>
+<li><a class="reference internal" href="#dodashapp-example">DoDashApp Example</a></li>
+<li><a class="reference internal" href="#visualizationpage-example">VisualizationPage example</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to DSE DO Dashboard’s documentation!</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="next chapter">dse_do_dashboard</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/readme_link.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="dse_do_dashboard"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to DSE DO Dashboard’s documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Read me</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>

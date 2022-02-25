@@ -7,6 +7,7 @@ import os
 import pathlib
 import tempfile
 import zipfile
+from typing import List
 
 import flask
 import pandas as pd
@@ -36,8 +37,15 @@ class HomePageEdit(MainPage):
                          url='',
                          )
 
-    def get_layout(self):
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
+
+        # print(f"get_layout ref_scenario={reference_scenario_name} , ms={multi_scenario_names}")
+        selected_ref_scenarios = [] if multi_scenario_names is None else multi_scenario_names
+
+        # Reconcile reference_scenario_name and multi_scenario_names with actual scenarios? (if in the mean time a scenario got deleted)
+        selected_ref_scenario = reference_scenario_name if reference_scenario_name in scenarios_df.index else None
+        selected_ref_scenarios = [i for i in selected_ref_scenarios if i in scenarios_df.index]
 
         layout = html.Div([
 
@@ -46,14 +54,37 @@ class HomePageEdit(MainPage):
                 dbc.CardBody([
                     # dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
                     dcc.Dropdown(
-                        id='reference_scenario',
+                        id='reference_scenario_drpdwn',
                         options=[
                             {'label': i, 'value': i}
                             # for i in scenarios_df.reset_index().scenario_name
                             for i in scenarios_df.index
-                        ],  style = {'width': '28vw'})
+                        ],
+                        value=selected_ref_scenario,
+                        style = {'width': '28vw'})
                 ])
-            ], style = {'width': '30vw'}),
+            ], #style = {'width': '30vw'}
+            ),
+
+            dbc.Card([
+                dbc.CardHeader(html.Div("Reference Scenarios", style={'width': '28vw'})),
+                dbc.CardBody([
+                    # dbc.CardHeader(html.Div("Reference Scenario", style={'width': '28vw'})),
+                    dcc.Checklist(
+                        id='reference_scenarios_checklist',
+                        options=[
+                            {'label': i, 'value': i}
+                            # for i in scenarios_df.reset_index().scenario_name
+                            for i in scenarios_df.index
+                        ],
+                        value=selected_ref_scenarios,
+                        labelStyle={'display': 'block'},
+                        # style={"overflow":"auto"}
+                        # style = {'width': '28vw'}
+                    )
+                ])
+            ], #style = {'width': '30vw'}
+            ),
 
             dbc.Card([
                 dbc.CardHeader(html.Div("Scenarios", style={'width': '80vw'})),
@@ -331,7 +362,7 @@ class HomePageEdit(MainPage):
                         print("Input tables: {}".format(", ".join(inputs.keys())))
                         print("Output tables: {}".format(", ".join(outputs.keys())))
                         self.dash_app.dbm.replace_scenario_in_db(scenario_name=scenario_name, inputs=inputs, outputs=outputs)  #
-                        unzip_results.append(html.P(f"Uploaded scenario: '{scenario_name}' from '{filename}'"),)
+                        unzip_results.append(html.P(f"Uploaded scenario: '{scenario_name}' from '{info.filename}'"),)
                     else:
                         unzip_results.append(html.P(f"File: '{info.filename}' is not a .xlsx. Skipped."),)
                 child = html.Div(unzip_results)
@@ -612,3 +643,22 @@ class HomePageEdit(MainPage):
         def update_output(n_clicks):
             self.dash_app.shutdown()
             return 'The stop button has been clicked {} times.'.format(n_clicks)
+
+        ##############################################################################
+        #  Select Reference Scenarios
+        ##############################################################################
+        @app.callback(
+            Output('reference_scenario_name_store', 'data'),
+            Input('reference_scenario_drpdwn', 'value'),
+        )
+        def store_reference_scenario(reference_scenario_name):
+            # print(f"Selected ref scenario = {reference_scenario_name}")
+            return reference_scenario_name
+
+        @app.callback(
+            Output('multi_scenario_names_store', 'data'),
+            Input('reference_scenarios_checklist', 'value'),
+        )
+        def store_multi_scenario_names(multi_scenario_names):
+            # print(f"Multi scenario names = {multi_scenario_names}")
+            return multi_scenario_names

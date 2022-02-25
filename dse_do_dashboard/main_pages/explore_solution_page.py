@@ -1,5 +1,8 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+from typing import Optional, List
+
+from dash.exceptions import PreventUpdate
 
 from dse_do_dashboard.main_pages.main_page import MainPage
 from dash.dependencies import Input, Output
@@ -17,8 +20,8 @@ class ExploreSolutionPage(MainPage):
                          url='explore-solution',
                          )
 
-    def get_layout(self):
-        input_tables = self.dash_app.get_output_table_names()
+    def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
+        output_tables = self.dash_app.get_output_table_names()
         layout = html.Div([
 
             dbc.Card([
@@ -26,8 +29,8 @@ class ExploreSolutionPage(MainPage):
                 dbc.CardBody(
                     dcc.Dropdown(id='output_table_drpdwn',
                                  options=[ {'label': i, 'value': i}
-                                           for i in input_tables],
-                                 value=input_tables[0],
+                                           for i in output_tables],
+                                 value=(output_tables[0] if len(output_tables) > 0 else None),  # In case there are no output tables
                                  style = {'width': '75vw','height': '2vw'},
                                  ),
                 ),
@@ -49,8 +52,10 @@ class ExploreSolutionPage(MainPage):
         return layout
 
 
-    def update_data_and_pivot_output_table_callback(self, scenario_name, table_name):
+    def update_data_and_pivot_output_table_callback(self, scenario_name, table_name: Optional[str]):
         """Body for the Dash callback.
+
+        :param table_name (str): name of selected table. Can be None if no tables.
 
         Usage::
 
@@ -65,6 +70,9 @@ class ExploreSolutionPage(MainPage):
                 return [data_table_children, pivot_table_children]
 
         """
+        if table_name is None:
+            # In case there are no output tables
+            raise PreventUpdate
         output_table_names = [table_name]
         pm = self.dash_app.get_plotly_manager(scenario_name, [], output_table_names)
         dm = pm.dm

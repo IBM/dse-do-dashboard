@@ -1,17 +1,18 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
+import time
 from typing import Dict, List, Optional
 
 import pandas as pd
 
 from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
 from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
+from dse_do_dashboard.utils.domodelrunner import DoModelRunner, DoModelRunnerConfig
 from dse_do_utils import DataManager
 from dse_do_utils.scenariodbmanager import ScenarioDbManager
 
 from dse_do_dashboard.dash_app import DashApp, HostEnvironment
-from dash import html, Output, Input, State
+from dash import dcc, html, Output, Input, State
 import dash_bootstrap_components as dbc
 
 from dse_do_dashboard.main_pages.explore_solution_page import ExploreSolutionPage
@@ -24,6 +25,7 @@ from dse_do_dashboard.main_pages.visualization_tabs_page import VisualizationTab
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema, PivotTableConfig
 from dse_do_utils.plotlymanager import PlotlyManager
 from dse_do_dashboard.visualization_pages.visualization_page import VisualizationPage
+
 
 
 class DoDashApp(DashApp):
@@ -57,7 +59,10 @@ class DoDashApp(DashApp):
                  plotly_manager_class=None,
                  port: Optional[int] = 8050,
                  dash_debug: Optional[bool] = False,
-                 host_env: Optional[HostEnvironment] = None
+                 host_env: Optional[HostEnvironment] = None,
+                 bootstrap_theme=dbc.themes.BOOTSTRAP,
+                 bootstrap_figure_template:str="bootstrap",
+                 enable_long_running_callbacks: bool = False,
                  ):
         """Create a Dashboard app.
 
@@ -78,6 +83,7 @@ class DoDashApp(DashApp):
         :param host_env: If HostEnvironment.CPD402, will use the ws_applications import make_link to
         generate a requests_pathname_prefix for the Dash app. For use with custom environment in CPD v4.0.02.
         The alternative (None of HostEnvironment.Local) runs the Dash app regularly.
+        :param enable_long_running_callbacks. Default = True. Enables the use of Dash long-running callbacks for model runs. If False, it only allows for in-line runs.
         """
         self.db_credentials = db_credentials
         self.schema = schema
@@ -123,18 +129,38 @@ class DoDashApp(DashApp):
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
 
-        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port, dash_debug=dash_debug, host_env=host_env)
+        self.job_queue: List[DoModelRunner] = []  # TODO: migrate to Store. Using global variables is dangerous
+
+        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port,
+                         dash_debug=dash_debug, host_env=host_env,
+                         bootstrap_theme=bootstrap_theme, bootstrap_figure_template=bootstrap_figure_template,
+                         enable_long_running_callbacks=enable_long_running_callbacks,)
 
     def create_database_manager_instance(self) -> ScenarioDbManager:
         """Create an instance of a ScenarioDbManager.
         The default implementation uses the database_manager_class from the constructor.
         Optionally, override this method."""
         if self.database_manager_class is not None and self.db_credentials is not None:
-            print(f"Connecting to DB2 at {self.db_credentials['host']}")
+            print(f"Connecting to DB2 at {self.db_credentials['host']}, schema = {self.schema}")
             dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo)
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
         return dbm
+
+    def get_app_stores(self) -> List[dcc.Store]:
+        """Add global dcc.Stores"""
+        stores = [
+            # For reference scenario(s):
+            # TODO
+        ]
+        if self.enable_long_running_callbacks:
+            stores.extend([
+                # For long-running callbacks for model runs:
+                dcc.Store(id='lrc_job_trigger_store'),
+                dcc.Store(id='lrc_job_log_store'),
+                dcc.Store(id='lrc_job_queue_data_store'),
+            ])
+        return stores
 
     def create_main_pages(self) -> List[MainPage]:
         """Creates the ordered list of main pages for the DO app.
@@ -329,8 +355,9 @@ class DoDashApp(DashApp):
         Same as `read_scenario_tables_from_db`, but calls `read_scenario_table_from_db_cached`.
         Is called from dse_do_dashboard.DoDashApp to create the PlotlyManager."""
 
-        if input_table_names is None:  # load all tables by default
-            input_table_names = list(self.dbm.input_db_tables.keys())
+        if input_table_names is None:
+            # input_table_names = list(self.dbm.input_db_tables.keys())  #This is not consistent with implementation in ScenarioDbManager! Replace by empty list
+            input_table_names = []
             if 'Scenario' in input_table_names: input_table_names.remove('Scenario')  # Remove the scenario table
         if output_table_names is None:  # load all tables by default
             output_table_names = self.dbm.output_db_tables.keys()
@@ -345,11 +372,13 @@ class DoDashApp(DashApp):
             # print(f"read output table {scenario_table_name}")
             outputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
         return inputs, outputs
+
     ########################################################################################
     # End DB caching callbacks
     ########################################################################################
 
-    def display_content_callback(self, pathname: str, scenario_name: str):
+    def display_content_callback(self, pathname: str, scenario_name: str,
+                                 reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
         """Callback for main content area. Will update the content area.
         Will need to be called through callback in index.py, where `DA` is the instance of the DashApp.
 
@@ -373,10 +402,10 @@ class DoDashApp(DashApp):
         #     return self.get_visualization_tabs_page().get_layout()
         if page_name in self.main_pages_dict_by_url_page_name:
             page = self.main_pages_dict_by_url_page_name[page_name]
-            layout = page.get_layout()
+            layout = page.get_layout(scenario_name, reference_scenario_name, multi_scenario_names)
         elif page_name in self.visualization_pages_dict_by_url_page_name:
             vp = self.visualization_pages_dict_by_url_page_name[page_name]
-            layout = vp.get_layout(scenario_name)
+            layout = vp.get_layout(scenario_name, reference_scenario_name, multi_scenario_names)
         else:
             layout = self.get_not_found_page().get_layout(f"Page '{pathname}' not found")
         return layout
@@ -388,7 +417,13 @@ class DoDashApp(DashApp):
     #
     ###########################################################################################################
 
-    def get_plotly_manager(self, scenario_name: str, input_table_names: List[str] = None, output_table_names: List[str] = None) -> PlotlyManager:
+    def get_plotly_manager(self, scenario_name: str,
+                           input_table_names: List[str] = None,
+                           output_table_names: List[str] = None,
+                           reference_scenario_name: str = None,  # TODO: support single reference scenario
+                           multi_scenario_names: List[str] = None,
+                           enable_reference_scenario: bool = False,
+                           enable_multi_scenario: bool = False) -> PlotlyManager:
         """Creates the PlotlyManager based on the plotly_manager_class and the data_manager_class.
         Loads data for selected input and output tables from the DB, creates a DataManager and embeds into a PlotlyManager.
 
@@ -402,6 +437,25 @@ class DoDashApp(DashApp):
             dm = self.data_manager_class(inputs, outputs)
             dm.prepare_data_frames()
             pm = self.plotly_manager_class(dm)
+
+            # print(f"get_plotly_manager. Input tables = {input_table_names}")
+            if enable_reference_scenario and reference_scenario_name is not None:
+                inputs, outputs = self.read_scenario_tables_from_db_cached(reference_scenario_name, input_table_names, output_table_names)
+                ref_dm = self.data_manager_class(inputs, outputs)
+                ref_dm.prepare_data_frames()
+                pm.ref_dm = ref_dm  # TODO: add to pm via constructor
+            else:
+                pm.ref_dm = None
+
+            if enable_multi_scenario and multi_scenario_names is not None:
+                # TODO: this is not (yet) cached. Add caching.
+                ms_inputs, ms_outputs = self.dbm.read_multi_scenario_tables_from_db(multi_scenario_names, input_table_names, output_table_names)
+                # TODO: for now just add as properties of the pm, since the dm is for one scenario. Maybe we'll need a `MultiScenarioDataManager`?
+                pm.ms_inputs = ms_inputs
+                pm.ms_outputs = ms_outputs
+            else:
+                pm.ms_inputs = None
+                pm.ms_outputs = None
         else:
             print("Error: either specify the `data_manager_class` and the `plotly_manager_class` or override the method `get_plotly_manager`.")
             pm = None
@@ -566,3 +620,56 @@ class DoDashApp(DashApp):
                 return not is_open
             return is_open
 
+        if self.enable_long_running_callbacks:
+            app = self.app
+            runner_config_dict = {config.runner_id: config for config in self.get_do_model_runner_configs()}
+            @app.long_callback(
+                output=Output('lrc_job_log_store', 'data'),
+                inputs=(
+                        Input('lrc_job_trigger_store', 'data'),
+                ),
+                progress=Output('lrc_job_queue_data_store', 'data'), # Global store
+                progress_default=[],
+                prevent_initial_call=True,
+            )
+            def run_model_long_callback(
+                    set_progress,
+                    n_clicks,
+            ):
+                print(f"n_clicks = {n_clicks}")
+                trigger = n_clicks
+                if trigger is None:
+                    return "None"
+                scenario_name = n_clicks['scenario_name']
+                do_model_class_name = n_clicks['do_model_class_name']
+                print(f"RunModelPage2.run_model_callback_LRC model = {do_model_class_name}")
+                if do_model_class_name == 'None':
+                    return "None"
+                progress_dict = {'scenario': scenario_name, 'model': do_model_class_name, 'run_status': 'initializing'}
+                set_progress([progress_dict])
+                # time.sleep(1)
+
+                progress_dict['run_status'] = 'running'
+                set_progress([progress_dict])
+
+                runner_class = runner_config_dict[do_model_class_name].runner_class
+                runner = runner_class(scenario_name)
+                runner.run()
+
+                print("set_progress")
+                progress_dict['run_status'] = 'done'
+                set_progress([progress_dict])
+
+                # time.sleep(4)
+
+                log = f"Run {do_model_class_name} with scenario {scenario_name}\n" \
+                      "Log: \n" \
+                      f"{runner.log}"
+                return log
+
+    def get_do_model_runner_configs(self) -> List[DoModelRunnerConfig]:
+        """Returns the model runners for the 'Run Model' page.
+        Needs to be overridden.
+        """
+        configs = []
+        return configs

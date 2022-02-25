@@ -90,7 +90,8 @@ def get_data_table(df, table_schema: Optional[ScenarioTableSchema] = None, edita
         data_table_id = 'my_data_table'
     index_columns = []
     if table_schema is not None:
-        df = df.set_index(table_schema.index_columns).reset_index()  # ensures all index columns are first
+        if len(table_schema.index_columns) > 0:
+            df = df.set_index(table_schema.index_columns).reset_index()  # ensures all index columns are first
         index_columns = table_schema.index_columns
     return dash_table.DataTable(
         id=data_table_id,

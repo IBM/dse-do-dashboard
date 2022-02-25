@@ -480,8 +480,8 @@ class PharmaPlotlyManager(ScnfoPlotlyManager):
         df['location_product'] = df.productCountry + " - " +  df.productName
 
         color_discrete_map = self.gen_color_col(df['location_product'])
-        print(f"color_discrete_map={color_discrete_map}")
-        print(f"location_product = {df['location_product'].unique()}")
+        # print(f"color_discrete_map={color_discrete_map}")
+        # print(f"location_product = {df['location_product'].unique()}")
 
         labels = {'timePeriodSeq': 'Time Period', 'quantity': 'Quantity', 'productName': 'Product Name', 'productGroup':'Product Group',
                   'var_name': 'Var', 'location_product': 'Product Country'}

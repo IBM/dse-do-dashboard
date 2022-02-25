@@ -4,7 +4,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.1.1b0]
+## [Unreleased]## [0.1.2.1b]
+### Changed
+
+## [0.1.2.0] - 2022-02-24
+### Changed
+- Version bump-up from 0.1.1.1b to 0.1.2.0 due to new features
+- Fixed bug in KpiPageTemplate.__init__
+- Changed documentation build folder to `docs/doc_build`
+- Install requirement of SQLAlchemy >=1.3.23, <1.4 (setup.py)
+- Fixed versions of all required packages to match CPD 4.0.5
+- Upgraded to dse-do-utils v0.5.4.2
+- Fixed bug in PrepareDataPageEdit.get_data_table when zero index-columns
+- Fixed bug in dash_common_utils.get_data_table when zero index-columns
+- Fix in VisualizationTabsPage (hard-coded 'demand_tab' initial value)
+### Added
+- Reference scenario - PlotlyManager gets a pm.ref_dm based on the selected reference_scenario
+- Multi scenario compare - PlotlyManager gets a pm.ms_inputs and pm.ms_outputs dict of DataFrames for scenario compare
+- Improved support for interactive visualization pages: VisualizationPage stores PlotlyManager in `self.pm` in `VisualizationPage.get_layout`
+- DashApp.get_app_layout: added `className="dbc"` to support Bootstrap CSS, see https://hellodash.pythonanywhere.com/about_dbc_css
+- DashApp and DoDashApp constructors: added bootstrap_theme and bootstrap_figure_template to support Bootstrap CSS
+- PlotlyRowsVisualizationPage template to easily add a visualization page of rows of Plotly Figures
+- utils.domodelrunner and utils.donotebookrunner modules
+- RunModel page with IO for running in-line and long-running model callbacks
 
 ## [0.1.1.0] - 2022-01-11
 ### Changed

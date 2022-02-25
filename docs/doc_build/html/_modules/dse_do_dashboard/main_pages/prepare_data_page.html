@@ -1,0 +1,215 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.main_pages.prepare_data_page &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.prepare_data_page</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dse_do_dashboard.main_pages.prepare_data_page</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright IBM All Rights Reserved.</span>
+<span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">dash.exceptions</span> <span class="kn">import</span> <span class="n">PreventUpdate</span>
+
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.main_page</span> <span class="kn">import</span> <span class="n">MainPage</span>
+<span class="kn">from</span> <span class="nn">dash.dependencies</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span>
+<span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.utils.dash_common_utils</span> <span class="kn">import</span> <span class="n">get_data_table_card_children</span><span class="p">,</span> <span class="n">get_pivot_table_card_children</span>
+
+
+<div class="viewcode-block" id="PrepareDataPage"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page.PrepareDataPage">[docs]</a><span class="k">class</span> <span class="nc">PrepareDataPage</span><span class="p">(</span><span class="n">MainPage</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">,</span>
+                 <span class="n">page_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;Prepare Data&#39;</span><span class="p">,</span>
+                 <span class="n">page_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;prepare-data&#39;</span><span class="p">,</span>
+                 <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;prepare-data&#39;</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dash_app</span><span class="p">,</span>
+                         <span class="n">page_name</span><span class="o">=</span><span class="n">page_name</span><span class="p">,</span>
+                         <span class="n">page_id</span><span class="o">=</span><span class="n">page_id</span><span class="p">,</span>
+                         <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+                         <span class="p">)</span>
+
+<div class="viewcode-block" id="PrepareDataPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page.PrepareDataPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># input_tables = self.dash_app.get_input_table_names()</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_input_table_selection_card</span><span class="p">(),</span>
+            <span class="c1"># dbc.Card([</span>
+            <span class="c1">#     dbc.CardHeader(&#39;Input Table&#39;, style= {&#39;fullscreen&#39;:True}),</span>
+            <span class="c1">#     dbc.CardBody(</span>
+            <span class="c1">#         dcc.Dropdown(id=&#39;input_table_drpdwn&#39;,</span>
+            <span class="c1">#                      options=[ {&#39;label&#39;: i, &#39;value&#39;: i}</span>
+            <span class="c1">#                                for i in input_tables],</span>
+            <span class="c1">#                      value=input_tables[0],</span>
+            <span class="c1">#                      style = {&#39;width&#39;: &#39;75vw&#39;,&#39;height&#39;:&#39;2vw&#39;},</span>
+            <span class="c1">#                      ),</span>
+            <span class="c1">#     ),</span>
+            <span class="c1"># ], style = {&#39;width&#39;: &#39;80vw&#39;}),</span>
+
+            <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+                <span class="c1"># dbc.CardHeader(&#39;Input Table&#39;),</span>
+                <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;input_data_table_card&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;79vw&#39;</span><span class="p">}</span> <span class="p">),</span>
+                <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;input_data_table_div&quot;</span><span class="p">),</span>  <span class="c1"># TODO: not being used? If so cleanup.</span>
+            <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;80vw&#39;</span><span class="p">}),</span>
+
+            <span class="c1"># dbc.Card([</span>
+            <span class="c1">#</span>
+            <span class="c1">#     dbc.CardBody(id = &#39;input_pivot_table_card&#39;,style = {&#39;width&#39;: &#39;79vw&#39;}),</span>
+            <span class="c1">#     html.Div(id=&quot;input_pivot_table_div&quot;),</span>
+            <span class="c1"># ], style = {&#39;width&#39;: &#39;80vw&#39;})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_pivot_table_card</span><span class="p">(),</span>
+
+        <span class="p">])</span>
+        <span class="k">return</span> <span class="n">layout</span></div>
+
+<div class="viewcode-block" id="PrepareDataPage.get_input_table_selection_card"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page.PrepareDataPage.get_input_table_selection_card">[docs]</a>    <span class="k">def</span> <span class="nf">get_input_table_selection_card</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">input_tables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_input_table_names</span><span class="p">()</span>
+        <span class="n">card</span> <span class="o">=</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">CardHeader</span><span class="p">(</span><span class="s1">&#39;Input Table&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;fullscreen&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}),</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Dropdown</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;input_table_drpdwn&#39;</span><span class="p">,</span>
+                             <span class="n">options</span><span class="o">=</span><span class="p">[</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">}</span>
+                                       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">input_tables</span><span class="p">],</span>
+                             <span class="n">value</span><span class="o">=</span><span class="p">(</span><span class="n">input_tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_tables</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">),</span>  <span class="c1"># Handle zero input tables (rare)</span>
+                             <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;75vw&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">:</span> <span class="s1">&#39;2vw&#39;</span><span class="p">},</span>
+                             <span class="p">),</span>
+            <span class="p">),</span>
+        <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;80vw&#39;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">card</span></div>
+
+<div class="viewcode-block" id="PrepareDataPage.get_pivot_table_card"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page.PrepareDataPage.get_pivot_table_card">[docs]</a>    <span class="k">def</span> <span class="nf">get_pivot_table_card</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">card</span> <span class="o">=</span> <span class="n">dbc</span><span class="o">.</span><span class="n">Card</span><span class="p">([</span>
+            <span class="n">dbc</span><span class="o">.</span><span class="n">CardBody</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;input_pivot_table_card&#39;</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;79vw&#39;</span><span class="p">}),</span>
+            <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;input_pivot_table_div&quot;</span><span class="p">),</span>
+        <span class="p">],</span> <span class="n">style</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;width&#39;</span><span class="p">:</span> <span class="s1">&#39;80vw&#39;</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">card</span></div>
+
+<div class="viewcode-block" id="PrepareDataPage.update_data_and_pivot_input_table_callback"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page.PrepareDataPage.update_data_and_pivot_input_table_callback">[docs]</a>    <span class="k">def</span> <span class="nf">update_data_and_pivot_input_table_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Body for the Dash callback.</span>
+
+<span class="sd">        :param scenario_name: name of scenario</span>
+<span class="sd">        :param table_name: name of input table. Theoretically can be None if no input tables</span>
+
+<span class="sd">        Usage::</span>
+
+<span class="sd">            @app.callback([Output(&#39;input_data_table_card&#39;, &#39;children&#39;),</span>
+<span class="sd">            Output(&#39;input_pivot_table_card&#39;, &#39;children&#39;)],</span>
+<span class="sd">            [Input(&#39;top_menu_scenarios_drpdwn&#39;, &#39;value&#39;),</span>
+<span class="sd">            Input(&#39;input_table_drpdwn&#39;, &#39;value&#39;)])</span>
+<span class="sd">            def update_data_and_pivot_input_table(scenario_name, table_name):</span>
+<span class="sd">                data_table_children, pivot_table_children = DA.update_data_and_pivot_input_table_callback(scenario_name, table_name)</span>
+<span class="sd">                return [data_table_children, pivot_table_children]</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># print(f&quot;update_data_and_pivot_input_table for {table_name} in {scenario_name}&quot;)</span>
+        <span class="k">if</span> <span class="n">table_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># In case there are no input tables (rare)</span>
+            <span class="k">raise</span> <span class="n">PreventUpdate</span>
+        <span class="n">input_table_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">table_name</span><span class="p">]</span>
+        <span class="n">pm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">input_table_names</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="n">pm</span><span class="o">.</span><span class="n">dm</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_table_by_name</span><span class="p">(</span><span class="n">dm</span><span class="o">=</span><span class="n">dm</span><span class="p">,</span> <span class="n">table_name</span><span class="o">=</span><span class="n">table_name</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">table_schema</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_table_schema</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="n">pivot_table_config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_pivot_table_config</span><span class="p">(</span><span class="n">table_name</span><span class="p">)</span>
+        <span class="n">data_table_children</span> <span class="o">=</span> <span class="n">get_data_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">table_schema</span><span class="p">,</span> <span class="n">editable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pivot_table_children</span> <span class="o">=</span> <span class="n">get_pivot_table_card_children</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">,</span> <span class="n">pivot_table_config</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data_table_children</span><span class="p">,</span> <span class="n">pivot_table_children</span></div>
+
+<div class="viewcode-block" id="PrepareDataPage.set_dash_callbacks"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.prepare_data_page.PrepareDataPage.set_dash_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">set_dash_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Define Dash callbacks for this page</span>
+
+<span class="sd">        Will be called to register any callbacks</span>
+<span class="sd">        :return:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">app</span>
+
+        <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">([</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;input_data_table_card&#39;</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">),</span>
+                       <span class="n">Output</span><span class="p">(</span><span class="s1">&#39;input_pivot_table_card&#39;</span><span class="p">,</span> <span class="s1">&#39;children&#39;</span><span class="p">)],</span>
+                      <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">),</span>
+                       <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;input_table_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)])</span>
+        <span class="k">def</span> <span class="nf">update_data_and_pivot_input_table</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">table_name</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+            <span class="n">data_table_children</span><span class="p">,</span> <span class="n">pivot_table_children</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_data_and_pivot_input_table_callback</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">table_name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">data_table_children</span><span class="p">,</span> <span class="n">pivot_table_children</span><span class="p">]</span></div></div>
+
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.prepare_data_page</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>
