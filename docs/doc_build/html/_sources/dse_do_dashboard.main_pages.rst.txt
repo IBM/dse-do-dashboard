@@ -20,6 +20,14 @@ dse\_do\_dashboard.main\_pages.home\_page module
    :undoc-members:
    :show-inheritance:
 
+dse\_do\_dashboard.main\_pages.home\_page\_edit module
+------------------------------------------------------
+
+.. automodule:: dse_do_dashboard.main_pages.home_page_edit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dse\_do\_dashboard.main\_pages.main\_page module
 ------------------------------------------------
 
@@ -56,6 +64,14 @@ dse\_do\_dashboard.main\_pages.run\_model\_page module
 ------------------------------------------------------
 
 .. automodule:: dse_do_dashboard.main_pages.run_model_page
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+dse\_do\_dashboard.main\_pages.run\_model\_page\_old module
+-----------------------------------------------------------
+
+.. automodule:: dse_do_dashboard.main_pages.run_model_page_old
    :members:
    :undoc-members:
    :show-inheritance:

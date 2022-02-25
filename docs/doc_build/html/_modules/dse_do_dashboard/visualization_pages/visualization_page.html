@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dse_do_dashboard.visualization_pages.visualization_page &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <title>dse_do_dashboard.visualization_pages.visualization_page &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.visualization_pages.visualization_page</a></li> 
       </ul>
@@ -61,7 +61,9 @@
 <span class="sd">    * get_layout_children(self)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">,</span> <span class="n">page_name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="n">page_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
-                 <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+                 <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+                 <span class="n">enable_reference_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">enable_multi_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Best practice to specify the minimal set of input and output tables.</span>
 <span class="sd">        Loading less tables speeds of the response time of the dashboard.</span>
@@ -74,6 +76,8 @@
 <span class="sd">            url (str): url name</span>
 <span class="sd">            input_table_names (List[str]): list of input table names required loading by the combined visualizations on this page. Or [&#39;*&#39;] for all input tables.</span>
 <span class="sd">            output_table_names (List[str]): list of output table names required loading by the combined visualizations on this page. Or [&#39;*&#39;] for all output tables.</span>
+<span class="sd">            enable_reference_scenario (bool): if True and if reference_scenario_name not None, will load the reference scenario and add a ref_dm dataManager to the PlotlyManager</span>
+<span class="sd">            enable_multi_scenario (bool): if True and if there are more than 1 scenarios to compare in multi_scenario_names, will load multiple scenarios (including the currently selected) in ms_inputs and ms_outputs of the PlotlyManager</span>
 <span class="sd">        TODO:</span>
 <span class="sd">        * dash_app: DoDashApp. Due to circular imports, cannot specify type!</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -84,24 +88,37 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">input_table_names</span> <span class="o">=</span> <span class="n">input_table_names</span>  <span class="c1"># Names of input tables required for any of the plots in this page</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">output_table_names</span> <span class="o">=</span> <span class="n">output_table_names</span>  <span class="c1"># Names of output tables required for any of the plots in this page</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_reference_scenario</span> <span class="o">=</span> <span class="n">enable_reference_scenario</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enable_multi_scenario</span> <span class="o">=</span> <span class="n">enable_multi_scenario</span>
         <span class="c1"># if len(input_table_names) == 1 and input_table_names[0] == &#39;*&#39;:</span>
         <span class="c1">#     self.input_table_names = dash_app.get_input_table_names()</span>
         <span class="c1"># else:</span>
         <span class="c1">#     self.input_table_names = input_table_names  # Names of input tables required for any of the plots in this page</span>
 
-<div class="viewcode-block" id="VisualizationPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="VisualizationPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                   <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns layout of visualization page.</span>
 <span class="sd">        TODO:</span>
 <span class="sd">        * We are NOT using pattern-matching callback anynore, so the `id` of the Div is no long relevant</span>
 <span class="sd">        * Do we need 2 Divs? (This is what worked so far)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span>
+                                          <span class="n">reference_scenario_name</span><span class="o">=</span><span class="n">reference_scenario_name</span><span class="p">,</span>
+                                          <span class="n">multi_scenario_names</span><span class="o">=</span><span class="n">multi_scenario_names</span><span class="p">,</span>
+                                          <span class="n">enable_reference_scenario</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_reference_scenario</span><span class="p">,</span>
+                                          <span class="n">enable_multi_scenario</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_multi_scenario</span><span class="p">)</span>
         <span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
             <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">(</span>
                 <span class="nb">id</span><span class="o">=</span><span class="p">{</span>
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;tab_layout&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;index&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">page_id</span>
                 <span class="p">},</span>
-                <span class="n">children</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_layout_children</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">))</span>
+                <span class="n">children</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">get_layout_children</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pm</span><span class="p">),</span>
+                <span class="c1"># children=self.get_layout_children(self.get_plotly_manager(scenario_name,</span>
+                <span class="c1">#                                                           reference_scenario_name=reference_scenario_name,</span>
+                <span class="c1">#                                                           multi_scenario_names=multi_scenario_names,</span>
+                <span class="c1">#                                                           enable_reference_scenario=self.enable_reference_scenario,</span>
+                <span class="c1">#                                                           enable_multi_scenario=self.enable_multi_scenario))</span>
             <span class="p">)</span>
         <span class="p">])</span>
         <span class="k">return</span> <span class="n">layout</span></div>
@@ -162,8 +179,19 @@
             <span class="n">output_table_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_table_names</span>
         <span class="k">return</span> <span class="n">output_table_names</span></div>
 
-<div class="viewcode-block" id="VisualizationPage.get_plotly_manager"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_plotly_manager">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotly_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_input_table_names</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_output_table_names</span><span class="p">())</span></div>
+<div class="viewcode-block" id="VisualizationPage.get_plotly_manager"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.get_plotly_manager">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotly_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">enable_reference_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                           <span class="n">enable_multi_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># reference_scenario_name = None</span>
+        <span class="c1"># multi_scenario_names = None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">get_plotly_manager</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">get_input_table_names</span><span class="p">(),</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">get_output_table_names</span><span class="p">(),</span>
+                                                <span class="n">reference_scenario_name</span><span class="o">=</span><span class="n">reference_scenario_name</span><span class="p">,</span>
+                                                <span class="n">multi_scenario_names</span><span class="o">=</span><span class="n">multi_scenario_names</span><span class="p">,</span>
+                                                <span class="n">enable_reference_scenario</span><span class="o">=</span><span class="n">enable_reference_scenario</span><span class="p">,</span>
+                                                <span class="n">enable_multi_scenario</span><span class="o">=</span><span class="n">enable_multi_scenario</span>
+                                                <span class="p">)</span></div>
 
 <div class="viewcode-block" id="VisualizationPage.set_dash_callbacks"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.visualization_page.VisualizationPage.set_dash_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">set_dash_callbacks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Define Dash callbacks for this page.</span>
@@ -217,7 +245,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.visualization_pages.visualization_page</a></li> 
       </ul>

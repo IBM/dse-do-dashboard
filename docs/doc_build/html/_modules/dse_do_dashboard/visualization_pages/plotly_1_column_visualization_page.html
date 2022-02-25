@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dse_do_dashboard.visualization_pages.plotly_1_column_visualization_page &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <title>dse_do_dashboard.visualization_pages.plotly_1_column_visualization_page &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.visualization_pages.plotly_1_column_visualization_page</a></li> 
       </ul>
@@ -60,13 +60,17 @@
 
 <div class="viewcode-block" id="Plotly1ColumnVisualizationPage"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.plotly_1_column_visualization_page.Plotly1ColumnVisualizationPage">[docs]</a><span class="k">class</span> <span class="nc">Plotly1ColumnVisualizationPage</span><span class="p">(</span><span class="n">VisualizationPage</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">,</span> <span class="n">page_name</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="n">page_id</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s1">&#39;default&#39;</span><span class="p">,</span>
-                 <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+                 <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
+                 <span class="n">enable_reference_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">enable_multi_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dash_app</span><span class="o">=</span><span class="n">dash_app</span><span class="p">,</span>
                          <span class="n">page_name</span><span class="o">=</span><span class="n">page_name</span><span class="p">,</span>
                          <span class="n">page_id</span><span class="o">=</span><span class="n">page_id</span><span class="p">,</span>
                          <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
                          <span class="n">input_table_names</span> <span class="o">=</span> <span class="n">input_table_names</span><span class="p">,</span>
                          <span class="n">output_table_names</span> <span class="o">=</span> <span class="n">output_table_names</span><span class="p">,</span>
+                         <span class="n">enable_reference_scenario</span><span class="o">=</span><span class="n">enable_reference_scenario</span><span class="p">,</span>
+                         <span class="n">enable_multi_scenario</span><span class="o">=</span><span class="n">enable_multi_scenario</span>
                          <span class="p">)</span>
 
 <div class="viewcode-block" id="Plotly1ColumnVisualizationPage.get_plotly_figures"><a class="viewcode-back" href="../../../dse_do_dashboard.visualization_pages.html#dse_do_dashboard.visualization_pages.plotly_1_column_visualization_page.Plotly1ColumnVisualizationPage.get_plotly_figures">[docs]</a>    <span class="nd">@abstractmethod</span>
@@ -130,7 +134,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.visualization_pages.plotly_1_column_visualization_page</a></li> 
       </ul>

@@ -5,9 +5,8 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-    <title>dse_do_dashboard.utils package &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.utils package &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bizstyle.css" />
     
@@ -40,7 +39,7 @@
         <li class="right" >
           <a href="dse_do_dashboard.main_pages.html" title="dse_do_dashboard.main_pages package"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >dse_do_dashboard</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="dse_do_dashboard.html" accesskey="U">dse_do_dashboard package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.utils package</a></li> 
@@ -52,12 +51,12 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <section id="dse-do-dashboard-utils-package">
+  <div class="section" id="dse-do-dashboard-utils-package">
 <h1>dse_do_dashboard.utils package<a class="headerlink" href="#dse-do-dashboard-utils-package" title="Permalink to this headline">¶</a></h1>
-<section id="submodules">
+<div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</section>
-<section id="module-dse_do_dashboard.utils.dash_common_utils">
+</div>
+<div class="section" id="module-dse_do_dashboard.utils.dash_common_utils">
 <span id="dse-do-dashboard-utils-dash-common-utils-module"></span><h2>dse_do_dashboard.utils.dash_common_utils module<a class="headerlink" href="#module-dse_do_dashboard.utils.dash_common_utils" title="Permalink to this headline">¶</a></h2>
 <p>Common functions for generating Dash components</p>
 <dl class="py class">
@@ -226,11 +225,263 @@ Returns a default Figure in case of an exception</p>
 <span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.dash_common_utils.</span></span><span class="sig-name descname"><span class="pre">table_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df_column</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/dash_common_utils.html#table_type"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.dash_common_utils.table_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-dse_do_dashboard.utils">
+</div>
+<div class="section" id="module-dse_do_dashboard.utils.domodelrunner">
+<span id="dse-do-dashboard-utils-domodelrunner-module"></span><h2>dse_do_dashboard.utils.domodelrunner module<a class="headerlink" href="#module-dse_do_dashboard.utils.domodelrunner" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoClassModelRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner.</span></span><span class="sig-name descname"><span class="pre">DoClassModelRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_manager_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimization_engine_class</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dash_app</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_manager_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_echo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoClassModelRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoClassModelRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner.DoModelRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_dashboard.utils.domodelrunner.DoModelRunner</span></code></a></p>
+<p>TODO: grab the self.log so we can use this in the UI</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoClassModelRunner.run_model">
+<span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoClassModelRunner.run_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoClassModelRunner.run_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run an OptimizationEngine class</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoDeployedModelRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner.</span></span><span class="sig-name descname"><span class="pre">DoDeployedModelRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wml_credentials</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">space_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">deployment_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dash_app</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_manager_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_echo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoDeployedModelRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoDeployedModelRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner.DoModelRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_dashboard.utils.domodelrunner.DoModelRunner</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoDeployedModelRunner.run_model">
+<span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoDeployedModelRunner.run_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoDeployedModelRunner.run_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner.</span></span><span class="sig-name descname"><span class="pre">DoModelRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dash_app</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_manager_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_echo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>TODO: For all model classes, after completion grab run-time, log, solve_status</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunner.create_database_manager_instance">
+<span class="sig-name descname"><span class="pre">create_database_manager_instance</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">dse_do_utils.scenariodbmanager.ScenarioDbManager</span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunner.create_database_manager_instance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner.create_database_manager_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an instance of a ScenarioDbManager.
+The default implementation uses the database_manager_class from the constructor.
+Optionally, override this method.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunner.load_inputs">
+<span class="sig-name descname"><span class="pre">load_inputs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunner.load_inputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner.load_inputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><ol class="arabic simple">
+<li><p>Load inputs from DB</p></li>
+<li><p>Run model</p></li>
+<li><p>Write outputs back to DB</p></li>
+</ol>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunner.run_model">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunner.run_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner.run_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunner.update_outputs">
+<span class="sig-name descname"><span class="pre">update_outputs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">outputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunner.update_outputs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner.update_outputs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner.</span></span><span class="sig-name descname"><span class="pre">DoModelRunnerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">runner_class</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoModelRunnerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig.runner_class">
+<span class="sig-name descname"><span class="pre">runner_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner.DoModelRunner"><span class="pre">dse_do_dashboard.utils.domodelrunner.DoModelRunner</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig.runner_class" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig.runner_id">
+<span class="sig-name descname"><span class="pre">runner_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig.runner_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig.runner_name">
+<span class="sig-name descname"><span class="pre">runner_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunnerConfig.runner_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoNotebookModelRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner.</span></span><span class="sig-name descname"><span class="pre">DoNotebookModelRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">notebook_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_globals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">my_locals</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dash_app</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">database_manager_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">db_echo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoNotebookModelRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoNotebookModelRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner.DoModelRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_dashboard.utils.domodelrunner.DoModelRunner</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner.DoNotebookModelRunner.run_model">
+<span class="sig-name descname"><span class="pre">run_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner.html#DoNotebookModelRunner.run_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner.DoNotebookModelRunner.run_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dse_do_dashboard.utils.domodelrunner_old">
+<span id="dse-do-dashboard-utils-domodelrunner-old-module"></span><h2>dse_do_dashboard.utils.domodelrunner_old module<a class="headerlink" href="#module-dse_do_dashboard.utils.domodelrunner_old" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoDbJobRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.</span></span><span class="sig-name descname"><span class="pre">DoDbJobRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dbm</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">dse_do_utils.scenariodbmanager.ScenarioDbManager</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scenario_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner_old.DoModelRunner"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.DoModelRunner</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoDbJobRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoDbJobRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Runs a DO Model based on a scenario in the DB.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoDbJobRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoDbJobRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoDbJobRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoDeployRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.</span></span><span class="sig-name descname"><span class="pre">DoDeployRunner</span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoDeployRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoDeployRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner_old.DoModelRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.DoModelRunner</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoDeployRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoDeployRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoDeployRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoModelRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.</span></span><span class="sig-name descname"><span class="pre">DoModelRunner</span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoModelRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoModelRunner.run">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoModelRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract method</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoNotebookRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.</span></span><span class="sig-name descname"><span class="pre">DoNotebookRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_filepath</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoNotebookRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoNotebookRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner" title="dse_do_dashboard.utils.domodelrunner_old.DoModelRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_dashboard.utils.domodelrunner_old.DoModelRunner</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.domodelrunner_old.DoNotebookRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">pandas.core.frame.DataFrame</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/domodelrunner_old.html#DoNotebookRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.domodelrunner_old.DoNotebookRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>TODO</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-dse_do_dashboard.utils.donotebookrunner">
+<span id="dse-do-dashboard-utils-donotebookrunner-module"></span><h2>dse_do_dashboard.utils.donotebookrunner module<a class="headerlink" href="#module-dse_do_dashboard.utils.donotebookrunner" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.donotebookrunner.</span></span><span class="sig-name descname"><span class="pre">DoNotebookRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exec_globals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exec_locals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#DoNotebookRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#dse_do_dashboard.utils.donotebookrunner.NotebookRunner" title="dse_do_dashboard.utils.donotebookrunner.NotebookRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_dashboard.utils.donotebookrunner.NotebookRunner</span></code></a></p>
+<p>Runs the code extracted from a ‘DO solver’ notebook designed to work with a DO Experiment.
+Ignores any code cell starting with <cite>#dd-ignore</cite>.
+A DoNotebookRunner assumes an input dictionary is passed-in as the only ‘globals’.
+And all outputs are added to the dictionary ‘outputs’.
+An empty <cite>outputs</cite> dictionary is part of the globals, so the code can either add output DataFrames to the existing outputs,
+or re-create a new outputs dictionary.</p>
+<p>For now, add globals() and locals() in constructor, otherwise there are issues with importing certain packages.
+The <cite>inputs</cite> and an empty <cite>outputs</cite> will be added in each run.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">runner</span> <span class="o">=</span> <span class="n">DoNotebookRunner</span><span class="p">(</span><span class="n">notebook_path</span><span class="p">,</span> <span class="nb">globals</span><span class="p">(),</span> <span class="nb">locals</span><span class="p">())</span>
+<span class="n">outputs</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner.include_code_cell">
+<span class="sig-name descname"><span class="pre">include_code_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#DoNotebookRunner.include_code_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner.include_code_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation always returns True.
+To be overridden for custom cell filtering.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner.print_code">
+<span class="sig-name descname"><span class="pre">print_code</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#DoNotebookRunner.print_code"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner.print_code" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#DoNotebookRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.DoNotebookRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs the notebook.
+Passes-in the inputs as part of the exec_globals.
+And adds an empty <cite>outputs</cite> to the globals, so that the notebook can add output DataFrames, e.g. <cite>outputs[“a”] = xxx</cite>.
+Notebook is also allowed to re-create the outputs Dict, e.g. <cite>outputs = {“a”: xxx}</cite></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.InterpreterError">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.donotebookrunner.</span></span><span class="sig-name descname"><span class="pre">InterpreterError</span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#InterpreterError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.InterpreterError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.NotebookRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.donotebookrunner.</span></span><span class="sig-name descname"><span class="pre">NotebookRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">notebook_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exec_globals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exec_locals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">{}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#NotebookRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.NotebookRunner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Runs the code from a notebook.
+Extracts code from notebook.
+Runs the code. Returns the log (i.e. stdoutput).</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">runner</span> <span class="o">=</span> <span class="n">NotebookRunner</span><span class="p">(</span><span class="n">notebook_path</span><span class="p">)</span>
+<span class="n">log</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">globals</span><span class="p">(),</span> <span class="nb">locals</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.NotebookRunner.include_code_cell">
+<span class="sig-name descname"><span class="pre">include_code_cell</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cell_source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#NotebookRunner.include_code_cell"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.NotebookRunner.include_code_cell" title="Permalink to this definition">¶</a></dt>
+<dd><p>Default implementation always returns True.
+To be overridden for custom cell filtering.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.NotebookRunner.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#NotebookRunner.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.NotebookRunner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts and runs the notebook.
+Returns the log.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.donotebookrunner.my_exec">
+<span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.donotebookrunner.</span></span><span class="sig-name descname"><span class="pre">my_exec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cmd</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">globals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">locals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'source</span> <span class="pre">string'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/donotebookrunner.html#my_exec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.donotebookrunner.my_exec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Does an <cite>exec()</cite> with exception handling to get the line-number where the exception has occurred in the extracted code (cmd).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dse_do_dashboard.utils.scenariodbmanager_update">
+<span id="dse-do-dashboard-utils-scenariodbmanager-update-module"></span><h2>dse_do_dashboard.utils.scenariodbmanager_update module<a class="headerlink" href="#module-dse_do_dashboard.utils.scenariodbmanager_update" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="dse_do_dashboard.utils.scenariodbmanager_update.ScenarioDbManagerUpdate">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">dse_do_dashboard.utils.scenariodbmanager_update.</span></span><span class="sig-name descname"><span class="pre">ScenarioDbManagerUpdate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_db_tables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dse_do_utils.scenariodbmanager.ScenarioDbTable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_db_tables</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">dse_do_utils.scenariodbmanager.ScenarioDbTable</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">credentials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">echo</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi_scenario</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_transactions</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enable_sqlite_fk</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dse_do_dashboard/utils/scenariodbmanager_update.html#ScenarioDbManagerUpdate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#dse_do_dashboard.utils.scenariodbmanager_update.ScenarioDbManagerUpdate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dse_do_utils.scenariodbmanager.ScenarioDbManager</span></code></p>
+<p>DEPRECATED - was used to develop DB features that are now migrated to dse-do-utils
+To test editable tables. Supports DB updates of edits.
+Supports CRUD operations on scenarios.
+Changes are added to dse-do-utils v 0.5.4.0b</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-dse_do_dashboard.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-dse_do_dashboard.utils" title="Permalink to this headline">¶</a></h2>
-</section>
-</section>
+</div>
+</div>
 
 
             <div class="clearer"></div>
@@ -244,6 +495,10 @@ Returns a default Figure in case of an exception</p>
 <li><a class="reference internal" href="#">dse_do_dashboard.utils package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-dse_do_dashboard.utils.dash_common_utils">dse_do_dashboard.utils.dash_common_utils module</a></li>
+<li><a class="reference internal" href="#module-dse_do_dashboard.utils.domodelrunner">dse_do_dashboard.utils.domodelrunner module</a></li>
+<li><a class="reference internal" href="#module-dse_do_dashboard.utils.domodelrunner_old">dse_do_dashboard.utils.domodelrunner_old module</a></li>
+<li><a class="reference internal" href="#module-dse_do_dashboard.utils.donotebookrunner">dse_do_dashboard.utils.donotebookrunner module</a></li>
+<li><a class="reference internal" href="#module-dse_do_dashboard.utils.scenariodbmanager_update">dse_do_dashboard.utils.scenariodbmanager_update module</a></li>
 <li><a class="reference internal" href="#module-dse_do_dashboard.utils">Module contents</a></li>
 </ul>
 </li>
@@ -291,7 +546,7 @@ Returns a default Figure in case of an exception</p>
         <li class="right" >
           <a href="dse_do_dashboard.main_pages.html" title="dse_do_dashboard.main_pages package"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="modules.html" >dse_do_dashboard</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="dse_do_dashboard.html" >dse_do_dashboard package</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.utils package</a></li> 

@@ -20,6 +20,14 @@ dse\_do\_dashboard.visualization\_pages.plotly\_1\_column\_visualization\_page m
    :undoc-members:
    :show-inheritance:
 
+dse\_do\_dashboard.visualization\_pages.plotly\_rows\_visualization\_page module
+--------------------------------------------------------------------------------
+
+.. automodule:: dse_do_dashboard.visualization_pages.plotly_rows_visualization_page
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dse\_do\_dashboard.visualization\_pages.visualization\_page module
 ------------------------------------------------------------------
 

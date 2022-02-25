@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dse_do_dashboard.do_dash_app &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <title>dse_do_dashboard.do_dash_app &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.do_dash_app</a></li> 
       </ul>
@@ -45,18 +45,19 @@
   <h1>Source code for dse_do_dashboard.do_dash_app</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright IBM All Rights Reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
-
+<span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.home_page_edit</span> <span class="kn">import</span> <span class="n">HomePageEdit</span>
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.prepare_data_page_edit</span> <span class="kn">import</span> <span class="n">PrepareDataPageEdit</span>
+<span class="kn">from</span> <span class="nn">dse_do_dashboard.utils.domodelrunner</span> <span class="kn">import</span> <span class="n">DoModelRunner</span><span class="p">,</span> <span class="n">DoModelRunnerConfig</span>
 <span class="kn">from</span> <span class="nn">dse_do_utils</span> <span class="kn">import</span> <span class="n">DataManager</span>
 <span class="kn">from</span> <span class="nn">dse_do_utils.scenariodbmanager</span> <span class="kn">import</span> <span class="n">ScenarioDbManager</span>
 
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.dash_app</span> <span class="kn">import</span> <span class="n">DashApp</span><span class="p">,</span> <span class="n">HostEnvironment</span>
-<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">html</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">Input</span><span class="p">,</span> <span class="n">State</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">Input</span><span class="p">,</span> <span class="n">State</span>
 <span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
 
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.explore_solution_page</span> <span class="kn">import</span> <span class="n">ExploreSolutionPage</span>
@@ -69,6 +70,7 @@
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.utils.dash_common_utils</span> <span class="kn">import</span> <span class="n">ScenarioTableSchema</span><span class="p">,</span> <span class="n">PivotTableConfig</span>
 <span class="kn">from</span> <span class="nn">dse_do_utils.plotlymanager</span> <span class="kn">import</span> <span class="n">PlotlyManager</span>
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.visualization_pages.visualization_page</span> <span class="kn">import</span> <span class="n">VisualizationPage</span>
+
 
 
 <div class="viewcode-block" id="DoDashApp"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp">[docs]</a><span class="k">class</span> <span class="nc">DoDashApp</span><span class="p">(</span><span class="n">DashApp</span><span class="p">):</span>
@@ -102,7 +104,10 @@
                  <span class="n">plotly_manager_class</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                  <span class="n">port</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">8050</span><span class="p">,</span>
                  <span class="n">dash_debug</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                 <span class="n">host_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HostEnvironment</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="n">host_env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">HostEnvironment</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">bootstrap_theme</span><span class="o">=</span><span class="n">dbc</span><span class="o">.</span><span class="n">themes</span><span class="o">.</span><span class="n">BOOTSTRAP</span><span class="p">,</span>
+                 <span class="n">bootstrap_figure_template</span><span class="p">:</span><span class="nb">str</span><span class="o">=</span><span class="s2">&quot;bootstrap&quot;</span><span class="p">,</span>
+                 <span class="n">enable_long_running_callbacks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
                  <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a Dashboard app.</span>
 
@@ -123,6 +128,7 @@
 <span class="sd">        :param host_env: If HostEnvironment.CPD402, will use the ws_applications import make_link to</span>
 <span class="sd">        generate a requests_pathname_prefix for the Dash app. For use with custom environment in CPD v4.0.02.</span>
 <span class="sd">        The alternative (None of HostEnvironment.Local) runs the Dash app regularly.</span>
+<span class="sd">        :param enable_long_running_callbacks. Default = True. Enables the use of Dash long-running callbacks for model runs. If False, it only allows for in-line runs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db_credentials</span> <span class="o">=</span> <span class="n">db_credentials</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">schema</span> <span class="o">=</span> <span class="n">schema</span>
@@ -168,18 +174,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">read_scenario_table_from_db_callback</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># For Flask caching</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">read_scenarios_table_from_db_callback</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># For Flask caching</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logo_file_name</span><span class="o">=</span><span class="n">logo_file_name</span><span class="p">,</span> <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span> <span class="n">dash_debug</span><span class="o">=</span><span class="n">dash_debug</span><span class="p">,</span> <span class="n">host_env</span><span class="o">=</span><span class="n">host_env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">job_queue</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">DoModelRunner</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># TODO: migrate to Store. Using global variables is dangerous</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logo_file_name</span><span class="o">=</span><span class="n">logo_file_name</span><span class="p">,</span> <span class="n">cache_config</span><span class="o">=</span><span class="n">cache_config</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="n">port</span><span class="p">,</span>
+                         <span class="n">dash_debug</span><span class="o">=</span><span class="n">dash_debug</span><span class="p">,</span> <span class="n">host_env</span><span class="o">=</span><span class="n">host_env</span><span class="p">,</span>
+                         <span class="n">bootstrap_theme</span><span class="o">=</span><span class="n">bootstrap_theme</span><span class="p">,</span> <span class="n">bootstrap_figure_template</span><span class="o">=</span><span class="n">bootstrap_figure_template</span><span class="p">,</span>
+                         <span class="n">enable_long_running_callbacks</span><span class="o">=</span><span class="n">enable_long_running_callbacks</span><span class="p">,)</span>
 
 <div class="viewcode-block" id="DoDashApp.create_database_manager_instance"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.create_database_manager_instance">[docs]</a>    <span class="k">def</span> <span class="nf">create_database_manager_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ScenarioDbManager</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create an instance of a ScenarioDbManager.</span>
 <span class="sd">        The default implementation uses the database_manager_class from the constructor.</span>
 <span class="sd">        Optionally, override this method.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">database_manager_class</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">db_credentials</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connecting to DB2 at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">db_credentials</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connecting to DB2 at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">db_credentials</span><span class="p">[</span><span class="s1">&#39;host&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">, schema = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">dbm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">database_manager_class</span><span class="p">(</span><span class="n">credentials</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_credentials</span><span class="p">,</span> <span class="n">schema</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="n">echo</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">db_echo</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">dbm</span></div>
+
+<div class="viewcode-block" id="DoDashApp.get_app_stores"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.get_app_stores">[docs]</a>    <span class="k">def</span> <span class="nf">get_app_stores</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Add global dcc.Stores&quot;&quot;&quot;</span>
+        <span class="n">stores</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="c1"># For reference scenario(s):</span>
+            <span class="c1"># TODO</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_long_running_callbacks</span><span class="p">:</span>
+            <span class="n">stores</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span>
+                <span class="c1"># For long-running callbacks for model runs:</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;lrc_job_trigger_store&#39;</span><span class="p">),</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;lrc_job_log_store&#39;</span><span class="p">),</span>
+                <span class="n">dcc</span><span class="o">.</span><span class="n">Store</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s1">&#39;lrc_job_queue_data_store&#39;</span><span class="p">),</span>
+            <span class="p">])</span>
+        <span class="k">return</span> <span class="n">stores</span></div>
 
 <div class="viewcode-block" id="DoDashApp.create_main_pages"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.create_main_pages">[docs]</a>    <span class="k">def</span> <span class="nf">create_main_pages</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">MainPage</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Creates the ordered list of main pages for the DO app.</span>
@@ -374,8 +400,9 @@
 <span class="sd">        Same as `read_scenario_tables_from_db`, but calls `read_scenario_table_from_db_cached`.</span>
 <span class="sd">        Is called from dse_do_dashboard.DoDashApp to create the PlotlyManager.&quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">input_table_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># load all tables by default</span>
-            <span class="n">input_table_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dbm</span><span class="o">.</span><span class="n">input_db_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">input_table_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># input_table_names = list(self.dbm.input_db_tables.keys())  #This is not consistent with implementation in ScenarioDbManager! Replace by empty list</span>
+            <span class="n">input_table_names</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">if</span> <span class="s1">&#39;Scenario&#39;</span> <span class="ow">in</span> <span class="n">input_table_names</span><span class="p">:</span> <span class="n">input_table_names</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s1">&#39;Scenario&#39;</span><span class="p">)</span>  <span class="c1"># Remove the scenario table</span>
         <span class="k">if</span> <span class="n">output_table_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># load all tables by default</span>
             <span class="n">output_table_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbm</span><span class="o">.</span><span class="n">output_db_tables</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -390,11 +417,13 @@
             <span class="c1"># print(f&quot;read output table {scenario_table_name}&quot;)</span>
             <span class="n">outputs</span><span class="p">[</span><span class="n">scenario_table_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_scenario_table_from_db_cached</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">scenario_table_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span></div>
+
     <span class="c1">########################################################################################</span>
     <span class="c1"># End DB caching callbacks</span>
     <span class="c1">########################################################################################</span>
 
-<div class="viewcode-block" id="DoDashApp.display_content_callback"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.display_content_callback">[docs]</a>    <span class="k">def</span> <span class="nf">display_content_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<div class="viewcode-block" id="DoDashApp.display_content_callback"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.display_content_callback">[docs]</a>    <span class="k">def</span> <span class="nf">display_content_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pathname</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                                 <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Callback for main content area. Will update the content area.</span>
 <span class="sd">        Will need to be called through callback in index.py, where `DA` is the instance of the DashApp.</span>
 
@@ -418,10 +447,10 @@
         <span class="c1">#     return self.get_visualization_tabs_page().get_layout()</span>
         <span class="k">if</span> <span class="n">page_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_pages_dict_by_url_page_name</span><span class="p">:</span>
             <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">main_pages_dict_by_url_page_name</span><span class="p">[</span><span class="n">page_name</span><span class="p">]</span>
-            <span class="n">layout</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_layout</span><span class="p">()</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">page_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">visualization_pages_dict_by_url_page_name</span><span class="p">:</span>
             <span class="n">vp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visualization_pages_dict_by_url_page_name</span><span class="p">[</span><span class="n">page_name</span><span class="p">]</span>
-            <span class="n">layout</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">)</span>
+            <span class="n">layout</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">layout</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_not_found_page</span><span class="p">()</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Page &#39;</span><span class="si">{</span><span class="n">pathname</span><span class="si">}</span><span class="s2">&#39; not found&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">layout</span></div>
@@ -433,7 +462,13 @@
     <span class="c1">#</span>
     <span class="c1">###########################################################################################################</span>
 
-<div class="viewcode-block" id="DoDashApp.get_plotly_manager"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.get_plotly_manager">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotly_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotlyManager</span><span class="p">:</span>
+<div class="viewcode-block" id="DoDashApp.get_plotly_manager"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.get_plotly_manager">[docs]</a>    <span class="k">def</span> <span class="nf">get_plotly_manager</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                           <span class="n">input_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">output_table_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>  <span class="c1"># TODO: support single reference scenario</span>
+                           <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="n">enable_reference_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                           <span class="n">enable_multi_scenario</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PlotlyManager</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Creates the PlotlyManager based on the plotly_manager_class and the data_manager_class.</span>
 <span class="sd">        Loads data for selected input and output tables from the DB, creates a DataManager and embeds into a PlotlyManager.</span>
 
@@ -447,6 +482,25 @@
             <span class="n">dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager_class</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
             <span class="n">dm</span><span class="o">.</span><span class="n">prepare_data_frames</span><span class="p">()</span>
             <span class="n">pm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotly_manager_class</span><span class="p">(</span><span class="n">dm</span><span class="p">)</span>
+
+            <span class="c1"># print(f&quot;get_plotly_manager. Input tables = {input_table_names}&quot;)</span>
+            <span class="k">if</span> <span class="n">enable_reference_scenario</span> <span class="ow">and</span> <span class="n">reference_scenario_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_scenario_tables_from_db_cached</span><span class="p">(</span><span class="n">reference_scenario_name</span><span class="p">,</span> <span class="n">input_table_names</span><span class="p">,</span> <span class="n">output_table_names</span><span class="p">)</span>
+                <span class="n">ref_dm</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_manager_class</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+                <span class="n">ref_dm</span><span class="o">.</span><span class="n">prepare_data_frames</span><span class="p">()</span>
+                <span class="n">pm</span><span class="o">.</span><span class="n">ref_dm</span> <span class="o">=</span> <span class="n">ref_dm</span>  <span class="c1"># TODO: add to pm via constructor</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pm</span><span class="o">.</span><span class="n">ref_dm</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">enable_multi_scenario</span> <span class="ow">and</span> <span class="n">multi_scenario_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># TODO: this is not (yet) cached. Add caching.</span>
+                <span class="n">ms_inputs</span><span class="p">,</span> <span class="n">ms_outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbm</span><span class="o">.</span><span class="n">read_multi_scenario_tables_from_db</span><span class="p">(</span><span class="n">multi_scenario_names</span><span class="p">,</span> <span class="n">input_table_names</span><span class="p">,</span> <span class="n">output_table_names</span><span class="p">)</span>
+                <span class="c1"># TODO: for now just add as properties of the pm, since the dm is for one scenario. Maybe we&#39;ll need a `MultiScenarioDataManager`?</span>
+                <span class="n">pm</span><span class="o">.</span><span class="n">ms_inputs</span> <span class="o">=</span> <span class="n">ms_inputs</span>
+                <span class="n">pm</span><span class="o">.</span><span class="n">ms_outputs</span> <span class="o">=</span> <span class="n">ms_outputs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pm</span><span class="o">.</span><span class="n">ms_inputs</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">pm</span><span class="o">.</span><span class="n">ms_outputs</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Error: either specify the `data_manager_class` and the `plotly_manager_class` or override the method `get_plotly_manager`.&quot;</span><span class="p">)</span>
             <span class="n">pm</span> <span class="o">=</span> <span class="kc">None</span>
@@ -609,8 +663,61 @@
         <span class="k">def</span> <span class="nf">toggle_collapse</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">is_open</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
                 <span class="k">return</span> <span class="ow">not</span> <span class="n">is_open</span>
-            <span class="k">return</span> <span class="n">is_open</span></div></div>
+            <span class="k">return</span> <span class="n">is_open</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_long_running_callbacks</span><span class="p">:</span>
+            <span class="n">app</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app</span>
+            <span class="n">runner_config_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">config</span><span class="o">.</span><span class="n">runner_id</span><span class="p">:</span> <span class="n">config</span> <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_do_model_runner_configs</span><span class="p">()}</span>
+            <span class="nd">@app</span><span class="o">.</span><span class="n">long_callback</span><span class="p">(</span>
+                <span class="n">output</span><span class="o">=</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;lrc_job_log_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                <span class="n">inputs</span><span class="o">=</span><span class="p">(</span>
+                        <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;lrc_job_trigger_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                <span class="p">),</span>
+                <span class="n">progress</span><span class="o">=</span><span class="n">Output</span><span class="p">(</span><span class="s1">&#39;lrc_job_queue_data_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span> <span class="c1"># Global store</span>
+                <span class="n">progress_default</span><span class="o">=</span><span class="p">[],</span>
+                <span class="n">prevent_initial_call</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">def</span> <span class="nf">run_model_long_callback</span><span class="p">(</span>
+                    <span class="n">set_progress</span><span class="p">,</span>
+                    <span class="n">n_clicks</span><span class="p">,</span>
+            <span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;n_clicks = </span><span class="si">{</span><span class="n">n_clicks</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">trigger</span> <span class="o">=</span> <span class="n">n_clicks</span>
+                <span class="k">if</span> <span class="n">trigger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;None&quot;</span>
+                <span class="n">scenario_name</span> <span class="o">=</span> <span class="n">n_clicks</span><span class="p">[</span><span class="s1">&#39;scenario_name&#39;</span><span class="p">]</span>
+                <span class="n">do_model_class_name</span> <span class="o">=</span> <span class="n">n_clicks</span><span class="p">[</span><span class="s1">&#39;do_model_class_name&#39;</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RunModelPage2.run_model_callback_LRC model = </span><span class="si">{</span><span class="n">do_model_class_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">do_model_class_name</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="s2">&quot;None&quot;</span>
+                <span class="n">progress_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scenario&#39;</span><span class="p">:</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="s1">&#39;model&#39;</span><span class="p">:</span> <span class="n">do_model_class_name</span><span class="p">,</span> <span class="s1">&#39;run_status&#39;</span><span class="p">:</span> <span class="s1">&#39;initializing&#39;</span><span class="p">}</span>
+                <span class="n">set_progress</span><span class="p">([</span><span class="n">progress_dict</span><span class="p">])</span>
+                <span class="c1"># time.sleep(1)</span>
+
+                <span class="n">progress_dict</span><span class="p">[</span><span class="s1">&#39;run_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span>
+                <span class="n">set_progress</span><span class="p">([</span><span class="n">progress_dict</span><span class="p">])</span>
+
+                <span class="n">runner_class</span> <span class="o">=</span> <span class="n">runner_config_dict</span><span class="p">[</span><span class="n">do_model_class_name</span><span class="p">]</span><span class="o">.</span><span class="n">runner_class</span>
+                <span class="n">runner</span> <span class="o">=</span> <span class="n">runner_class</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">)</span>
+                <span class="n">runner</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;set_progress&quot;</span><span class="p">)</span>
+                <span class="n">progress_dict</span><span class="p">[</span><span class="s1">&#39;run_status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;done&#39;</span>
+                <span class="n">set_progress</span><span class="p">([</span><span class="n">progress_dict</span><span class="p">])</span>
+
+                <span class="c1"># time.sleep(4)</span>
+
+                <span class="n">log</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Run </span><span class="si">{</span><span class="n">do_model_class_name</span><span class="si">}</span><span class="s2"> with scenario </span><span class="si">{</span><span class="n">scenario_name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span> \
+                      <span class="s2">&quot;Log: </span><span class="se">\n</span><span class="s2">&quot;</span> \
+                      <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">runner</span><span class="o">.</span><span class="n">log</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">return</span> <span class="n">log</span></div>
+
+<div class="viewcode-block" id="DoDashApp.get_do_model_runner_configs"><a class="viewcode-back" href="../../dse_do_dashboard.html#dse_do_dashboard.do_dash_app.DoDashApp.get_do_model_runner_configs">[docs]</a>    <span class="k">def</span> <span class="nf">get_do_model_runner_configs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">DoModelRunnerConfig</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Returns the model runners for the &#39;Run Model&#39; page.</span>
+<span class="sd">        Needs to be overridden.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">configs</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="n">configs</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -642,7 +749,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.do_dash_app</a></li> 
       </ul>

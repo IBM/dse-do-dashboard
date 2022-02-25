@@ -6,7 +6,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>dse_do_dashboard.main_pages.visualization_tabs_page &#8212; DSE DO Dashboard 0.1.1.1b documentation</title>
+    <title>dse_do_dashboard.main_pages.visualization_tabs_page &#8212; DSE DO Dashboard 0.1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
     
@@ -31,7 +31,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.visualization_tabs_page</a></li> 
       </ul>
@@ -46,17 +46,20 @@
 <span></span><span class="c1"># Copyright IBM All Rights Reserved.</span>
 <span class="c1"># SPDX-License-Identifier: Apache-2.0</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.main_pages.main_page</span> <span class="kn">import</span> <span class="n">MainPage</span>
-<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">Input</span>
+<span class="kn">from</span> <span class="nn">dash</span> <span class="kn">import</span> <span class="n">dcc</span><span class="p">,</span> <span class="n">html</span><span class="p">,</span> <span class="n">Output</span><span class="p">,</span> <span class="n">Input</span><span class="p">,</span> <span class="n">State</span>
 <span class="kn">import</span> <span class="nn">dash_bootstrap_components</span> <span class="k">as</span> <span class="nn">dbc</span>
 
 <span class="kn">from</span> <span class="nn">dse_do_dashboard.visualization_pages.visualization_page</span> <span class="kn">import</span> <span class="n">VisualizationPage</span>
 
 
 <div class="viewcode-block" id="VisualizationTabsPage"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.visualization_tabs_page.VisualizationTabsPage">[docs]</a><span class="k">class</span> <span class="nc">VisualizationTabsPage</span><span class="p">(</span><span class="n">MainPage</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Visualization pages in tabbed layout&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;Visualization pages in tabbed layout</span>
+
+<span class="sd">    TODO (minor): handle case when there are no visualization pages (i.e. len(self.dash_app.visualization_pages) == 0)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dash_app</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dash_app</span><span class="p">,</span>
                          <span class="n">page_name</span><span class="o">=</span><span class="s1">&#39;Visualization&#39;</span><span class="p">,</span>
@@ -64,7 +67,7 @@
                          <span class="n">url</span><span class="o">=</span><span class="s1">&#39;visualization&#39;</span><span class="p">,</span>
                          <span class="p">)</span>
 
-<div class="viewcode-block" id="VisualizationTabsPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.visualization_tabs_page.VisualizationTabsPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="VisualizationTabsPage.get_layout"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.visualization_tabs_page.VisualizationTabsPage.get_layout">[docs]</a>    <span class="k">def</span> <span class="nf">get_layout</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="n">tab_style</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;fontWeight&quot;</span><span class="p">:</span> <span class="s2">&quot;bold&quot;</span><span class="p">}</span>
         <span class="n">visualization_pages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dash_app</span><span class="o">.</span><span class="n">visualization_pages</span>
         <span class="n">tab_children</span> <span class="o">=</span> <span class="p">[</span>
@@ -77,7 +80,7 @@
         <span class="p">]</span>
         <span class="n">tabs</span> <span class="o">=</span> <span class="n">dcc</span><span class="o">.</span><span class="n">Tabs</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;tabs&quot;</span><span class="p">,</span>
-            <span class="n">value</span><span class="o">=</span><span class="s2">&quot;demand_tab&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">visualization_pages</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">page_id</span><span class="p">,</span>
             <span class="n">children</span><span class="o">=</span><span class="n">tab_children</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">layout</span> <span class="o">=</span> <span class="n">html</span><span class="o">.</span><span class="n">Div</span><span class="p">([</span>
@@ -87,7 +90,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">layout</span></div>
 
-<div class="viewcode-block" id="VisualizationTabsPage.get_visualization_tab_layout_callback"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.visualization_tabs_page.VisualizationTabsPage.get_visualization_tab_layout_callback">[docs]</a>    <span class="k">def</span> <span class="nf">get_visualization_tab_layout_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_id</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">):</span>
+<div class="viewcode-block" id="VisualizationTabsPage.get_visualization_tab_layout_callback"><a class="viewcode-back" href="../../../dse_do_dashboard.main_pages.html#dse_do_dashboard.main_pages.visualization_tabs_page.VisualizationTabsPage.get_visualization_tab_layout_callback">[docs]</a>    <span class="k">def</span> <span class="nf">get_visualization_tab_layout_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page_id</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Callback to render the visualization tabs.</span>
 <span class="sd">        Call from DoDashApp, which is in turn is called from index.py::</span>
@@ -106,7 +109,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting layout for </span><span class="si">{</span><span class="n">page_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="c1"># tab_layout = getattr(sys.modules[f&quot;visualization_pages.{vp.module_name}&quot;], &#39;layout&#39;)</span>
-                <span class="n">tab_layout</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">)</span>
+                <span class="n">tab_layout</span> <span class="o">=</span> <span class="n">vp</span><span class="o">.</span><span class="n">get_layout</span><span class="p">(</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">tab_layout</span>
 
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -129,10 +132,15 @@
 
         <span class="nd">@app</span><span class="o">.</span><span class="n">callback</span><span class="p">(</span><span class="n">Output</span><span class="p">(</span><span class="s2">&quot;page_content&quot;</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">),</span>
                       <span class="p">[</span><span class="n">Input</span><span class="p">(</span><span class="s2">&quot;tabs&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">),</span>
-                       <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)])</span>
-        <span class="k">def</span> <span class="nf">get_visualization_tab_layout_callback</span><span class="p">(</span><span class="n">page_id</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">):</span>
+                       <span class="n">Input</span><span class="p">(</span><span class="s1">&#39;top_menu_scenarios_drpdwn&#39;</span><span class="p">,</span> <span class="s1">&#39;value&#39;</span><span class="p">)],</span>
+                      <span class="p">[</span><span class="n">State</span><span class="p">(</span><span class="s1">&#39;reference_scenario_name_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">),</span>
+                       <span class="n">State</span><span class="p">(</span><span class="s1">&#39;multi_scenario_names_store&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)])</span>
+        <span class="k">def</span> <span class="nf">get_visualization_tab_layout_callback</span><span class="p">(</span><span class="n">page_id</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span> <span class="n">reference_scenario_name</span><span class="p">,</span> <span class="n">multi_scenario_names</span><span class="p">):</span>
             <span class="sd">&quot;&quot;&quot;To update the tabbed-visualization page.&quot;&quot;&quot;</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_visualization_tab_layout_callback</span><span class="p">(</span><span class="n">page_id</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">)</span></div></div>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;xxxxxxxxxxxxxxxxxxxxxx&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_visualization_tab_layout_callback</span><span class="p">(</span><span class="n">page_id</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">,</span>
+                                                              <span class="n">reference_scenario_name</span><span class="o">=</span><span class="n">reference_scenario_name</span><span class="p">,</span>
+                                                              <span class="n">multi_scenario_names</span><span class="o">=</span><span class="n">multi_scenario_names</span><span class="p">)</span></div></div>
 </pre></div>
 
             <div class="clearer"></div>
@@ -164,7 +172,7 @@
         <li class="right" >
           <a href="../../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.1.1b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.0 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.main_pages.visualization_tabs_page</a></li> 
       </ul>

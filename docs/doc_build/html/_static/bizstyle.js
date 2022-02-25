@@ -36,6 +36,6 @@ $(window).resize(function(){
         $("li.nav-item-0 a").text("Top");
     }
     else {
-        $("li.nav-item-0 a").text("DSE DO Dashboard 0.1.1.1b documentation");
+        $("li.nav-item-0 a").text("DSE DO Dashboard 0.1.2.0 documentation");
     }
 });

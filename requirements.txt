@@ -37,3 +37,6 @@ m2r2
 wheel==0.36.2
 twine
 
+# To avoid error in documentation generator (Spinx)
+ibm_watson_machine_learning
+
