@@ -9,4 +9,4 @@ Best practice to keep version here, in a separate file.
 See https://stackoverflow.com/questions/458550/standard-way-to-embed-version-into-python-package
 """
 
-__version__ = "0.1.2.0fp1"
+__version__ = "0.1.2.0.post1"
