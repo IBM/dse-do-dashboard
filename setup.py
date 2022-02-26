@@ -32,16 +32,6 @@ setuptools.setup(
     url="https://github.com/IBM/dse-do-dashboard",
     packages=setuptools.find_packages(),
     install_requires=[
-        # 'dse-do-utils>=0.5.3.1',
-        # 'dash>=2.0.0',
-        # 'flask_caching',
-        # 'dash_bootstrap_components',
-        # 'dash_pivottable',
-        # 'dash_daq',
-        # 'sqlalchemy>=1.3.23',
-        # 'pandas',
-        # 'plotly'
-
         'dse-do-utils>=0.5.4.2',
         'dash',
         'flask_caching',
@@ -58,7 +48,6 @@ setuptools.setup(
         'psutil',  # For long-running callbacks
 
         # 'dse-do-utils>=0.5.4.2',
-        # # 'dash',
         # 'dash~=2.0.0',
         # 'flask_caching==1.10.1',
         # 'dash_bootstrap_components==1.0.2',
