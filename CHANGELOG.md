@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]## [0.1.2.1b]
 ### Changed
 
-## [0.1.2.0fp1] - 2022-02-25
+## [0.1.2.0.post1] - 2022-02-25
 ### Changed
 - Removed most dependency versions in setup.py in attempt to fix CPD installation issue
 
