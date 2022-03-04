@@ -24,6 +24,7 @@ class HostEnvironment(enum.Enum):
 
 class DashApp(ABC):
     def __init__(self, logo_file_name: str = 'IBM.png',
+                 navbar_brand_name: Optional[str] = 'Dashboard',
                  cache_config: Dict = {},
                  port: int = 8050,
                  dash_debug: bool = False,
@@ -55,6 +56,7 @@ class DashApp(ABC):
         self.adbar_width = "4rem"
 
         self.logo_file_name = logo_file_name  # set before call to get_app_layout()
+        self.navbar_brand_name = navbar_brand_name
         self.cache_config = cache_config
 
         self.config_cache()
@@ -254,6 +256,12 @@ class DashApp(ABC):
         src = self.app.get_asset_url(self.logo_file_name)
         return src
 
+    def get_navbar_brand_children(self) -> str:
+        """The children of the dbc.NavbarBrand component, typically a plain string.
+        To be overridden."""
+        brand = self.navbar_brand_name  #'Dashboard'
+        return brand
+
     def get_navbar(self):
         # The scenario-bar is the section on the right with the scenario-dropdown and the refresh button
         scenario_bar = dbc.Row(
@@ -285,7 +293,8 @@ class DashApp(ABC):
                         dbc.Row(
                             [
                                 dbc.Col(html.Img(src=self.get_logo_src(), height="50vh")),
-                                dbc.Col(dbc.NavbarBrand("Dashboard", className="ms-2")),
+                                # dbc.Col(dbc.NavbarBrand("Dashboard", className="ms-2")),
+                                dbc.Col(dbc.NavbarBrand(self.get_navbar_brand_children(), className="ms-2")),
                             ],
                             align="center",
                             className="g-0",

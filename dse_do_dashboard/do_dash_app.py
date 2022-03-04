@@ -52,6 +52,7 @@ class DoDashApp(DashApp):
                  schema: Optional[str] = None,
                  db_echo: Optional[bool] = False,
                  logo_file_name: Optional[str] = 'IBM.png',
+                 navbar_brand_name: Optional[str] = 'Dashboard',
                  cache_config: Optional[Dict]= {},
                  visualization_pages: Optional[List[VisualizationPage]]= [],
                  database_manager_class=None,
@@ -131,7 +132,8 @@ class DoDashApp(DashApp):
 
         self.job_queue: List[DoModelRunner] = []  # TODO: migrate to Store. Using global variables is dangerous
 
-        super().__init__(logo_file_name=logo_file_name, cache_config=cache_config, port=port,
+        super().__init__(logo_file_name=logo_file_name, navbar_brand_name=navbar_brand_name,
+                         cache_config=cache_config, port=port,
                          dash_debug=dash_debug, host_env=host_env,
                          bootstrap_theme=bootstrap_theme, bootstrap_figure_template=bootstrap_figure_template,
                          enable_long_running_callbacks=enable_long_running_callbacks,)

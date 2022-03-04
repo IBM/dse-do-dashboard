@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]## [0.1.2.1b]
 ### Changed
+### Added
+- Customize the 'brand' name of the dashboard by overriding DashApp.get_navbar_brand_children
+- Customize the 'brand' name text of the dashboard from DashApp constructor argument `navbar_brand_name`
+- FoliumColumnVisualizationPage for Folium maps
+
+## [0.1.2.0.post1] - 2022-02-25
+### Changed
+- Removed most version fixes in setup.py to avoid installation error in CP4D
 
 ## [0.1.2.0] - 2022-02-24
 ### Changed
