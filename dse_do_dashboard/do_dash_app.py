@@ -541,7 +541,8 @@ class DoDashApp(DashApp):
                 for column in table.columns_metadata:
                     # print(column.primary_key)
                     # print(column.name)
-                    if column.name != 'scenario_name':
+                    # if column.name != 'scenario_name' :
+                    if column.name not in ['scenario_seq','scenario_name']:  # Works in both designs
                         if column.primary_key:
                             index_columns.append(column.name)
                         else:
