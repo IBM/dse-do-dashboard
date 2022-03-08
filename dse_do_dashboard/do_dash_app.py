@@ -542,7 +542,7 @@ class DoDashApp(DashApp):
                     # print(column.primary_key)
                     # print(column.name)
                     # if column.name != 'scenario_name' :
-                    if column.name not in ['scenario_seq','scenario_name']:  # Works in both designs
+                    if column.name not in ['scenario_seq', 'scenario_name']:  # Works in both designs
                         if column.primary_key:
                             index_columns.append(column.name)
                         else:
@@ -556,7 +556,7 @@ class DoDashApp(DashApp):
                     foreign_tables = [],
                 )
                 tss.append(ts)
-        table_schemas: Dict[str, ScenarioTableSchema] = {t.table_name : t for t in tss}
+        table_schemas: Dict[str, ScenarioTableSchema] = {t.table_name: t for t in tss}
         return table_schemas
 
     def get_pivot_table_configs(self) -> Dict[str, PivotTableConfig]:
