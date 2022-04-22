@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]## [0.1.2.1b0]
 ### Changed
+
+## [0.1.2.1] - 2002-04-21
+### Changed
 ### Added
 - Customize the 'brand' name of the dashboard by overriding DashApp.get_navbar_brand_children
 - Customize the 'brand' name text of the dashboard from DashApp constructor argument `navbar_brand_name`
