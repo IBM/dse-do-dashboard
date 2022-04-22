@@ -4,12 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.1b]
+## [Unreleased]## [0.1.2.1b0]
 ### Changed
 ### Added
 - Customize the 'brand' name of the dashboard by overriding DashApp.get_navbar_brand_children
 - Customize the 'brand' name text of the dashboard from DashApp constructor argument `navbar_brand_name`
 - FoliumColumnVisualizationPage for Folium maps
+- DashApp.set_run_server_kwargs to add arguments to app.run_server() call, e.g. to set `host='localhost'` for Macs.
 
 ## [0.1.2.0.post1] - 2022-02-25
 ### Changed

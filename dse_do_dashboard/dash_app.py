@@ -65,8 +65,14 @@ class DashApp(ABC):
         self.set_cache_callbacks()
         self.set_dash_callbacks()
 
+        # To run locally on Mac, you need to specifically set host='localhost'
+        self.run_server_kwargs: Dict = {}  # {"host": "localhost"}
 
-
+    def set_run_server_kwargs(self, **run_server_kwargs):
+        """Use to set input arguments for Dash.run_server(), in addition to `debug` and `port`.
+        For instance, running locally on a Mac requires host='localhost'. """
+        if run_server_kwargs is not None:
+            self.run_server_kwargs = run_server_kwargs
 
     def set_bootstrap_figure_template(self, bootstrap_figure_template: str):
         """See https://hellodash.pythonanywhere.com/theme_explorer"""
@@ -114,7 +120,7 @@ class DashApp(ABC):
                 DA.run_server()
 
         """
-        self.app.run_server(debug=self.dash_debug, port=self.port)
+        self.app.run_server(debug=self.dash_debug, port=self.port, **self.run_server_kwargs)
 
     def config_cache(self):
         self.cache = Cache()
