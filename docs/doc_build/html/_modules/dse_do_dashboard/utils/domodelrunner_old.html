@@ -1,0 +1,131 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>dse_do_dashboard.utils.domodelrunner_old &#8212; DSE DO Dashboard 0.1.2.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bizstyle.css" />
+    
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.utils.domodelrunner_old</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for dse_do_dashboard.utils.domodelrunner_old</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">abc</span> <span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+<span class="kn">from</span> <span class="nn">dse_do_utils.scenariodbmanager</span> <span class="kn">import</span> <span class="n">Inputs</span><span class="p">,</span> <span class="n">Outputs</span><span class="p">,</span> <span class="n">ScenarioDbManager</span>
+
+
+<div class="viewcode-block" id="DoModelRunner"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner">[docs]</a><span class="k">class</span> <span class="nc">DoModelRunner</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="DoModelRunner.run"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoModelRunner.run">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Inputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Outputs</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Abstract method&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<div class="viewcode-block" id="DoNotebookRunner"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoNotebookRunner">[docs]</a><span class="k">class</span> <span class="nc">DoNotebookRunner</span><span class="p">(</span><span class="n">DoModelRunner</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">notebook_filepath</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notebook_filepath</span> <span class="o">=</span> <span class="n">notebook_filepath</span>
+
+<div class="viewcode-block" id="DoNotebookRunner.run"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoNotebookRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Inputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Outputs</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;TODO&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<div class="viewcode-block" id="DoDeployRunner"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoDeployRunner">[docs]</a><span class="k">class</span> <span class="nc">DoDeployRunner</span><span class="p">(</span><span class="n">DoModelRunner</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="DoDeployRunner.run"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoDeployRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Inputs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Outputs</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;TODO&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{}</span></div></div>
+
+
+<div class="viewcode-block" id="DoDbJobRunner"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoDbJobRunner">[docs]</a><span class="k">class</span> <span class="nc">DoDbJobRunner</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Runs a DO Model based on a scenario in the DB.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dbm</span><span class="p">:</span> <span class="n">ScenarioDbManager</span><span class="p">,</span> <span class="n">scenario_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="n">DoModelRunner</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbm</span> <span class="o">=</span> <span class="n">dbm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scenario_name</span> <span class="o">=</span> <span class="n">scenario_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+
+<div class="viewcode-block" id="DoDbJobRunner.run"><a class="viewcode-back" href="../../../dse_do_dashboard.utils.html#dse_do_dashboard.utils.domodelrunner_old.DoDbJobRunner.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dbm</span><span class="o">.</span><span class="n">read_scenario_input_tables_from_db</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scenario_name</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dbm</span><span class="o">.</span><span class="n">update_scenario_output_tables_in_db</span><span class="p">(</span><span class="n">scenario_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">scenario_name</span><span class="p">,</span> <span class="n">outputs</span><span class="o">=</span><span class="n">outputs</span><span class="p">)</span></div></div>
+</pre></div>
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">DSE DO Dashboard 0.1.2.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">dse_do_dashboard.utils.domodelrunner_old</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Victor Terpstra &lt;vterpstra@us.ibm.com&gt;.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 4.3.2.
+    </div>
+  </body>
+</html>
