@@ -358,11 +358,27 @@ class DoDashApp(DashApp):
         Is called from dse_do_dashboard.DoDashApp to create the PlotlyManager."""
 
         if input_table_names is None:
-            # input_table_names = list(self.dbm.input_db_tables.keys())  #This is not consistent with implementation in ScenarioDbManager! Replace by empty list
+            # input_table_names = list(self.dbm.input_db_tables.keys())  # This is not consistent with implementation in ScenarioDbManager! Replace by empty list
             input_table_names = []
             if 'Scenario' in input_table_names: input_table_names.remove('Scenario')  # Remove the scenario table
         if output_table_names is None:  # load all tables by default
             output_table_names = self.dbm.output_db_tables.keys()
+
+        # VT 2022-09-12: Only read tables that exist in schema:
+        # TODO: test and enable this code to handle optional tables in DB, like the Warehouse, WarehouseProperties, etc
+        # input_table_names_in_schema = []
+        # for input_table_name in input_table_names:
+        #     if input_table_name in self.dbm.input_db_tables.keys():
+        #         input_table_names_in_schema.append(input_table_name)
+        #     else:
+        #         print(f"Warning: DODashApp.read_scenario_tables_from_db_cached: input table {input_table_name} not in schema. Table not read.")
+        #
+        # output_table_names_in_schema = []
+        # for output_table_name in output_table_names:
+        #     if output_table_name in self.dbm.output_db_tables.keys():
+        #         output_table_names_in_schema.append(output_table_name)
+        #     else:
+        #         print(f"Warning: DODashApp.read_scenario_tables_from_db_cached: output table {output_table_name} not in schema. Table not read.")
 
         inputs = {}
         for scenario_table_name in input_table_names:
