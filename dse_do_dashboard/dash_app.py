@@ -1,6 +1,6 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
+import signal
 from abc import ABC
 from typing import Dict, Optional, List
 
@@ -481,11 +481,12 @@ class DashApp(ABC):
         """Shuts-down the Flash web-server, releasing the port.
         Relevant in CPD, so the port gets released immediately.
         """
-        from flask import request
-        func = request.environ.get('werkzeug.server.shutdown')
-        if func is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
-        func()
+        os.kill(os.getpid(), signal.SIGTERM)
+        # from flask import request
+        # func = request.environ.get('werkzeug.server.shutdown')
+        # if func is None:
+        #     raise RuntimeError('Not running with the Werkzeug Server')
+        # func()
 
     def get_table_schema(self, table_name) -> Optional[ScenarioTableSchema]:
         pass
