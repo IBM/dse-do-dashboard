@@ -5,6 +5,7 @@ from typing import List, Optional, Dict
 
 import pandas as pd
 import dash
+from dash.dash_table.Format import Format
 from dash.exceptions import PreventUpdate
 
 from dse_do_dashboard.main_pages.main_page import MainPage

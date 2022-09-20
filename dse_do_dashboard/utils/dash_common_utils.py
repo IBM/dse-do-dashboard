@@ -18,6 +18,9 @@ import dash_bootstrap_components as dbc
 ##########################################################################
 #  Generic Schema NamedTuple classes
 ##########################################################################
+from dash.dash_table.Format import Format
+
+
 class ForeignKeySchema(NamedTuple):
     table_name: str
     foreign_keys: List[str]
@@ -97,7 +100,7 @@ def get_data_table(df, table_schema: Optional[ScenarioTableSchema] = None, edita
         id=data_table_id,
         data=df.to_dict('records'),
         columns=[
-            {'name': i, 'id': i, 'type': table_type(df[i])}
+            {'name': i, 'id': i, 'type': table_type(df[i])}  # TODO: format 'thousands' separator with: 'format':Format().group(True) or ,  'format': Format(group=',', precision=0)
             for i in df.columns
         ],
         fixed_rows={'headers': True},

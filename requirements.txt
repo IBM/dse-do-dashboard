@@ -1,5 +1,5 @@
 # For DSE_DO_Dashboard:
-dash~=2.0.0
+dash>=2.0.0
 ## gunicorn==19.9.0  # May not be necessary
 flask_caching==1.10.1
 dash_bootstrap_components==1.0.2
