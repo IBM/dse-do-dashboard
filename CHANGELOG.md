@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.2.2b0] - 2022-09-22
 ### Changed
 - Stop Server button now uses os.kill() instead of deprecated Werkzeug callback
+- DashApp.run_server(self, **kwargs) with arguments for dash app.run_server()
+### Removed
+- DashApp.set_run_server_kwargs()
 
 ## [0.1.2.1] - 2022-04-28
 ### Changed
