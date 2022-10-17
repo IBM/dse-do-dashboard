@@ -70,8 +70,9 @@ class DoModelRunner(ABC):
         return {}
 
     def update_outputs(self, outputs: Outputs):
-        pass
-        # self.dbm.update_scenario_output_tables_in_db(scenario_name=self.scenario_name, outputs=outputs)
+        # print("Update output tables in DB")
+        self.dbm.update_scenario_output_tables_in_db(scenario_name=self.scenario_name, outputs=outputs)
+        # print("Done update output tables in DB")
 
 
 class DoNotebookModelRunner(DoModelRunner):

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.2.2b1] - 2022-10-17
 ### Changed
 - DashApp.run_server(self, **kwargs) with arguments for dash app.run_server()
+- Enabled write output to DB after run model.
 ### Removed
 - DashApp.set_run_server_kwargs()
 
