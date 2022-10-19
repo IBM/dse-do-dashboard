@@ -383,12 +383,15 @@ class DoDashApp(DashApp):
         inputs = {}
         for scenario_table_name in input_table_names:
             # print(f"read input table {scenario_table_name}")
-            inputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
+            # TODO: skip scenario_table_name if not in schema
+            if scenario_table_name in self.dbm.input_db_tables.keys():
+                inputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
 
         outputs = {}
         for scenario_table_name in output_table_names:
             # print(f"read output table {scenario_table_name}")
-            outputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
+            if scenario_table_name in self.dbm.output_db_tables.keys():
+                outputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
         return inputs, outputs
 
     ########################################################################################

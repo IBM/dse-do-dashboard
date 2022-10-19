@@ -116,6 +116,7 @@ class PrepareDataPageEdit(PrepareDataPage):
             ],
             fixed_rows={'headers': True},
             editable=editable,
+            virtualization=True,
             # fixed_columns={'headers': False, 'data': 0}, # Does NOT create a horizontal scroll bar
             filter_action="native",
             sort_action="native",
@@ -128,7 +129,8 @@ class PrepareDataPageEdit(PrepareDataPage):
                 'font_size': '12px',
                 'textAlign': 'left'},
             style_table={
-                'maxHeight': '400px',
+                'maxHeight': '600px',
+                # 'height': '800',
                 'overflowY': 'scroll'
             },
             style_header={

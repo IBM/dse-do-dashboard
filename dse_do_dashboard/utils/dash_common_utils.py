@@ -105,6 +105,7 @@ def get_data_table(df, table_schema: Optional[ScenarioTableSchema] = None, edita
         ],
         fixed_rows={'headers': True},
         editable=editable,
+        virtualization=True,
         # fixed_columns={'headers': False, 'data': 0}, # Does NOT create a horizontal scroll bar
         filter_action="native",
         sort_action="native",
@@ -117,7 +118,7 @@ def get_data_table(df, table_schema: Optional[ScenarioTableSchema] = None, edita
             'font_size': '12px',
             'textAlign': 'left'},
         style_table={
-            'maxHeight': '400px',
+            'maxHeight': '800px',
             'overflowY': 'scroll'
         },
         style_header={
@@ -157,6 +158,7 @@ def get_editable_data_table(df, table_schema: Optional[ScenarioTableSchema]=None
             for i in df.columns
         ],
         fixed_rows={'headers': True},
+        # page_size=20,
         editable=True,
         # fixed_columns={'headers': False, 'data': 0}, # Does NOT create a horizontal scroll bar
         filter_action="native",
