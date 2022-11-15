@@ -39,8 +39,8 @@ setuptools.setup(
         'dash-bootstrap-templates',
         'dash_pivottable',
         'dash_daq',
-        'sqlalchemy>=1.3.23, <1.4',
-        'pandas<1.4',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
+        'sqlalchemy>=1.3.23',
+        'pandas',  # Pandas 1.4 requires sqlalchemy 1.4, see https://pandas.pydata.org/docs/dev/whatsnew/v1.4.0.html
         'plotly',  # 5.5.0 is causing problems installing on CPD
         'openpyxl',
         'diskcache',  # For long-running callbacks
