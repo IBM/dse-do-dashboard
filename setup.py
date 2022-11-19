@@ -1,6 +1,7 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import setuptools
 
 ###########################################################
@@ -17,13 +18,34 @@ import setuptools
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-version = '0.1.2.2b1'
+###############################################################################
+# To get the __version__.
+# See https://packaging.python.org/guides/single-sourcing-package-version/
+# This avoids doing an `import dse_do_supply_chain`, which is causing problems
+# installing in a WML DO deployment
+###############################################################################
+def read(rel_path: str) -> str:
+    here = os.path.abspath(os.path.dirname(__file__))
+    # intentionally *not* adding an encoding option to open, See:
+    #   https://github.com/pypa/virtualenv/issues/201#issuecomment-3145690
+    with open(os.path.join(here, rel_path)) as fp:
+        return fp.read()
+
+def get_version(rel_path: str) -> str:
+    for line in read(rel_path).splitlines():
+        if line.startswith("__version__"):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    raise RuntimeError("Unable to find version string.")
+###############################################################################
+
+# version = '0.1.2.2b2'
 
 setuptools.setup(
     name="dse_do_dashboard",
     # version=dse_do_dashboard.__version__,
     # version=__version__,
-    version=version,
+    version=get_version("dse_do_dashboard/version.py"),
     author="Victor Terpstra",
     author_email="vterpstra@us.ibm.com",
     description="Decision Optimization Dashboard for IBM Cloud Pak for Data DO projects",
