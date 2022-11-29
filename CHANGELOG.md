@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - DoDashApp.read_scenario_tables_from_db_cached only reads tables in the schema, skips others without warning.
 - Enabled virtualization in DashTables (Prepare data and Explore Solution)
+- Removed unused import in dash_common_utils causing failure in PyCharm debug mode
 
 ## [0.1.2.2b1] - 2022-10-17
 ### Changed

@@ -256,7 +256,7 @@ def get_pivot_table_card_children(df, scenario_name, table_name, pivot_config: O
 
 #####################################
 import functools
-import plotly.express as px
+# import plotly.express as px
 import plotly.graph_objects as go
 import traceback
 
