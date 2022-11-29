@@ -4,10 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.2b2]
+## [Unreleased]## [0.1.2.2b3]
+### Changed
+- setup.py avoids import of dse_do_utils to get __version__
+
+## [0.1.2.2b2] - 2022-11-15
 ### Changed
 - DoDashApp.read_scenario_tables_from_db_cached only reads tables in the schema, skips others without warning.
 - Enabled virtualization in DashTables (Prepare data and Explore Solution)
+- Remove restriction on SQLAlchemy version < 1.4
 - Removed unused import in dash_common_utils causing failure in PyCharm debug mode
 
 ## [0.1.2.2b1] - 2022-10-17
