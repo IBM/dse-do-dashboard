@@ -1,6 +1,6 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
-
+import signal
 from abc import ABC
 from typing import Dict, Optional, List
 
@@ -69,7 +69,8 @@ class DashApp(ABC):
         self.run_server_kwargs: Dict = {}  # {"host": "localhost"}
 
     def set_run_server_kwargs(self, **run_server_kwargs):
-        """Use to set input arguments for Dash.run_server(), in addition to `debug` and `port`.
+        """DEPRECATED (also non-functional). Use `self.run_server(self, **kwargs)` to pass additional arguments.
+        Use to set input arguments for Dash.run_server(), in addition to `debug` and `port`.
         For instance, running locally on a Mac requires host='localhost'. """
         if run_server_kwargs is not None:
             self.run_server_kwargs = run_server_kwargs
@@ -112,15 +113,32 @@ class DashApp(ABC):
         app.config.suppress_callback_exceptions = True
         return app
 
-    def run_server(self):
-        """Runs the Dash server.
+    def run_server(self, **kwargs):
+        '''
+        Runs the Dash server.
         To be called from index.py::
 
             if __name__ == '__main__':
                 DA.run_server()
 
-        """
-        self.app.run_server(debug=self.dash_debug, port=self.port, **self.run_server_kwargs)
+        '''
+
+        if 'debug' not in kwargs:
+            kwargs['debug'] = self.dash_debug
+        if 'port' not in kwargs:
+            kwargs['port'] = self.port
+
+        self.app.run_server(**kwargs)
+
+    # def run_server(self):
+    #     """Runs the Dash server.
+    #     To be called from index.py::
+    #
+    #         if __name__ == '__main__':
+    #             DA.run_server()
+    #
+    #     """
+    #     self.app.run_server(debug=self.dash_debug, port=self.port, **self.run_server_kwargs)
 
     def config_cache(self):
         self.cache = Cache()
@@ -481,11 +499,12 @@ class DashApp(ABC):
         """Shuts-down the Flash web-server, releasing the port.
         Relevant in CPD, so the port gets released immediately.
         """
-        from flask import request
-        func = request.environ.get('werkzeug.server.shutdown')
-        if func is None:
-            raise RuntimeError('Not running with the Werkzeug Server')
-        func()
+        os.kill(os.getpid(), signal.SIGTERM)
+        # from flask import request
+        # func = request.environ.get('werkzeug.server.shutdown')
+        # if func is None:
+        #     raise RuntimeError('Not running with the Werkzeug Server')
+        # func()
 
     def get_table_schema(self, table_name) -> Optional[ScenarioTableSchema]:
         pass

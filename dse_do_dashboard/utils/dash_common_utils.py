@@ -18,6 +18,9 @@ import dash_bootstrap_components as dbc
 ##########################################################################
 #  Generic Schema NamedTuple classes
 ##########################################################################
+from dash.dash_table.Format import Format
+
+
 class ForeignKeySchema(NamedTuple):
     table_name: str
     foreign_keys: List[str]
@@ -97,11 +100,12 @@ def get_data_table(df, table_schema: Optional[ScenarioTableSchema] = None, edita
         id=data_table_id,
         data=df.to_dict('records'),
         columns=[
-            {'name': i, 'id': i, 'type': table_type(df[i])}
+            {'name': i, 'id': i, 'type': table_type(df[i])}  # TODO: format 'thousands' separator with: 'format':Format().group(True) or ,  'format': Format(group=',', precision=0)
             for i in df.columns
         ],
         fixed_rows={'headers': True},
         editable=editable,
+        virtualization=True,
         # fixed_columns={'headers': False, 'data': 0}, # Does NOT create a horizontal scroll bar
         filter_action="native",
         sort_action="native",
@@ -114,7 +118,7 @@ def get_data_table(df, table_schema: Optional[ScenarioTableSchema] = None, edita
             'font_size': '12px',
             'textAlign': 'left'},
         style_table={
-            'maxHeight': '400px',
+            'maxHeight': '800px',
             'overflowY': 'scroll'
         },
         style_header={
@@ -154,6 +158,7 @@ def get_editable_data_table(df, table_schema: Optional[ScenarioTableSchema]=None
             for i in df.columns
         ],
         fixed_rows={'headers': True},
+        # page_size=20,
         editable=True,
         # fixed_columns={'headers': False, 'data': 0}, # Does NOT create a horizontal scroll bar
         filter_action="native",
@@ -251,7 +256,7 @@ def get_pivot_table_card_children(df, scenario_name, table_name, pivot_config: O
 
 #####################################
 import functools
-import plotly.express as px
+# import plotly.express as px
 import plotly.graph_objects as go
 import traceback
 
