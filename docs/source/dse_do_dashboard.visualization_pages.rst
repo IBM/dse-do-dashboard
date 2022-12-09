@@ -4,6 +4,14 @@ dse\_do\_dashboard.visualization\_pages package
 Submodules
 ----------
 
+dse\_do\_dashboard.visualization\_pages.folium\_column\_visualization\_page module
+----------------------------------------------------------------------------------
+
+.. automodule:: dse_do_dashboard.visualization_pages.folium_column_visualization_page
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 dse\_do\_dashboard.visualization\_pages.kpi\_page\_template module
 ------------------------------------------------------------------
 
