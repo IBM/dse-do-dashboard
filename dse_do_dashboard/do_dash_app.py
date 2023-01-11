@@ -9,7 +9,7 @@ from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
 from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
 from dse_do_dashboard.utils.domodelrunner import DoModelRunner, DoModelRunnerConfig
 from dse_do_utils import DataManager
-from dse_do_utils.scenariodbmanager import ScenarioDbManager
+from dse_do_utils.scenariodbmanager import ScenarioDbManager, DatabaseType
 
 from dse_do_dashboard.dash_app import DashApp, HostEnvironment
 from dash import dcc, html, Output, Input, State
@@ -64,6 +64,7 @@ class DoDashApp(DashApp):
                  bootstrap_theme=dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
+                 db_type: DatabaseType = DatabaseType.DB2
                  ):
         """Create a Dashboard app.
 
@@ -89,6 +90,7 @@ class DoDashApp(DashApp):
         self.db_credentials = db_credentials
         self.schema = schema
         self.db_echo = db_echo
+        self.db_type = db_type
         self.database_manager_class = database_manager_class
         # assert issubclass(self.database_manager_class, ScenarioDbManager)
         self.dbm = self.create_database_manager_instance()
@@ -143,8 +145,8 @@ class DoDashApp(DashApp):
         The default implementation uses the database_manager_class from the constructor.
         Optionally, override this method."""
         if self.database_manager_class is not None and self.db_credentials is not None:
-            print(f"Connecting to DB2 at {self.db_credentials['host']}, schema = {self.schema}")
-            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo)
+            print(f"Connecting to {self.db_type} at {self.db_credentials['host']}, schema = {self.schema}")
+            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo, db_type = self.db_type)
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
         return dbm
