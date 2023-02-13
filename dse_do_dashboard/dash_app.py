@@ -16,7 +16,7 @@ from dash.long_callback import DiskcacheLongCallbackManager
 
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema
 
-
+# TODO: use dse_do_utils.scenariomanager.Platform instead?
 class HostEnvironment(enum.Enum):
     Local = 1  # Regular Dash
     CPD402 = 2  # Special handling of port

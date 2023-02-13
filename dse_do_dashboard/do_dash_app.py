@@ -64,7 +64,8 @@ class DoDashApp(DashApp):
                  bootstrap_theme=dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
-                 db_type: DatabaseType = DatabaseType.DB2
+                 db_type: DatabaseType = DatabaseType.DB2,
+                 db_manager_kwargs: Optional[Dict] = None,
                  ):
         """Create a Dashboard app.
 
@@ -91,6 +92,7 @@ class DoDashApp(DashApp):
         self.schema = schema
         self.db_echo = db_echo
         self.db_type = db_type
+        self.db_manager_kwargs = db_manager_kwargs
         self.database_manager_class = database_manager_class
         # assert issubclass(self.database_manager_class, ScenarioDbManager)
         self.dbm = self.create_database_manager_instance()
@@ -134,6 +136,8 @@ class DoDashApp(DashApp):
 
         self.job_queue: List[DoModelRunner] = []  # TODO: migrate to Store. Using global variables is dangerous
 
+
+
         super().__init__(logo_file_name=logo_file_name, navbar_brand_name=navbar_brand_name,
                          cache_config=cache_config, port=port,
                          dash_debug=dash_debug, host_env=host_env,
@@ -146,7 +150,9 @@ class DoDashApp(DashApp):
         Optionally, override this method."""
         if self.database_manager_class is not None and self.db_credentials is not None:
             print(f"Connecting to {self.db_type} at {self.db_credentials['host']}, schema = {self.schema}")
-            dbm = self.database_manager_class(credentials=self.db_credentials, schema=self.schema, echo=self.db_echo, db_type = self.db_type)
+            dbm = self.database_manager_class(credentials=self.db_credentials,
+                                              schema=self.schema, echo=self.db_echo, db_type = self.db_type,
+                                              **self.db_manager_kwargs)
         else:
             print("Error: either specifiy `database_manager_class`, `db_credentials` and `schema`, or override `create_database_manager_instance`.")
         return dbm
