@@ -65,7 +65,7 @@ class DoDashApp(DashApp):
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
                  db_type: DatabaseType = DatabaseType.DB2,
-                 db_manager_kwargs: Optional[Dict] = None,
+                 db_manager_kwargs: Dict = {},
                  ):
         """Create a Dashboard app.
 
