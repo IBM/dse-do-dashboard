@@ -65,7 +65,7 @@ class DoDashApp(DashApp):
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
                  db_type: DatabaseType = DatabaseType.DB2,
-                 db_manager_kwargs: Dict = {},
+                 db_manager_kwargs: Dict = {},  # Do set to None
                  ):
         """Create a Dashboard app.
 
@@ -92,7 +92,7 @@ class DoDashApp(DashApp):
         self.schema = schema
         self.db_echo = db_echo
         self.db_type = db_type
-        self.db_manager_kwargs = db_manager_kwargs
+        self.db_manager_kwargs = db_manager_kwargs if db_manager_kwargs is not None else {}  # To ensure no None value
         self.database_manager_class = database_manager_class
         # assert issubclass(self.database_manager_class, ScenarioDbManager)
         self.dbm = self.create_database_manager_instance()
