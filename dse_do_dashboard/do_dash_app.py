@@ -65,7 +65,8 @@ class DoDashApp(DashApp):
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
                  db_type: DatabaseType = DatabaseType.DB2,
-                 db_manager_kwargs: Dict = {},  # Do set to None
+                 db_manager_kwargs: Dict = {},  # Do not set to None,
+                 dash_kwargs: Dict = {},
                  ):
         """Create a Dashboard app.
 
@@ -142,7 +143,8 @@ class DoDashApp(DashApp):
                          cache_config=cache_config, port=port,
                          dash_debug=dash_debug, host_env=host_env,
                          bootstrap_theme=bootstrap_theme, bootstrap_figure_template=bootstrap_figure_template,
-                         enable_long_running_callbacks=enable_long_running_callbacks,)
+                         enable_long_running_callbacks=enable_long_running_callbacks,
+                         dash_kwargs=dash_kwargs)
 
     def create_database_manager_instance(self) -> ScenarioDbManager:
         """Create an instance of a ScenarioDbManager.

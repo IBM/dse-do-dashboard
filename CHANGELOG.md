@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.3b2]
+## [Unreleased]## [0.1.2.3b3]
+
+## [0.1.2.3b2] - 2023-03-20
 ### Fixed
 - DoDashApp parameter `db_manager_kwargs` defaults to an empty dict (instead of None)
+### Added
+- DoDashApp support for additional Dash kwargs (`dash_kwargs`)
 
 ## [0.1.2.3b1] - 2023-01-11
 ### Added

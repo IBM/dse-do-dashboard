@@ -32,6 +32,7 @@ class DashApp(ABC):
                  bootstrap_theme = dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template: str = "bootstrap",
                  enable_long_running_callbacks: bool = False,
+                 dash_kwargs: Dict = {},
                  ):
         self.port = port
         self.host_env = host_env
@@ -39,7 +40,7 @@ class DashApp(ABC):
         self.bootstrap_theme = bootstrap_theme
         self.set_bootstrap_figure_template(bootstrap_figure_template)
 
-        # Long running callbacks:
+        # Long-running callbacks:
         self.enable_long_running_callbacks = enable_long_running_callbacks
         if self.enable_long_running_callbacks:
             cache = diskcache.Cache("./cache")
@@ -47,6 +48,7 @@ class DashApp(ABC):
         else:
             self.long_callback_manager = None
 
+        self.dash_kwargs = dash_kwargs
         self.app = self.create_dash_app()
 
         # Margins to layout the header, sidebar and content area:
@@ -100,12 +102,14 @@ class DashApp(ABC):
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path,
                             long_callback_manager=self.long_callback_manager,
+                            **self.dash_kwargs
                             )
         else:
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path,
                             long_callback_manager=self.long_callback_manager,
+                            **self.dash_kwargs
                             )
         dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.css"
         app.config.external_stylesheets = [self.bootstrap_theme, dbc_css]
