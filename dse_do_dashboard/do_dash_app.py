@@ -53,7 +53,7 @@ class DoDashApp(DashApp):
                  db_echo: Optional[bool] = False,
                  logo_file_name: Optional[str] = 'IBM.png',
                  navbar_brand_name: Optional[str] = 'Dashboard',
-                 cache_config: Optional[Dict]= {},
+                 cache_config: Optional[Dict] = {},
                  visualization_pages: Optional[List[VisualizationPage]]= [],
                  database_manager_class=None,
                  data_manager_class=None,
