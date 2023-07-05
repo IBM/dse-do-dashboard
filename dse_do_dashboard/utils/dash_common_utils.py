@@ -409,7 +409,8 @@ def diff_dashtable_mi(data, data_previous, index_columns: List[str] = None,
         row = row[row.eq(True)]
 
         #         print(f"row={row}")
-        for change in row.iteritems():
+        # for change in row.iteritems():  # Deprecated in Pandas 2.0
+        for change in row.items():
             change = {
                 "row_idx": row_id,
                 "column_name": change[0],

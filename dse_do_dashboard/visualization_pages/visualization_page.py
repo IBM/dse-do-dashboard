@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 from dash import html
 # from dse_do_dashboard.do_dash_app import DoDashApp
 from dse_do_dashboard.main_pages.not_found import NotFoundPage
@@ -15,8 +15,10 @@ class VisualizationPage(ABC):
     Subclass should override/implement:
     * get_layout_children(self)
     """
-    def __init__(self, dash_app, page_name:str='Default', page_id:str='default', url:str='default',
-                 input_table_names: List[str] = [], output_table_names: List[str] = [],
+    def __init__(self, dash_app,
+                 page_name: str = 'Default', page_id: str = 'default', url: str = 'default',
+                 input_table_names: Optional[List[str]] = None,
+                 output_table_names: Optional[List[str]] = None,
                  enable_reference_scenario: bool = False,
                  enable_multi_scenario: bool = False):
         """
@@ -36,6 +38,10 @@ class VisualizationPage(ABC):
         TODO:
         * dash_app: DoDashApp. Due to circular imports, cannot specify type!
         """
+        if output_table_names is None:
+            output_table_names = []
+        if input_table_names is None:
+            input_table_names = []
         self.dash_app = dash_app
         self.page_name = page_name  # As shown in UI
         self.page_id = page_id  # Used for Dash pattern-matching callback
