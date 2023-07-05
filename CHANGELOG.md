@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.2.3b3] - 2023-07-05
 - dash_app.HostEnvironment is now an IntEnum to allow integer compare
-- dash_common_utils.diff_dashtable_mi .iteritems() replaced by .items() (Pandas 2.0 deprecated)
+- dash_common_utils.diff_dashtable_mi .iteritems() replaced by .items() (Pandas 2.0 deprecated) 
 
 ## [0.1.2.3b2] - 2023-03-20
 ### Fixed
