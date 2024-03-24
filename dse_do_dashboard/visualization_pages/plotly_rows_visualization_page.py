@@ -1,5 +1,7 @@
 # Copyright IBM All Rights Reserved.
 # SPDX-License-Identifier: Apache-2.0
+from __future__ import annotations
+
 from abc import abstractmethod
 from typing import List, NamedTuple
 
@@ -28,8 +30,10 @@ class PlotlyRowsVisualizationPage(VisualizationPage):
                          )
 
     @abstractmethod
-    def get_plotly_figures(self, pm: PlotlyManager) -> List[List[go.Figure]]:
+    def get_plotly_figures(self, pm: PlotlyManager) -> List[List[go.Figure] | go.Figure]:
         """
+        Update 20240323: if row with one Figure, can also return Figure instead of list with one Figure.
+        This makes this compatible with Plotly1ColumnVisualizationPage
         :returns List of Lists of Plotly Figures. One for each row.
         """
         rows=[]
@@ -37,27 +41,43 @@ class PlotlyRowsVisualizationPage(VisualizationPage):
 
     def get_layout_children(self, pm: PlotlyManager):
         """Creates a layout for KPI gauges with multiple rows and columns.
-        Each row can contain any number of columns."""
+        Each row can contain any number of columns.
+        """
         figures = self.get_plotly_figures(pm=pm)
 
-        figure_style = {'height': '20vh', 'width': '20vw', 'margin-left': 'auto', 'margin-right': 'auto',
-                       'display': 'block'}
+        # figure_style = {'height': '20vh', 'width': '20vw', 'margin-left': 'auto', 'margin-right': 'auto',
+        #                'display': 'block'}
         layout_childen = []
 
         for figure_row in figures:
-            row_layout = dbc.Row([
-                dbc.Col(
-                    dbc.Card([
-                        dbc.CardBody(
-                            dcc.Graph(
-                                style=figure_style,
-                                figure=figure
+            if isinstance(figure_row, list):  # VT-20240323:
+                row_layout = dbc.Row([
+                    dbc.Col(
+                        dbc.Card([
+                            dbc.CardBody(
+                                dcc.Graph(
+                                    # style=figure_style,  # VT_20240323: disabled style
+                                    figure=figure
+                                )
                             )
-                        )
-                    ])
+                        ])
+                    )
+                    for figure in figure_row
+                ])
+            else:
+                figure = figure_row
+                row_layout = dbc.Row(
+                    dbc.Col(
+                        dbc.Card([
+                            dbc.CardBody(
+                                dcc.Graph(
+                                    figure=figure,
+                                )
+                            )
+                        ])
+                        # , width=12
+                    )
                 )
-                for figure in figure_row
-            ])
             layout_childen.append(row_layout)
 
         return layout_childen
