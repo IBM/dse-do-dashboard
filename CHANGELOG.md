@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]## [0.1.2.3b4]
+### Added
+- PlotlyRowsVisualizationPage adds supports row with just one go.Figure, avoiding list. Makes this compatible with Plotly1ColumnVisualizationPage 
 
 ## [0.1.2.3b3] - 2023-07-05
 - dash_app.HostEnvironment is now an IntEnum to allow integer compare
