@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.3b4]
+## [Unreleased]## [0.1.2.3b5]
+
+## [0.1.2.3b4] - 2024-04-10
 ### Added
 - PlotlyRowsVisualizationPage adds supports row with just one go.Figure, avoiding list. Makes this compatible with Plotly1ColumnVisualizationPage 
 
