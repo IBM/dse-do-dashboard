@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.3b5]
+## [Unreleased]## [0.1.2.3b6]
+
+## [0.1.2.3b5] - 2024-04-15
+### Added
+- PlotlyRowsVisualizationPage.__init__ adds parameters enable_reference_scenario and enable_multi_scenario
 
 ## [0.1.2.3b4] - 2024-04-10
 ### Added
