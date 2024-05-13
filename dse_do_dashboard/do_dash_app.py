@@ -9,6 +9,7 @@ from dse_do_dashboard.main_pages.home_page_edit import HomePageEdit
 from dse_do_dashboard.main_pages.prepare_data_page_edit import PrepareDataPageEdit
 from dse_do_dashboard.utils.domodelrunner import DoModelRunner, DoModelRunnerConfig
 from dse_do_utils import DataManager
+from dse_do_utils.datamanager import Inputs, Outputs
 from dse_do_utils.scenariodbmanager import ScenarioDbManager, DatabaseType
 
 from dse_do_dashboard.dash_app import DashApp, HostEnvironment
@@ -362,38 +363,20 @@ class DoDashApp(DashApp):
 
     def read_scenario_tables_from_db_cached(self, scenario_name: str,
                                             input_table_names: List[str] = None,
-                                            output_table_names: List[str] = None):
+                                            output_table_names: List[str] = None) -> (Inputs, Outputs):
         """For use with Flask caching. Loads data for selected input and output tables.
         Same as `read_scenario_tables_from_db`, but calls `read_scenario_table_from_db_cached`.
         Is called from dse_do_dashboard.DoDashApp to create the PlotlyManager."""
 
         if input_table_names is None:
-            # input_table_names = list(self.dbm.input_db_tables.keys())  # This is not consistent with implementation in ScenarioDbManager! Replace by empty list
             input_table_names = []
             if 'Scenario' in input_table_names: input_table_names.remove('Scenario')  # Remove the scenario table
         if output_table_names is None:  # load all tables by default
             output_table_names = self.dbm.output_db_tables.keys()
 
-        # VT 2022-09-12: Only read tables that exist in schema:
-        # TODO: test and enable this code to handle optional tables in DB, like the Warehouse, WarehouseProperties, etc
-        # input_table_names_in_schema = []
-        # for input_table_name in input_table_names:
-        #     if input_table_name in self.dbm.input_db_tables.keys():
-        #         input_table_names_in_schema.append(input_table_name)
-        #     else:
-        #         print(f"Warning: DODashApp.read_scenario_tables_from_db_cached: input table {input_table_name} not in schema. Table not read.")
-        #
-        # output_table_names_in_schema = []
-        # for output_table_name in output_table_names:
-        #     if output_table_name in self.dbm.output_db_tables.keys():
-        #         output_table_names_in_schema.append(output_table_name)
-        #     else:
-        #         print(f"Warning: DODashApp.read_scenario_tables_from_db_cached: output table {output_table_name} not in schema. Table not read.")
-
         inputs = {}
         for scenario_table_name in input_table_names:
             # print(f"read input table {scenario_table_name}")
-            # TODO: skip scenario_table_name if not in schema
             if scenario_table_name in self.dbm.input_db_tables.keys():
                 inputs[scenario_table_name] = self.read_scenario_table_from_db_cached(scenario_name, scenario_table_name)
 
