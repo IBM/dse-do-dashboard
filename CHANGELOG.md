@@ -4,7 +4,38 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.3b0]
+## [Unreleased]## [0.1.2.3b6]
+
+## [0.1.2.3] - 2024-11-26
+### Added
+- DashPlotlyManager: support for scenario kpi compare
+- Visualization page KPIComparePage to automatically compare KPIs
+
+## [0.1.2.3b5] - 2024-04-15
+### Added
+- PlotlyRowsVisualizationPage.__init__ adds parameters enable_reference_scenario and enable_multi_scenario
+
+## [0.1.2.3b4] - 2024-04-10
+### Added
+- PlotlyRowsVisualizationPage adds supports row with just one go.Figure, avoiding list. Makes this compatible with Plotly1ColumnVisualizationPage 
+
+## [0.1.2.3b3] - 2023-07-05
+- dash_app.HostEnvironment is now an IntEnum to allow integer compare
+- dash_common_utils.diff_dashtable_mi .iteritems() replaced by .items() (Pandas 2.0 deprecated) 
+
+## [0.1.2.3b2] - 2023-03-20
+### Fixed
+- DoDashApp parameter `db_manager_kwargs` defaults to an empty dict (instead of None)
+### Added
+- DoDashApp support for additional Dash kwargs (`dash_kwargs`)
+
+## [0.1.2.3b1] - 2023-01-11
+### Added
+- DoDashApp support for additional ScenarioDbManager kwargs (`db_manager_kwargs`)
+
+## [0.1.2.3b0] - 2023-01-11
+### Added
+- DoDashApp support for PostgreSQL database
 
 ## [0.1.2.2] - 2022-12-09
 ### Changed
