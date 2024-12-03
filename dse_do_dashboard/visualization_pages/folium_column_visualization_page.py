@@ -30,6 +30,8 @@ class FoliumColumnVisualizationPage(VisualizationPage):
                          enable_reference_scenario=enable_reference_scenario,
                          enable_multi_scenario=enable_multi_scenario
                          )
+        self.map_height = 1000  #'100%'
+        self.map_width = '100%'
 
     @abstractmethod
     def get_folium_maps(self, pm: PlotlyManager) -> List:
@@ -51,7 +53,7 @@ class FoliumColumnVisualizationPage(VisualizationPage):
                     dbc.Card([
                         ##       dbc.CardHeader(""),
                         dbc.CardBody(
-                            html.Iframe(id='folium-map',  width='100%', height=800,
+                            html.Iframe(id='folium-map',  width=self.map_width, height=self.map_height,
                                         srcDoc = m.get_root().render()
                                         )
                         )
