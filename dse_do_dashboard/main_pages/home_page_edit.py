@@ -421,7 +421,8 @@ class HomePageEdit(MainPage):
                         filepath = os.path.join(tmpdir, filename)
                         with pd.ExcelWriter(filepath) as writer:
                             ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
-                            writer.save()
+                            # writer.save()  # Gave FutureWarning error
+                            # writer.close()  # Gives error 'Calling close() on already closed file.' Seems to work fine without.
                             zipMe.write(filepath, arcname=filename, compress_type=zipfile.ZIP_DEFLATED)
                 data = dcc.send_file(zip_filepath)
 
