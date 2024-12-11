@@ -14,7 +14,6 @@ import pandas as pd
 from dash.exceptions import PreventUpdate
 import dash
 
-from dse_do_dashboard import DoDashApp
 from dse_do_utils import ScenarioManager
 
 from dse_do_dashboard.main_pages.main_page import MainPage
@@ -32,7 +31,10 @@ class HomePageEdit(MainPage):
     - Download Scenario(s)
     - Upload Scenario(s)
     """
-    def __init__(self, dash_app: DoDashApp):
+    def __init__(self, dash_app):
+        """
+        dash_app: DoDashApp  Note: cannot import due to cicular import error
+        """
         super().__init__(dash_app,
                          page_name='Home',
                          page_id='home',
