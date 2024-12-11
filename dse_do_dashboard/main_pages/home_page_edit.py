@@ -13,6 +13,8 @@ import flask
 import pandas as pd
 from dash.exceptions import PreventUpdate
 import dash
+
+from dse_do_dashboard import DoDashApp
 from dse_do_utils import ScenarioManager
 
 from dse_do_dashboard.main_pages.main_page import MainPage
@@ -30,7 +32,7 @@ class HomePageEdit(MainPage):
     - Download Scenario(s)
     - Upload Scenario(s)
     """
-    def __init__(self, dash_app):
+    def __init__(self, dash_app: DoDashApp):
         super().__init__(dash_app,
                          page_name='Home',
                          page_id='home',
@@ -38,7 +40,7 @@ class HomePageEdit(MainPage):
                          )
 
     def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
-        scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
+        scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  # Is method on DoDashApp
 
         # print(f"get_layout ref_scenario={reference_scenario_name} , ms={multi_scenario_names}")
         selected_ref_scenarios = [] if multi_scenario_names is None else multi_scenario_names
