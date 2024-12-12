@@ -55,7 +55,8 @@ class RunModelPage(MainPage):
                     for config in configs
                 ],
                 # value=(configs[0].runner_id if len(configs) > 0 else None),
-                value=('None'),
+                # value=('None'),
+                value=configs[0].runner_id if len(configs)>0 else 'None',
                 style = {'width': '28vw',
                          # 'background-color': '#FF4136'
                          }),

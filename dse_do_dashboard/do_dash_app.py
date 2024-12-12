@@ -684,6 +684,7 @@ class DoDashApp(DashApp):
 
     def get_do_model_runner_configs(self) -> List[DoModelRunnerConfig]:
         """Returns the model runners for the 'Run Model' page.
+        The first entry, if it exists, will be automatically selected in the Run Model page.
         Needs to be overridden.
         """
         configs = []

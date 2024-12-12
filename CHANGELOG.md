@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]## [0.1.2.4b0]
 ### Changed
 - FoliumColumnVisualizationPage default map height increased from 800 to 1000
+- RunModelPage, do_model_class_drpdwn now automatically selects the first DoModelRunnerConfig in configs
+- DoClassModelRunner.run_model() now redirects the stdout log to the RunModel page.
 ### Fixed
 - HomePageEdit.download_scenarios_callback: Fixed FutureWarning and close() warnings.
 

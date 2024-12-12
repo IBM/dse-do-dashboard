@@ -96,7 +96,7 @@ class DoNotebookModelRunner(DoModelRunner):
         self.locals = my_locals
 
     def run_model(self, inputs: Inputs) -> Outputs:
-        """TODO"""
+        """"""
         runner = DoNotebookRunner(self.notebook_filepath, self.globals, self.locals)
         outputs = runner.run(inputs)
         self.log = runner.log
@@ -105,7 +105,7 @@ class DoNotebookModelRunner(DoModelRunner):
 
 class DoClassModelRunner(DoModelRunner):
     """
-    TODO: grab the self.log so we can use this in the UI
+    Done VT_20241212: grab the self.log so we can use this in the UI
     """
     def __init__(self, scenario_name: str, data_manager_class,
                  optimization_engine_class,
@@ -125,11 +125,31 @@ class DoClassModelRunner(DoModelRunner):
         self.data_manager_class = data_manager_class
         self.optimization_engine_class = optimization_engine_class
 
+    # def run_model(self, inputs: Inputs) -> Outputs:
+    #     """Run an OptimizationEngine class"""
+    #     dm = self.data_manager_class(inputs=inputs)
+    #     engine = self.optimization_engine_class(data_manager=dm)
+    #     outputs = engine.run()
+    #     return outputs
+
     def run_model(self, inputs: Inputs) -> Outputs:
-        """Run an OptimizationEngine class"""
-        dm = self.data_manager_class(inputs=inputs)
-        engine = self.optimization_engine_class(data_manager=dm)
-        outputs = engine.run()
+        """Run an OptimizationEngine class.
+        VT20241212: grabbing the CPLEX log from stdoutput using https://docs.python.org/3/library/contextlib.html#contextlib.redirect_stdout.
+        Notes:
+            - This does NOT grab the logger output!
+            - This re-directs the log, so you do NOT see it in the dashboard console anymore.
+        TODO: Include the logger output
+        TODO: Make the logging redirection optional, so for debugging we can disable this.
+
+        """
+        from contextlib import redirect_stdout
+        import io
+        f = io.StringIO()
+        with redirect_stdout(f):
+            dm = self.data_manager_class(inputs=inputs)
+            engine = self.optimization_engine_class(data_manager=dm)
+            outputs = engine.run()
+        self.log = f.getvalue()
         return outputs
 
 
