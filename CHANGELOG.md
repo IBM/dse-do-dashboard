@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DoClassModelRunner.run_model() now redirects the stdout log to the RunModel page.
 ### Fixed
 - HomePageEdit.download_scenarios_callback: Fixed FutureWarning and close() warnings.
+### Added
+- UserManual.md (in documentation folder)
 
 ## [0.1.2.3] - 2024-11-26
 ### Added
