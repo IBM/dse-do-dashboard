@@ -9,8 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - FoliumColumnVisualizationPage default map height increased from 800 to 1000
 - RunModelPage, do_model_class_drpdwn now automatically selects the first DoModelRunnerConfig in configs
 - DoClassModelRunner.run_model() now redirects the stdout log to the RunModel page.
+- BACKWARD INCOMPATIBILITY: DoDashApp.__init__() database_type default value changed from DatabaseType.DB2 to DatabaseType.PostgreSQL
+- BACKWARD INCOMPATIBILITY: DoDashApp.__init__() db_manager_kwargs default value changed from {} to {'enable_scenario_seq': True, 'future': True}
 ### Fixed
 - HomePageEdit.download_scenarios_callback: Fixed FutureWarning and close() warnings.
+- DashApp and DoDashApp: mutable default arguments replaced
 ### Added
 - UserManual.md (in documentation folder)
 

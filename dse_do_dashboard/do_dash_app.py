@@ -54,8 +54,8 @@ class DoDashApp(DashApp):
                  db_echo: Optional[bool] = False,
                  logo_file_name: Optional[str] = 'IBM.png',
                  navbar_brand_name: Optional[str] = 'Dashboard',
-                 cache_config: Optional[Dict] = {},
-                 visualization_pages: Optional[List[VisualizationPage]]= [],
+                 cache_config: Optional[Dict] = None,
+                 visualization_pages: Optional[List[VisualizationPage]]=None,
                  database_manager_class=None,
                  data_manager_class=None,
                  plotly_manager_class=None,
@@ -65,9 +65,9 @@ class DoDashApp(DashApp):
                  bootstrap_theme=dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
-                 db_type: DatabaseType = DatabaseType.DB2,
-                 db_manager_kwargs: Dict = {},  # Do not set to None,
-                 dash_kwargs: Dict = {},
+                 db_type: DatabaseType = DatabaseType.PostgreSQL,  # DatabaseType.DB2,
+                 db_manager_kwargs: Dict = None,  # Do not set to None,
+                 dash_kwargs: Dict = None,
                  ):
         """Create a Dashboard app.
 
@@ -90,6 +90,18 @@ class DoDashApp(DashApp):
         The alternative (None of HostEnvironment.Local) runs the Dash app regularly.
         :param enable_long_running_callbacks. Default = True. Enables the use of Dash long-running callbacks for model runs. If False, it only allows for in-line runs.
         """
+        if dash_kwargs is None:
+            dash_kwargs = {}
+        if db_manager_kwargs is None:
+            db_manager_kwargs = {'enable_scenario_seq': True, 'future': True}
+        if visualization_pages is None:
+            visualization_pages = []
+        if cache_config is None:
+            # This default should typically apply to any non-deployment platform
+            cache_config = {
+                'CACHE_TYPE': 'SimpleCache',
+                'CACHE_DEFAULT_TIMEOUT': 3600  # in seconds, i.e. 1 hour
+            }
         self.db_credentials = db_credentials
         self.schema = schema
         self.db_echo = db_echo
@@ -126,12 +138,12 @@ class DoDashApp(DashApp):
         # assert issubclass(self.data_manager_class, DataManager)
         # assert issubclass(self.plotly_manager_class, PlotlyManager)
 
-        if cache_config is None:
-            # This default should typically apply to any non-deployment platform
-            cache_config = {
-                'CACHE_TYPE': 'SimpleCache',
-                'CACHE_DEFAULT_TIMEOUT': 3600  # in seconds, i.e. 1 hour
-            }
+        # if cache_config is None:
+        #     # This default should typically apply to any non-deployment platform
+        #     cache_config = {
+        #         'CACHE_TYPE': 'SimpleCache',
+        #         'CACHE_DEFAULT_TIMEOUT': 3600  # in seconds, i.e. 1 hour
+        #     }
 
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching

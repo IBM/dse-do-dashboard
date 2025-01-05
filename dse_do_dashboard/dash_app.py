@@ -26,15 +26,19 @@ class HostEnvironment(enum.IntEnum):
 class DashApp(ABC):
     def __init__(self, logo_file_name: str = 'IBM.png',
                  navbar_brand_name: Optional[str] = 'Dashboard',
-                 cache_config: Dict = {},
+                 cache_config: Optional[Dict]=None,
                  port: int = 8050,
                  dash_debug: bool = False,
                  host_env: Optional[HostEnvironment] = None,
                  bootstrap_theme = dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template: str = "bootstrap",
                  enable_long_running_callbacks: bool = False,
-                 dash_kwargs: Dict = {},
+                 dash_kwargs: Optional[Dict]=None,
                  ):
+        if dash_kwargs is None:
+            dash_kwargs = {}
+        if cache_config is None:
+            cache_config = {}
         self.port = port
         self.host_env = host_env
         self.dash_debug = dash_debug
