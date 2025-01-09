@@ -1,5 +1,5 @@
 from abc import abstractmethod
-from typing import List
+from typing import List, Optional
 
 from dash import dcc
 import dash_bootstrap_components as dbc
@@ -15,7 +15,7 @@ from dse_do_utils.plotlymanager import PlotlyManager
 
 class Plotly1ColumnVisualizationPage(VisualizationPage):
     def __init__(self, dash_app, page_name:str='Default', page_id:str='default', url:str='default',
-                 input_table_names: List[str] = [], output_table_names: List[str] = [],
+                 input_table_names: Optional[List[str]] = None, output_table_names: Optional[List[str]] = None,
                  enable_reference_scenario: bool = False,
                  enable_multi_scenario: bool = False):
         super().__init__(dash_app=dash_app,
