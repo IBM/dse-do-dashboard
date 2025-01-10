@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from typing import List, Optional
 
-from dash import dcc
+from dash import dcc, html
 import dash_bootstrap_components as dbc
 from plotly.graph_objs import Figure
 
@@ -17,7 +17,8 @@ class Plotly1ColumnVisualizationPage(VisualizationPage):
     def __init__(self, dash_app, page_name:str='Default', page_id:str='default', url:str='default',
                  input_table_names: Optional[List[str]] = None, output_table_names: Optional[List[str]] = None,
                  enable_reference_scenario: bool = False,
-                 enable_multi_scenario: bool = False):
+                 enable_multi_scenario: bool = False,
+                 show_page_name: bool = False):
         super().__init__(dash_app=dash_app,
                          page_name=page_name,
                          page_id=page_id,
@@ -27,6 +28,7 @@ class Plotly1ColumnVisualizationPage(VisualizationPage):
                          enable_reference_scenario=enable_reference_scenario,
                          enable_multi_scenario=enable_multi_scenario
                          )
+        self.show_page_name = show_page_name
 
     @abstractmethod
     def get_plotly_figures(self, pm: PlotlyManager) -> List[Figure]:
@@ -56,5 +58,10 @@ class Plotly1ColumnVisualizationPage(VisualizationPage):
             )
             for fig in self.get_plotly_figures(pm)
         ]
+
+        # Add a title row with the page_name
+        if self.show_page_name:
+            title_card = dbc.Card(html.H2(self.page_name, className='text-center'))
+            layout_children.insert(0, title_card)
 
         return layout_children

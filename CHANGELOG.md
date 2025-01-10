@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DashApp and DoDashApp: mutable default arguments replaced
 ### Added
 - UserManual.md (in documentation folder)
+- Plotly1ColumnVisualizationPage, `show_page_name` shows PageName in page.
 
 ## [0.1.2.3] - 2024-11-26
 ### Added
