@@ -467,7 +467,8 @@ class HomePageEdit(MainPage):
                 filepath = os.path.join(tmpdir, filename)
                 with pd.ExcelWriter(filepath) as writer:
                     ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
-                    writer.save()
+                    # writer.save()  # VT_20250218: was causing FutureWarning
+                    # writer.close()  # VT_20250218: was causing error 'Calling close() on already closed file.' Seems to work fine without.
                     data = dcc.send_file(filepath)
 
             return 0, data
