@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DoClassModelRunner.run_model() now redirects the stdout log to the RunModel page.
 - BACKWARD INCOMPATIBILITY: DoDashApp.__init__() database_type default value changed from DatabaseType.DB2 to DatabaseType.PostgreSQL
 - BACKWARD INCOMPATIBILITY: DoDashApp.__init__() db_manager_kwargs default value changed from {} to {'enable_scenario_seq': True, 'future': True}
+- Removed deprecated long-running callback option to avoid import error with recent (>2.18) versions of dash
 ### Fixed
 - HomePageEdit.download_scenarios_callback: Fixed FutureWarning and close() warnings.
 - HomePageEdit.download_scenario_callback: Fixed FutureWarning and close() warnings.
