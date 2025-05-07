@@ -3,6 +3,8 @@ from typing import Optional, TypeVar, Dict
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+
 from dse_do_utils import DataManager
 from dse_do_utils.plotlymanager import PlotlyManager
 
@@ -106,3 +108,75 @@ class DashPlotlyManager(PlotlyManager[DM]):
         ms_selected = self.get_multi_scenario_compare_selected()
         ref_selected = isinstance(self.ref_dm, DataManager)
         return not ms_selected and ref_selected
+
+    #################################################
+    # Optimization Progress
+    #################################################
+    def plotly_optimization_progress(self) -> Optional[go.Figure]:
+        df, kpis = self.dm.get_optimization_progress_as_wide_df()
+
+        if df.shape[0] == 0:
+            return go.Figure()
+
+        # Create figure with secondary y-axis
+        fig = make_subplots(specs=[[{"secondary_y": True}]])
+
+        # Add traces
+        fig.add_trace(
+            go.Scatter(x=df.solve_time, y=df.objective_value, name="Objective", hovertemplate="Objective = %{y}<br>Solve time = %{x:.2f} sec"),
+            secondary_y=False,
+        )
+        fig.add_trace(
+            go.Scatter(x=df.solve_time, y=df.objective_bound, name="Bound", hovertemplate="Bound = %{y}<br>Solve time = %{x:.2f} sec"),
+            secondary_y=False,
+        )
+
+        fig.add_trace(
+            go.Scatter(x=df.solve_time, y=df.objective_gap, name="Gap", hovertemplate="Gap = %{y:%}<br>Solve time = %{x:.2f} sec"),
+            secondary_y=True,
+        )
+
+        # Add figure title
+        fig.update_layout(
+            title_text="Objective, Bound and Gap progress"
+        )
+
+        # Set x-axis title
+        fig.update_xaxes(title_text="Solve Time (s)")
+
+        # Set y-axes titles
+        fig.update_yaxes(title_text="Objective and bound", secondary_y=False)
+        fig.update_yaxes(title_text="Gap", secondary_y=True)
+        return fig
+
+    def plotly_optimization_progress_kpis(self) -> Optional[go.Figure]:
+        """Plots the KPI values as a function of the solve time.
+        Returns None if no KPIs
+        """
+        # kpis = ['Allocated Volume', 'Utilization']
+
+        df, kpis = self.dm.get_optimization_progress_as_wide_df()
+        # df = self.dm.get_optimization_progress_kpis_as_wide_df()
+
+        # Handle when no KPIs, i.e. empty list
+        if len(kpis) == 0:
+            return go.Figure()
+
+        # Create figure with secondary y-axis
+        fig = make_subplots(rows=len(kpis), cols=1)
+
+        for row, kpi in enumerate(kpis, start=1):
+            fig.add_trace(
+                go.Scatter(x=df.solve_time, y=df[kpi], name=kpi, hovertemplate=f"{kpi} = %{{y}}<br>Solve time = %{{x:.2f}} sec"),
+                row=row, col=1,
+            )
+            fig.update_yaxes(title_text=kpi, row=row, col=1)
+
+        # Add figure title
+        fig.update_layout(
+            title_text="KPIs progress"
+        )
+
+        # Set x-axis title
+        fig.update_xaxes(title_text="Solve Time (s)")
+        return fig

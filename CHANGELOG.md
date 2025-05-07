@@ -19,6 +19,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - UserManual.md (in documentation folder)
 - Plotly1ColumnVisualizationPage, `show_page_name` shows PageName in page.
+- OptimizationProgressPage and OptimizationProgressGridPage for graphs/table of 'OptimizationProgress' table
+- DashPlotlyManager.plotly_optimization_progress and .plotly_optimization_progress_kpis
 
 ## [0.1.2.3] - 2024-11-26
 ### Added
