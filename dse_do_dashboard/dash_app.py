@@ -108,14 +108,14 @@ class DashApp(ABC):
                             requests_pathname_prefix=requests_prefix,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path,
-                            long_callback_manager=self.long_callback_manager,
+                            # long_callback_manager=self.long_callback_manager, # VT_20250513: deprecated
                             **self.dash_kwargs
                             )
         else:
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path,
-                            long_callback_manager=self.long_callback_manager,
+                            # long_callback_manager=self.long_callback_manager, # VT_20250513: deprecated
                             **self.dash_kwargs
                             )
         dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.css"
