@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.4b1]
+## [Unreleased]## [0.1.2.4b2]
+#### Fixed
+- DashApp.run_server() now uses app.run() vs the deprecated app.run_server() method.
+
+## [0.1.2.4b1] - 2025-06-11
 ### Fixed
 - Removed more code around deprecated long-running callback option to avoid import error with recent (>2.18) versions of dash
 

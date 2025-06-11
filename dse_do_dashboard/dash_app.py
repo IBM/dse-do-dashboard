@@ -139,7 +139,8 @@ class DashApp(ABC):
         if 'port' not in kwargs:
             kwargs['port'] = self.port
 
-        self.app.run_server(**kwargs)
+        # self.app.run_server(**kwargs)  # VT_20250611: deprecated in Dash 2.0, use `self.app.run(**kwargs)` instead
+        self.app.run(**kwargs)
 
     # def run_server(self):
     #     """Runs the Dash server.
@@ -475,7 +476,7 @@ class DashApp(ABC):
 
             # print(f"Reference scenario = {reference_scenario_name}")
             # print(f"Multi scenario names = {multi_scenario_names}")
-            print(f"Showing URL = {pathname}")
+            # print(f"Showing URL = {pathname}")  # VT_20250609: this is/was causing an exception! TODO: why?
             return self.display_content_callback(pathname, scenario_name, reference_scenario_name, multi_scenario_names)
 
         @app.callback(
