@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]## [0.1.2.4b2]
 #### Fixed
 - DashApp.run_server() now uses app.run() vs the deprecated app.run_server() method.
+- HomePageEdit. Fixed failure when downloading scenario(s) in Excel and zip files. 
 
 ## [0.1.2.4b1] - 2025-06-11
 ### Fixed
