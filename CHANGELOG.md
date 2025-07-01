@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Removed more code around deprecated long-running callback option to avoid import error with recent (>2.18) versions of dash
 
-## [0.1.2.4b0]
+## [0.1.2.4b0] - 2025-05-13
 ### Changed
 - FoliumColumnVisualizationPage default map height increased from 800 to 1000
 - RunModelPage, do_model_class_drpdwn now automatically selects the first DoModelRunnerConfig in configs
