@@ -4,7 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.4b2]
+## [Unreleased]## [0.1.2.4b3]
+
+## [0.1.2.4b2] - 2025-08-15
 #### Fixed
 - DashApp.run_server() now uses app.run() vs the deprecated app.run_server() method.
 - HomePageEdit. Fixed failure when downloading scenario(s) in Excel and zip files. 
