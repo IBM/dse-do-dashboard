@@ -115,6 +115,12 @@ class DoClassModelRunner(DoModelRunner):
                  schema: str = None,
                  db_echo: bool = False,
                  ):
+        if schema is None:
+            schema = dash_app.schema
+        if database_manager_class is None:
+            database_manager_class = dash_app.database_manager_class
+        if db_credentials is None:
+            db_credentials = dash_app.db_credentials
         super().__init__(scenario_name,
                          dash_app=dash_app,
                          database_manager_class=database_manager_class,
