@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Fixed
 - DashApp.run_server() now uses app.run() vs the deprecated app.run_server() method.
 - HomePageEdit. Fixed failure when downloading scenario(s) in Excel and zip files. 
+### Added
+- DoClassModelRunner to get DB schema and credentials from Dash app instance.
+- KpiPageTemplate api to generate KPIs AgGrid with compare scenarios.
+- New DefaultKpiPage to quickly get a KPI page with Grid view.
 
 ## [0.1.2.4b1] - 2025-06-11
 ### Fixed
