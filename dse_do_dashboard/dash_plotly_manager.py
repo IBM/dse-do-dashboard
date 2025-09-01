@@ -123,16 +123,19 @@ class DashPlotlyManager(PlotlyManager[DM]):
 
         # Add traces
         fig.add_trace(
-            go.Scatter(x=df.solve_time, y=df.objective_value, name="Objective", hovertemplate="Objective = %{y}<br>Solve time = %{x:.2f} sec"),
+            go.Scatter(x=df.solve_time, y=df.objective_value, name="Objective", hovertemplate="Objective = %{y}<br>Solve time = %{x:.2f} sec",
+                       line_shape='hv',
+                       # line_shape={'shape': 'hv'},  # Doesn't work!
+                       ),
             secondary_y=False,
         )
         fig.add_trace(
-            go.Scatter(x=df.solve_time, y=df.objective_bound, name="Bound", hovertemplate="Bound = %{y}<br>Solve time = %{x:.2f} sec"),
+            go.Scatter(x=df.solve_time, y=df.objective_bound, name="Bound", hovertemplate="Bound = %{y}<br>Solve time = %{x:.2f} sec", line_shape='hv'),
             secondary_y=False,
         )
 
         fig.add_trace(
-            go.Scatter(x=df.solve_time, y=df.objective_gap, name="Gap", hovertemplate="Gap = %{y:%}<br>Solve time = %{x:.2f} sec"),
+            go.Scatter(x=df.solve_time, y=df.objective_gap, name="Gap", hovertemplate="Gap = %{y:%}<br>Solve time = %{x:.2f} sec", line_shape='hv'),
             secondary_y=True,
         )
 
@@ -167,7 +170,7 @@ class DashPlotlyManager(PlotlyManager[DM]):
 
         for row, kpi in enumerate(kpis, start=1):
             fig.add_trace(
-                go.Scatter(x=df.solve_time, y=df[kpi], name=kpi, hovertemplate=f"{kpi} = %{{y}}<br>Solve time = %{{x:.2f}} sec"),
+                go.Scatter(x=df.solve_time, y=df[kpi], name=kpi, hovertemplate=f"{kpi} = %{{y}}<br>Solve time = %{{x:.2f}} sec", line_shape='hv'),
                 row=row, col=1,
             )
             fig.update_yaxes(title_text=kpi, row=row, col=1)
