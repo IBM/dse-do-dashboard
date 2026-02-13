@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - DoClassModelRunner to get DB schema and credentials from Dash app instance.
 - KpiPageTemplate api to generate KPIs AgGrid with compare scenarios.
 - New DefaultKpiPage to quickly get a KPI page with Grid view.
+- OptimizationProgressPage to visualize optimization progress with Plotly line charts.
 
 ## [0.1.2.4b1] - 2025-06-11
 ### Fixed
