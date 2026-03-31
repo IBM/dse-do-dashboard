@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 ### Added
 ### Fixed
+- KpiPageTemplate.get_kpi_grid fixed bug where column show NaN if scenario name contains a dot.
 
 ## [0.1.2.4b3] - 2026-02-16
 ### Added

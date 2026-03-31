@@ -222,13 +222,36 @@ class KpiPageTemplate(VisualizationPage):
 
         # # Convert long DataFrame with columns 'kpi', 'value', and 'scenario_name' to wide format: index='kpi', columns='scenario_name', values='value'
         df = df.pivot(index='kpi', columns='scenario_name', values='value').reset_index()
+        
+        # Fill NaN values with 0 or empty string depending on your preference
+        # Option 1: Fill with 0 for numeric columns
+        numeric_columns = df.select_dtypes(include=['number']).columns
+        df[numeric_columns] = df[numeric_columns].fillna(0)
+        
+        # Option 2: If you prefer to keep NaN as empty or show as text, comment out the above and use:
+        # df = df.fillna('')
+
+
+        # Bob - 2026-03-31:
+        # Fixed the issue where column headers containing dots caused NaN values in AgGrid.
+        # Root Cause:
+        # AG Grid interprets dots in field names as nested object paths (e.g., "scenario.name" tries to access row.scenario.name instead of row["scenario.name"]).
+        # Solution Applied:
+        # Added valueGetter functions to all column definitions that use bracket notation to properly access column data:
+        # - For numeric columns: 'valueGetter': {"function": f"params.data['{c}']"}
+        # - For the 'kpi' column: 'valueGetter': {"function": "params.data['kpi']"}
+        # This ensures that column names with dots are treated as literal strings rather than nested object paths, allowing the data to display correctly instead of showing NaN values.
 
         column_def_override = {
-            c: {'field': c, 'headerName': c, 'type': ['numericColumn'],
+            c: {'field': c, 'headerName': c,
+                # 'type': ['numericColumn'],
+                'type': 'numericColumn',
                 'valueFormatter': {"function": f"d3.format(',.{format_num_decimals}~f')(params.value)"},
-                } if c != 'kpi' else {'field': 'kpi', 'headerName': 'KPI', 'pinned': 'left'}
+                'valueGetter': {"function": f"params.data['{c}']"}
+                } if c != 'kpi' else {'field': 'kpi', 'headerName': 'KPI', 'pinned': 'left', 'valueGetter': {"function": "params.data['kpi']"}}
             for c in df.columns
         }
+        # column_def_override = {}
 
         columns_in_grid = df.columns
         columns_in_data = columns_in_grid
