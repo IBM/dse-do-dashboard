@@ -11,7 +11,7 @@ from dash_bootstrap_templates import load_figure_template
 import os
 from flask_caching import Cache
 import enum
-import diskcache
+# import diskcache
 # from dash.long_callback import DiskcacheLongCallbackManager  # Deprecated, see https://dash.plotly.com/background-callbacks
 
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema
