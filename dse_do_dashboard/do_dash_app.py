@@ -35,16 +35,22 @@ class DoDashApp(DashApp):
     It will start to make some sense once there are different frameworks for DashApp, i.e. peers of DoDashApp.
 
     How-To create a DO Dashboard:
+
     1. Subclass DoDashApp
     2. In the `__init__()`, specify:
+
        - logo_file_name (optional)
        - database_manager_class (required)
        - data_manager_class (required)
        - plotly_manager_class (required)
+
     3. Specify pivot-table configurations and table-schemas by overriding the methods:
+
        - get_pivot_table_configs (optional)
        - get_table_schemas (optional)
+
     4. Create instance of DoDashApp-subclass and specify:
+
        - db_credentials (required)
        - schema (basically required)
        - cache_config (optional)

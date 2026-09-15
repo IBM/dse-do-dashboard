@@ -136,21 +136,15 @@ class KpiPageTemplate(VisualizationPage):
 
     @staticmethod
     def make_traffic_light_gauge_v2(value: float, title: str, low_threshold: float, medium_threshold: float, max_val: float, reverse: bool=False) -> go.Figure:
-        """
-        Create a traffic-light-style gauge.
-        Parameters
-        ----------
-        value : float
-            The value to display on the gauge.
-        title : str
-            The title of the gauge.
-        low_threshold : float
-            The threshold for the low (green) range.
-        medium_threshold : float
-            The threshold for the medium (orange) range.
-        max_val : float
-            The maximum value of the gauge.
-        reverse : bool
+        """Create a traffic-light-style gauge.
+
+        :param value: The value to display on the gauge.
+        :param title: The title of the gauge.
+        :param low_threshold: The threshold for the low (green) range.
+        :param medium_threshold: The threshold for the medium (orange) range.
+        :param max_val: The maximum value of the gauge.
+        :param reverse: If true, reverses the color scale (green for high, red for low).
+        :return: Plotly Figure with the traffic light gauge.
         """
         if reverse:
             low_color = 'red'
