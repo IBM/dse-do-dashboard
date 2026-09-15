@@ -13,6 +13,7 @@ import flask
 import pandas as pd
 from dash.exceptions import PreventUpdate
 import dash
+
 from dse_do_utils import ScenarioManager
 
 from dse_do_dashboard.main_pages.main_page import MainPage
@@ -31,6 +32,9 @@ class HomePageEdit(MainPage):
     - Upload Scenario(s)
     """
     def __init__(self, dash_app):
+        """
+        dash_app: DoDashApp  Note: cannot import due to cicular import error
+        """
         super().__init__(dash_app,
                          page_name='Home',
                          page_id='home',
@@ -38,7 +42,7 @@ class HomePageEdit(MainPage):
                          )
 
     def get_layout(self, scenario_name: str = None, reference_scenario_name: str = None, multi_scenario_names: List[str] = None):
-        scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  #.reset_index()  # SCDB2.get_scenarios_df().reset_index()
+        scenarios_df = self.dash_app.read_scenarios_table_from_db_cached()  # Is method on DoDashApp
 
         # print(f"get_layout ref_scenario={reference_scenario_name} , ms={multi_scenario_names}")
         selected_ref_scenarios = [] if multi_scenario_names is None else multi_scenario_names
@@ -421,8 +425,9 @@ class HomePageEdit(MainPage):
                         filepath = os.path.join(tmpdir, filename)
                         with pd.ExcelWriter(filepath) as writer:
                             ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
-                            writer.save()
-                            zipMe.write(filepath, arcname=filename, compress_type=zipfile.ZIP_DEFLATED)
+                            # writer.save()  # Gave FutureWarning error
+                            # writer.close()  # Gives error 'Calling close() on already closed file.' Seems to work fine without.
+                        zipMe.write(filepath, arcname=filename, compress_type=zipfile.ZIP_DEFLATED)  # Do NOT make part of the `with` statement! The file may not (yet?) get closed properly. Fixed VT_20250701
                 data = dcc.send_file(zip_filepath)
 
             return 0, data
@@ -455,6 +460,7 @@ class HomePageEdit(MainPage):
             multi_threaded = False  # Enabling multi-threading does NOT result in speedup. In fact for small scenarios it is slower!
             inputs, outputs = self.dash_app.dbm.read_scenario_from_db(scenario_name, multi_threaded)
             #TODO: inputs include a scenario table. Remove.
+            print(f"Download scenario {scenario_name} with inputs: {inputs.keys()} and outputs: {outputs.keys()}.")
 
             data = None
             with tempfile.TemporaryDirectory() as tmpdir:
@@ -462,8 +468,9 @@ class HomePageEdit(MainPage):
                 filepath = os.path.join(tmpdir, filename)
                 with pd.ExcelWriter(filepath) as writer:
                     ScenarioManager.write_data_to_excel_s(writer, inputs=inputs, outputs=outputs)
-                    writer.save()
-                    data = dcc.send_file(filepath)
+                    # writer.save()  # VT_20250218: was causing FutureWarning
+                    # writer.close()  # VT_20250218: was causing error 'Calling close() on already closed file.'
+                data = dcc.send_file(filepath)  # Do NOT make part of the `with` statement! The file may not (yet?) get closed properly. Fixed VT_20250701
 
             return 0, data
 

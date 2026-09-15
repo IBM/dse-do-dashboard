@@ -35,16 +35,22 @@ class DoDashApp(DashApp):
     It will start to make some sense once there are different frameworks for DashApp, i.e. peers of DoDashApp.
 
     How-To create a DO Dashboard:
+
     1. Subclass DoDashApp
     2. In the `__init__()`, specify:
+
        - logo_file_name (optional)
        - database_manager_class (required)
        - data_manager_class (required)
        - plotly_manager_class (required)
+
     3. Specify pivot-table configurations and table-schemas by overriding the methods:
+
        - get_pivot_table_configs (optional)
        - get_table_schemas (optional)
+
     4. Create instance of DoDashApp-subclass and specify:
+
        - db_credentials (required)
        - schema (basically required)
        - cache_config (optional)
@@ -54,8 +60,8 @@ class DoDashApp(DashApp):
                  db_echo: Optional[bool] = False,
                  logo_file_name: Optional[str] = 'IBM.png',
                  navbar_brand_name: Optional[str] = 'Dashboard',
-                 cache_config: Optional[Dict] = {},
-                 visualization_pages: Optional[List[VisualizationPage]]= [],
+                 cache_config: Optional[Dict] = None,
+                 visualization_pages: Optional[List[VisualizationPage]]=None,
                  database_manager_class=None,
                  data_manager_class=None,
                  plotly_manager_class=None,
@@ -65,9 +71,9 @@ class DoDashApp(DashApp):
                  bootstrap_theme=dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template:str="bootstrap",
                  enable_long_running_callbacks: bool = False,
-                 db_type: DatabaseType = DatabaseType.DB2,
-                 db_manager_kwargs: Dict = {},  # Do not set to None,
-                 dash_kwargs: Dict = {},
+                 db_type: DatabaseType = DatabaseType.PostgreSQL,  # DatabaseType.DB2,
+                 db_manager_kwargs: Dict = None,  # Do not set to None,
+                 dash_kwargs: Dict = None,
                  ):
         """Create a Dashboard app.
 
@@ -90,6 +96,18 @@ class DoDashApp(DashApp):
         The alternative (None of HostEnvironment.Local) runs the Dash app regularly.
         :param enable_long_running_callbacks. Default = True. Enables the use of Dash long-running callbacks for model runs. If False, it only allows for in-line runs.
         """
+        if dash_kwargs is None:
+            dash_kwargs = {}
+        if db_manager_kwargs is None:
+            db_manager_kwargs = {'enable_scenario_seq': True, 'future': True}
+        if visualization_pages is None:
+            visualization_pages = []
+        if cache_config is None:
+            # This default should typically apply to any non-deployment platform
+            cache_config = {
+                'CACHE_TYPE': 'SimpleCache',
+                'CACHE_DEFAULT_TIMEOUT': 3600  # in seconds, i.e. 1 hour
+            }
         self.db_credentials = db_credentials
         self.schema = schema
         self.db_echo = db_echo
@@ -126,12 +144,12 @@ class DoDashApp(DashApp):
         # assert issubclass(self.data_manager_class, DataManager)
         # assert issubclass(self.plotly_manager_class, PlotlyManager)
 
-        if cache_config is None:
-            # This default should typically apply to any non-deployment platform
-            cache_config = {
-                'CACHE_TYPE': 'SimpleCache',
-                'CACHE_DEFAULT_TIMEOUT': 3600  # in seconds, i.e. 1 hour
-            }
+        # if cache_config is None:
+        #     # This default should typically apply to any non-deployment platform
+        #     cache_config = {
+        #         'CACHE_TYPE': 'SimpleCache',
+        #         'CACHE_DEFAULT_TIMEOUT': 3600  # in seconds, i.e. 1 hour
+        #     }
 
         self.read_scenario_table_from_db_callback = None  # For Flask caching
         self.read_scenarios_table_from_db_callback = None # For Flask caching
@@ -684,6 +702,7 @@ class DoDashApp(DashApp):
 
     def get_do_model_runner_configs(self) -> List[DoModelRunnerConfig]:
         """Returns the model runners for the 'Run Model' page.
+        The first entry, if it exists, will be automatically selected in the Run Model page.
         Needs to be overridden.
         """
         configs = []

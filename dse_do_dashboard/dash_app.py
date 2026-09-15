@@ -11,8 +11,8 @@ from dash_bootstrap_templates import load_figure_template
 import os
 from flask_caching import Cache
 import enum
-import diskcache
-from dash.long_callback import DiskcacheLongCallbackManager
+# import diskcache
+# from dash.long_callback import DiskcacheLongCallbackManager  # Deprecated, see https://dash.plotly.com/background-callbacks
 
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema
 
@@ -26,15 +26,19 @@ class HostEnvironment(enum.IntEnum):
 class DashApp(ABC):
     def __init__(self, logo_file_name: str = 'IBM.png',
                  navbar_brand_name: Optional[str] = 'Dashboard',
-                 cache_config: Dict = {},
+                 cache_config: Optional[Dict]=None,
                  port: int = 8050,
                  dash_debug: bool = False,
                  host_env: Optional[HostEnvironment] = None,
                  bootstrap_theme = dbc.themes.BOOTSTRAP,
                  bootstrap_figure_template: str = "bootstrap",
                  enable_long_running_callbacks: bool = False,
-                 dash_kwargs: Dict = {},
+                 dash_kwargs: Optional[Dict]=None,
                  ):
+        if dash_kwargs is None:
+            dash_kwargs = {}
+        if cache_config is None:
+            cache_config = {}
         self.port = port
         self.host_env = host_env
         self.dash_debug = dash_debug
@@ -44,8 +48,10 @@ class DashApp(ABC):
         # Long-running callbacks:
         self.enable_long_running_callbacks = enable_long_running_callbacks
         if self.enable_long_running_callbacks:
-            cache = diskcache.Cache("./cache")
-            self.long_callback_manager = DiskcacheLongCallbackManager(cache)
+            print("WARNING: Long-running callbacks are disabled until refactored with updated Dash API.")
+            # TODO: replace by https://dash.plotly.com/background-callbacks
+            # cache = diskcache.Cache("./cache")
+            self.long_callback_manager = None  #DiskcacheLongCallbackManager(cache), deprecated see https://dash.plotly.com/background-callbacks
         else:
             self.long_callback_manager = None
 
@@ -102,14 +108,14 @@ class DashApp(ABC):
                             requests_pathname_prefix=requests_prefix,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path,
-                            long_callback_manager=self.long_callback_manager,
+                            # long_callback_manager=self.long_callback_manager, # VT_20250513: deprecated
                             **self.dash_kwargs
                             )
         else:
             app = dash.Dash(__name__,
                             # suppress_callback_exceptions = True,
                             assets_folder=assets_path,
-                            long_callback_manager=self.long_callback_manager,
+                            # long_callback_manager=self.long_callback_manager, # VT_20250513: deprecated
                             **self.dash_kwargs
                             )
         dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.css"
@@ -133,7 +139,8 @@ class DashApp(ABC):
         if 'port' not in kwargs:
             kwargs['port'] = self.port
 
-        self.app.run_server(**kwargs)
+        # self.app.run_server(**kwargs)  # VT_20250611: deprecated in Dash 2.0, use `self.app.run(**kwargs)` instead
+        self.app.run(**kwargs)
 
     # def run_server(self):
     #     """Runs the Dash server.
@@ -469,7 +476,7 @@ class DashApp(ABC):
 
             # print(f"Reference scenario = {reference_scenario_name}")
             # print(f"Multi scenario names = {multi_scenario_names}")
-            print(f"Showing URL = {pathname}")
+            # print(f"Showing URL = {pathname}")  # VT_20250609: this is/was causing an exception! TODO: why?
             return self.display_content_callback(pathname, scenario_name, reference_scenario_name, multi_scenario_names)
 
         @app.callback(

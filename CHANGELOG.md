@@ -4,7 +4,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.3b6]
+## [Unreleased]## [0.1.2.5b0]
+
+## [0.1.2.4] - 2026-09-15
+
+## [0.1.2.4b4] - 2026-09-14
+### Changed
+* DashApp. Removed diskcache import
+### Added
+* Added uv support
+### Fixed
+- KpiPageTemplate.get_kpi_grid fixed bug where column show NaN if scenario name contains a dot.
+- setup.py and pyproject.toml
+- Sphinx warnings resolved
+
+## [0.1.2.4b3] - 2026-02-16
+### Added
+- DoClassModelRunner to get DB schema and credentials from Dash app instance.
+- KpiPageTemplate api to generate KPIs AgGrid with compare scenarios.
+- New DefaultKpiPage to quickly get a KPI page with Grid view.
+- OptimizationProgressPage to visualize optimization progress with Plotly line charts.
+
+## [0.1.2.4b2] - 2025-08-15
+#### Fixed
+- DashApp.run_server() now uses app.run() vs the deprecated app.run_server() method.
+- HomePageEdit. Fixed failure when downloading scenario(s) in Excel and zip files. 
+
+## [0.1.2.4b1] - 2025-06-11
+### Fixed
+- Removed more code around deprecated long-running callback option to avoid import error with recent (>2.18) versions of dash
+
+## [0.1.2.4b0] - 2025-05-13
+### Changed
+- FoliumColumnVisualizationPage default map height increased from 800 to 1000
+- RunModelPage, do_model_class_drpdwn now automatically selects the first DoModelRunnerConfig in configs
+- DoClassModelRunner.run_model() now redirects the stdout log to the RunModel page.
+- BACKWARD INCOMPATIBILITY: DoDashApp.__init__() database_type default value changed from DatabaseType.DB2 to DatabaseType.PostgreSQL
+- BACKWARD INCOMPATIBILITY: DoDashApp.__init__() db_manager_kwargs default value changed from {} to {'enable_scenario_seq': True, 'future': True}
+- Removed deprecated long-running callback option to avoid import error with recent (>2.18) versions of dash
+### Fixed
+- HomePageEdit.download_scenarios_callback: Fixed FutureWarning and close() warnings.
+- HomePageEdit.download_scenario_callback: Fixed FutureWarning and close() warnings.
+- DashApp and DoDashApp: mutable default arguments replaced
+### Added
+- UserManual.md (in documentation folder)
+- Plotly1ColumnVisualizationPage, `show_page_name` shows PageName in page.
+- OptimizationProgressPage and OptimizationProgressGridPage for graphs/table of 'OptimizationProgress' table
+- DashPlotlyManager.plotly_optimization_progress and .plotly_optimization_progress_kpis
 
 ## [0.1.2.3] - 2024-11-26
 ### Added

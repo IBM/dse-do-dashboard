@@ -21,6 +21,6 @@ class KPIComparePage(PlotlyRowsVisualizationPage):
                          enable_multi_scenario=True
                          )
 
-    def get_plotly_figures(self, pm: PlotlyManager) -> List[Figure]:
+    def get_plotly_figures(self, pm: PlotlyManager) -> list[list[Figure]]:
         return pm.plotly_kpi_compare_bar_charts()
 
