@@ -6,6 +6,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]## [0.1.2.5b0]
 
+## [0.1.2.5b0] - 2026-09-28
+### Fixed
+* Package dependencies: removed version requirements from pyproject.toml
+
 ## [0.1.2.4] - 2026-09-15
 
 ## [0.1.2.4b4] - 2026-09-14
