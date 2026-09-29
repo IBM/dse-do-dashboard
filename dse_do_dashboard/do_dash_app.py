@@ -623,7 +623,7 @@ class DoDashApp(DashApp):
 
         @cache.memoize()
         def get_scenarios_df_cached_proc() -> pd.DataFrame:
-            print(f"DB read scenario table")
+            # print(f"DB read scenario table")
             df = self.dbm.get_scenarios_df()
             return df
         self.set_scenarios_table_read_callback(get_scenarios_df_cached_proc)
