@@ -17,7 +17,7 @@ import enum
 from dse_do_dashboard.utils.dash_common_utils import ScenarioTableSchema
 
 # TODO: use dse_do_utils.scenariomanager.Platform instead?
-# VT20230412: Changed to IntWenum to allow compare by int value. To avoid circular dependenies.
+# VT20230412: Changed to IntWenum to allow compare by int value. To avoid circular dependencies.
 class HostEnvironment(enum.IntEnum):
     Local = 1  # Regular Dash
     CPD402 = 2  # Special handling of port
