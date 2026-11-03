@@ -27,14 +27,14 @@ plotly  #~=5.20.0
 numpy
 
 #notebook runner:
-nbformat==5.1.3
+nbformat  # ==5.1.3
 
 #Sphinx and m2r2 for documentation generation:
 sphinx
 m2r2
 
 # wheel for building package:
-wheel==0.36.2
+wheel  # ==0.36.2
 twine
 setuptools
 

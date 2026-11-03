@@ -11,10 +11,10 @@ license = "Apache-2.0"
 authors = [
     { name = "Victor Terpstra", email = "vterpstra@us.ibm.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.11",
     "Operating System :: OS Independent",
     "Topic :: Documentation :: Sphinx",
 ]
@@ -25,21 +25,21 @@ dependencies = [
     "dash-bootstrap-templates",
     "dash-daq",
     "dash-pivottable",
-    "diskcache",
+#    "diskcache",
     "docplex",
     "flask-caching",
-    "folium",
-    "ibm-watson-machine-learning",
-    "m2r2",
-    "multiprocess",
-    "nbformat",
+#    "folium",
+#    "ibm-watson-machine-learning",
+#    "m2r2",
+#    "multiprocess",
+#    "nbformat",
     "numpy",
     "openpyxl",
     "pandas",
     "plotly",
-    "psutil",
+#    "psutil",
     "sqlalchemy",
-    "wheel",
+#    "wheel",
 ]
 
 [project.urls]
