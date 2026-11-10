@@ -17,6 +17,7 @@ import dash
 from dse_do_utils import ScenarioManager
 
 from dse_do_dashboard.main_pages.main_page import MainPage
+from dse_do_dashboard.utils.scenario_name_validation import get_scenario_name_error, MAX_SCENARIO_NAME_LENGTH
 from dash import dcc, html, Output, Input, State, ALL, MATCH
 import dash_daq as daq
 import dash_bootstrap_components as dbc
@@ -282,8 +283,21 @@ class HomePageEdit(MainPage):
                 )
         return modal
 
+    def _find_free_duplicate_scenario_name(self, scenario_name: str, scenarios_df=None) -> str:
+        """Finds the next free scenario name based on the pattern '{scenario_name}_copy_{n}'.
+        Only uses characters that are allowed by `scenario_name_validation`, and respects the max name length."""
+        if scenarios_df is None:
+            scenarios_df = self.dash_app.dbm.get_scenarios_df()
+        i = 1
+        while True:
+            suffix = f"_copy_{i}"
+            new_name = f"{scenario_name[:MAX_SCENARIO_NAME_LENGTH - len(suffix)]}{suffix}"
+            if new_name not in scenarios_df.index:
+                return new_name
+            i += 1
+
     def get_scenario_duplicate_modal_dialog(self, scenario_name: str, scenarios_df=None):
-        new_scenario_name = self.dash_app.dbm._find_free_duplicate_scenario_name(scenario_name, scenarios_df)
+        new_scenario_name = self._find_free_duplicate_scenario_name(scenario_name, scenarios_df)
         modal = dbc.Modal(
             [
                 dbc.ModalHeader("Duplicate Scenario"),
@@ -334,6 +348,9 @@ class HomePageEdit(MainPage):
         print(f"scenario_name = {scenario_name}, extension = {file_extension}")
         try:
             if file_extension == '.xlsx':
+                name_error = get_scenario_name_error(scenario_name)
+                if name_error is not None:
+                    return html.P(f"Invalid scenario name '{scenario_name}' (file '{filename}'). {name_error}")
                 # pass
                 # Assume that the user uploaded an excel file
                 # df = pd.read_excel(io.BytesIO(decoded))
@@ -359,6 +376,10 @@ class HomePageEdit(MainPage):
                     scenario_name = pathlib.Path(info.filename).stem
                     file_extension = pathlib.Path(info.filename).suffix
                     if file_extension == '.xlsx':
+                        name_error = get_scenario_name_error(scenario_name)
+                        if name_error is not None:
+                            unzip_results.append(html.P(f"File: '{info.filename}' has an invalid scenario name. {name_error} Skipped."),)
+                            continue
                         print(f"file in zip : {info.filename}")
                         filecontents = zip_file.read(info)
                         xl = pd.ExcelFile(filecontents)
@@ -547,6 +568,10 @@ class HomePageEdit(MainPage):
                 # print(f"Rename context type = {ctx_type}")
 
                 if ctx_type == 'duplicate_scenario_modal_rename':
+                    name_error = get_scenario_name_error(new_scenario_name)
+                    if name_error is not None:
+                        print(f"Duplicating scenario to '{new_scenario_name}' rejected. {name_error}")
+                        return is_open  # Keep the dialog open, don't duplicate
                     if new_scenario_name != current_scenario_name:
                         print(f"Duplicating scenario from {current_scenario_name} to {new_scenario_name}")
                         self.dash_app.dbm.duplicate_scenario_in_db(current_scenario_name, new_scenario_name)
@@ -585,6 +610,10 @@ class HomePageEdit(MainPage):
                 # print(f"Rename context type = {ctx_type}")
 
                 if ctx_type == 'rename_scenario_modal_rename':
+                    name_error = get_scenario_name_error(new_scenario_name)
+                    if name_error is not None:
+                        print(f"Renaming scenario to '{new_scenario_name}' rejected. {name_error}")
+                        return is_open  # Keep the dialog open, don't rename
                     if new_scenario_name != current_scenario_name:
                         print(f"Renaming scenario from {current_scenario_name} to {new_scenario_name}")
                         self.dash_app.dbm.rename_scenario_in_db(current_scenario_name, new_scenario_name)

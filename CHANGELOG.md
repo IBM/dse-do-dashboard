@@ -4,7 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]## [0.1.2.7b0]
+## [Unreleased]
+
+## [0.1.2.7b0]
+### Security
+* HomePageEdit: scenario names are now validated server-side (new `dse_do_dashboard.utils.scenario_name_validation`) 
+when uploading (.xlsx and files in .zip), renaming and duplicating scenarios. Only letters, digits, spaces, `_`, `-` 
+and `.` are allowed, with a max length of 256, and the name cannot start with a dot. Invalid names are rejected.
+* KpiPageTemplate.get_kpi_grid: fixed stored XSS (client-side code injection) via scenario names. 
+Scenario names (pivot column names) were interpolated into the JavaScript `valueGetter` string of the AgGrid column 
+definitions, which dash-ag-grid evaluates client-side. The `valueGetter` is now the constant expression 
+`params.data[params.colDef.field]`, so scenario names are never part of the JavaScript source.
+### Changed
+* HomePageEdit. Duplicate Scenario: the default name for the duplicate is now `{scenario_name}_copy_{n}` instead of `{scenario_name}({n})`, since brackets are no longer allowed in scenario names.
 
 ## [0.1.2.6] - 2026-11-03
 ### Fixed
