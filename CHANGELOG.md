@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.2.7b0]
+## [0.1.2.7] - 2026-11-10
 ### Security
 * HomePageEdit: scenario names are now validated server-side (new `dse_do_dashboard.utils.scenario_name_validation`) 
 when uploading (.xlsx and files in .zip), renaming and duplicating scenarios. Only letters, digits, spaces, `_`, `-` 
