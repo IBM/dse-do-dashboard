@@ -232,16 +232,21 @@ class KpiPageTemplate(VisualizationPage):
         # AG Grid interprets dots in field names as nested object paths (e.g., "scenario.name" tries to access row.scenario.name instead of row["scenario.name"]).
         # Solution Applied:
         # Added valueGetter functions to all column definitions that use bracket notation to properly access column data:
-        # - For numeric columns: 'valueGetter': {"function": f"params.data['{c}']"}
+        # - For numeric columns: 'valueGetter': {"function": "params.data[params.colDef.field]"}
         # - For the 'kpi' column: 'valueGetter': {"function": "params.data['kpi']"}
         # This ensures that column names with dots are treated as literal strings rather than nested object paths, allowing the data to display correctly instead of showing NaN values.
+        #
+        # Security: the column name (a scenario name, i.e. user-controlled data) must NEVER be interpolated into the
+        # JavaScript source of a {"function": ...} prop. dash-ag-grid evaluates those strings client-side, so a crafted
+        # scenario name would allow code injection (stored XSS). The valueGetter is therefore a constant expression that
+        # reads the column name at runtime from the column definition.
 
         column_def_override = {
             c: {'field': c, 'headerName': c,
                 # 'type': ['numericColumn'],
                 'type': 'numericColumn',
                 'valueFormatter': {"function": f"d3.format(',.{format_num_decimals}~f')(params.value)"},
-                'valueGetter': {"function": f"params.data['{c}']"}
+                'valueGetter': {"function": "params.data[params.colDef.field]"}
                 } if c != 'kpi' else {'field': 'kpi', 'headerName': 'KPI', 'pinned': 'left', 'valueGetter': {"function": "params.data['kpi']"}}
             for c in df.columns
         }
